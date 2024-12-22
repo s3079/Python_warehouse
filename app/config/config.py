@@ -8,7 +8,7 @@ class Config:
     DB_PASSWORD = "LeeNghien97@"
     
     # Application settings
-    DEFAULT_LANGUAGE = "English"
+    DEFAULT_LANGUAGE = "English"  # Changed from 'eng' to 'English'
     WINDOW_SIZE = "1200x800"
     
     @classmethod

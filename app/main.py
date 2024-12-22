@@ -1,9 +1,19 @@
 import os
 import sys
 
+def get_resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller"""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 # Add the project root directory to Python path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
+if not hasattr(sys, '_MEIPASS'):  # Only add to path if not running as bundle
+    sys.path.insert(0, project_root)
 
 import tkinter as tk
 from tkinter import ttk
@@ -46,7 +56,15 @@ class WarehouseApp:
         
     def translate(self, key):
         """Translate a key to the current language"""
-        return LANGUAGES[self.current_language][key]
+        try:
+            return LANGUAGES[self.current_language][key]
+        except KeyError:
+            print(f"Warning: Translation key '{key}' not found for language '{self.current_language}'")
+            # Fallback to English if key not found
+            try:
+                return LANGUAGES['English'][key]
+            except KeyError:
+                return key  # Return the key itself if no translation found
         
     def create_language_selector(self):
         """Create the language selection dropdown"""
