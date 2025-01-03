@@ -1,7 +1,4 @@
-from abc import ABC, abstractmethod
-from typing import Any, Dict
-
-class BaseController(ABC):
+class BaseController:
     """Abstract base class for all controllers"""
     
     def __init__(self):
@@ -16,19 +13,12 @@ class BaseController(ABC):
     def view(self):
         return self._view
     
-    @abstractmethod
-    def initialize(self):
-        """Initialize the controller"""
-        pass
-    
-    @abstractmethod
     def refresh_view(self):
-        """Refresh the view with updated data"""
-        pass
-    
-    def handle_error(self, error: Exception, context: str = ""):
-        """Handle errors in a consistent way"""
-        error_message = f"Error in {context}: {str(error)}"
-        # Log error here if needed
-        if self._view:
-            self._view.show_error(error_message)
+        """Refresh the view with current data"""
+        if self._view and hasattr(self._view, 'refresh'):
+            self._view.refresh()
+
+    def handle_error(self, error, action):
+        """Handle errors in the controller"""
+        error_message = f"Error {action}: {str(error)}"
+        print(error_message)  # Log the error

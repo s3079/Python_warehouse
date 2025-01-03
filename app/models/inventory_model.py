@@ -8,7 +8,7 @@ class InventoryModel(BaseModel):
     def get_all(self):
         """Get all inventory items with product details"""
         query = f"""
-            SELECT i.*, p.name as product_name, p.price,
+            SELECT i.*, p.name as product_name, p.unit_price,
                    c.name as category_name, s.name as supplier_name
             FROM {self._table_name} i
             JOIN products p ON i.product_id = p.product_id
@@ -61,7 +61,7 @@ class InventoryModel(BaseModel):
     def get_by_product_id(self, product_id: int):
         """Get inventory item by product ID"""
         query = f"""
-            SELECT i.*, p.name as product_name, p.price,
+            SELECT i.*, p.name as product_name, p.unit_price,
                    c.name as category_name, s.name as supplier_name
             FROM {self._table_name} i
             JOIN products p ON i.product_id = p.product_id
@@ -75,7 +75,7 @@ class InventoryModel(BaseModel):
     def get_low_stock_items(self, threshold: int = 10):
         """Get items with quantity below threshold"""
         query = f"""
-            SELECT i.*, p.name as product_name, p.price,
+            SELECT i.*, p.name as product_name, p.unit_price,
                    c.name as category_name, s.name as supplier_name
             FROM {self._table_name} i
             JOIN products p ON i.product_id = p.product_id

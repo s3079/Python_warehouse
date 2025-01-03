@@ -1,59 +1,74 @@
-from app.controllers.base_controller import BaseController
 from app.models.category_model import CategoryModel
-from app.views.category_view import CategoryView
 
-class CategoryController(BaseController):
-    def __init__(self, parent):
-        super().__init__()
+class CategoryController:
+    def __init__(self):
         self._model = CategoryModel()
-        self._view = CategoryView(parent)
-        self._view.controller = self
-        self.initialize()
     
-    def initialize(self):
-        """Initialize the controller"""
-        self.refresh_view()
-    
-    def refresh_view(self):
-        """Refresh the view with current data"""
+    def get_all_categories(self):
+        """Get all categories with their product counts"""
         try:
             categories = self._model.get_all()
-            self._view.refresh(categories)
+            if not categories:
+                return []
+                
+            # Results are already in dictionary format
+            formatted_categories = []
+            for category in categories:
+                category_dict = {
+                    "category_id": category["category_id"],
+                    "name": category["name"],
+                    "description": category["description"] if category["description"] else "",
+                    "created_at": category["created_at"],
+                    "updated_at": category["updated_at"],
+                    "total_products": self._model.count_products(category["category_id"])
+                }
+                formatted_categories.append(category_dict)
+            return formatted_categories
         except Exception as e:
-            self.handle_error(e, "refreshing categories")
+            print(f"Error getting categories: {e}")
+            self.handle_error(e, "getting categories")
+            return []
     
-    def add_category(self, name: str, description: str):
+    def add(self, name, description=""):
         """Add a new category"""
         try:
             if not name:
                 raise ValueError("Category name is required")
-                
-            self._model.add(name, description)
-            self._view.show_success("Category added successfully")
-            self.refresh_view()
-            
+            return self._model.add(name, description)
         except Exception as e:
             self.handle_error(e, "adding category")
+            raise
     
-    def update_category(self, category_id: int, name: str, description: str):
+    def update(self, category_id, name, description=""):
         """Update an existing category"""
         try:
+            if not category_id:
+                raise ValueError("Category ID is required")
             if not name:
                 raise ValueError("Category name is required")
-                
-            self._model.update(category_id, name, description)
-            self._view.show_success("Category updated successfully")
-            self.refresh_view()
-            
+            return self._model.update(category_id, name, description)
         except Exception as e:
             self.handle_error(e, "updating category")
+            raise
     
-    def delete_category(self, category_id: int):
+    def delete(self, category_id):
         """Delete a category"""
         try:
-            self._model.delete(category_id)
-            self._view.show_success("Category deleted successfully")
-            self.refresh_view()
-            
+            if not category_id:
+                raise ValueError("Category ID is required")
+                
+            # Check if category has products
+            product_count = self._model.count_products(category_id)
+            if product_count > 0:
+                raise ValueError(f"Cannot delete category with {product_count} products")
+                
+            return self._model.delete(category_id)
         except Exception as e:
             self.handle_error(e, "deleting category")
+            raise
+    
+    def handle_error(self, error, action):
+        """Handle errors in the controller"""
+        error_message = f"Error {action}: {str(error)}"
+        print(error_message)  # Log the error
+        return error_message

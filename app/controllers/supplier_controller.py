@@ -17,11 +17,28 @@ class SupplierController(BaseController):
     def refresh_view(self):
         """Refresh the view with current data"""
         try:
-            suppliers = self._model.get_all()
+            suppliers = self.get_all()
             self._view.refresh(suppliers)
         except Exception as e:
             self.handle_error(e, "refreshing suppliers")
     
+    def get_all(self):
+        """Get all suppliers"""
+        try:
+            return self._model.get_all()
+        except Exception as e:
+            self.handle_error(e, "getting suppliers")
+            return []
+
+    def get_total_count(self):
+        """Get total number of suppliers"""
+        try:
+            suppliers = self._model.get_all()
+            return len(suppliers) if suppliers else 0
+        except Exception as e:
+            self.handle_error(e, "getting supplier count")
+            return 0
+
     def add_supplier(self, name: str, contact_name: str = None, 
                     address: str = None, phone: str = None, email: str = None):
         """Add a new supplier"""
@@ -61,3 +78,10 @@ class SupplierController(BaseController):
             
         except Exception as e:
             self.handle_error(e, "deleting supplier")
+
+    def handle_error(self, error, action):
+        """Handle errors in the controller"""
+        error_message = f"Error {action}: {str(error)}"
+        print(error_message)  # Log the error
+        if self._view and hasattr(self._view, 'show_error'):
+            self._view.show_error(error_message)
