@@ -7,8 +7,12 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
 from app.views.login_view import LoginView
+from app.config.init_db import init_database
 
 def main():
+    # Initialize database and create admin account if needed
+    init_database()
+    
     root = tk.Tk()
     root.title("Quản lý kho hàng")
     
