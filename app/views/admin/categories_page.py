@@ -154,11 +154,23 @@ class CategoriesPage(ctk.CTkFrame):
         )
         table_container.grid(row=1, column=0, sticky="nsew", padx=20, pady=(0, 20))
         table_container.grid_columnconfigure(0, weight=1)
-        table_container.grid_rowconfigure(0, weight=1)
+        table_container.grid_rowconfigure(0, weight=1)  # Content area expands
+        table_container.grid_rowconfigure(1, weight=0)  # Pagination stays at bottom
 
-        # Create single scrollable frame for both header and content
-        self.table_content = ctk.CTkScrollableFrame(
+        # Create content area with fixed height for 10 rows
+        content_frame = ctk.CTkFrame(
             table_container,
+            fg_color="transparent",
+            height=500  # Fixed height for 10 rows (10 * 50px)
+        )
+        content_frame.grid(row=0, column=0, sticky="nsew")
+        content_frame.grid_propagate(False)  # Force fixed height
+        content_frame.grid_columnconfigure(0, weight=1)
+        content_frame.grid_rowconfigure(0, weight=1)
+
+        # Create scrollable frame inside content frame
+        self.table_content = ctk.CTkScrollableFrame(
+            content_frame,
             fg_color="transparent",
             orientation="vertical"
         )
@@ -183,7 +195,7 @@ class CategoriesPage(ctk.CTkFrame):
         main_frame.grid_columnconfigure(1, weight=5, minsize=desc_width)  # Description
         main_frame.grid_columnconfigure(2, weight=2, minsize=total_width)  # Total Products
         main_frame.grid_columnconfigure(3, weight=1, minsize=actions_width)  # Actions
-
+        
         # Create header row with fixed height
         header_frame = ctk.CTkFrame(
             main_frame,
@@ -191,7 +203,8 @@ class CategoriesPage(ctk.CTkFrame):
             height=50
         )
         header_frame.grid(row=0, column=0, columnspan=4, sticky="ew", padx=1)
-        
+        header_frame.grid_propagate(False)  # Force fixed height
+
         # Configure header columns with same weights and minimum sizes
         header_frame.grid_columnconfigure(0, weight=3, minsize=name_width)  # Name
         header_frame.grid_columnconfigure(1, weight=5, minsize=desc_width)  # Description
@@ -253,13 +266,14 @@ class CategoriesPage(ctk.CTkFrame):
         self.main_content.grid_columnconfigure(2, weight=2, minsize=total_width)  # Total Products
         self.main_content.grid_columnconfigure(3, weight=1, minsize=actions_width)  # Actions
         
-        # Add pagination frame at the bottom
+        # Add pagination frame at the bottom with minimal height
         self.pagination_frame = ctk.CTkFrame(
             table_container,
             fg_color="#F8F9FA",
             height=50
         )
-        self.pagination_frame.grid(row=1, column=0, sticky="ew", padx=1)
+        self.pagination_frame.grid(row=1, column=0, sticky="ew")
+        self.pagination_frame.grid_propagate(False)  # Force fixed height
         
         # Create pagination controls
         self.create_pagination_controls()
