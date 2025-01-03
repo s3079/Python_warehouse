@@ -28,43 +28,36 @@ class CategoriesPage(ctk.CTkFrame):
         # Create all icons
         self.search_icon = ctk.CTkImage(
             light_image=Image.open(search_icon_path),
-            dark_image=Image.open(search_icon_path),
             size=(20, 20)
         )
         
         self.filter_icon = ctk.CTkImage(
             light_image=Image.open(filter_icon_path),
-            dark_image=Image.open(filter_icon_path),
             size=(20, 20)
         )
         
         self.plus_icon = ctk.CTkImage(
             light_image=Image.open(plus_icon_path),
-            dark_image=Image.open(plus_icon_path),
             size=(20, 20)
         )
         
         self.trash_icon = ctk.CTkImage(
             light_image=Image.open(trash_icon_path),
-            dark_image=Image.open(trash_icon_path),
             size=(16, 16)
         )
         
         self.edit_icon = ctk.CTkImage(
             light_image=Image.open(edit_icon_path),
-            dark_image=Image.open(edit_icon_path),
             size=(16, 16)
         )
         
         self.chevron_left_image = ctk.CTkImage(
             light_image=Image.open(chevron_left_path),
-            dark_image=Image.open(chevron_left_path),
             size=(20, 20)
         )
         
         self.chevron_right_image = ctk.CTkImage(
             light_image=Image.open(chevron_right_path),
-            dark_image=Image.open(chevron_right_path),
             size=(20, 20)
         )
         
@@ -660,12 +653,13 @@ class CategoriesPage(ctk.CTkFrame):
     def delete_category(self, category):
         """Delete a category after confirmation"""
         # Create confirmation dialog
-        dialog = ctk.CTkToplevel(self)
+        dialog = ctk.CTkToplevel()
         dialog.title("Delete Category")
         dialog.geometry("400x200")
         dialog.resizable(False, False)
-        dialog.transient(self)
+        dialog.transient(self.winfo_toplevel())  # Set the main window as parent
         dialog.grab_set()
+        dialog.focus_set()  # Give focus to the dialog
         
         # Center the dialog
         dialog.update_idletasks()
@@ -675,16 +669,14 @@ class CategoriesPage(ctk.CTkFrame):
         y = (dialog.winfo_screenheight() // 2) - (height // 2)
         dialog.geometry(f"{width}x{height}+{x}+{y}")
         
-        result = {"confirmed": False}
-        
         def confirm():
-            result["confirmed"] = True
-            dialog.destroy()
             try:
                 self.controller.delete(category["category_id"])
                 self.load_categories()
+                dialog.destroy()
             except Exception as e:
                 self.show_error_dialog("Error", f"Failed to delete category: {str(e)}")
+                dialog.destroy()
         
         # Add message
         message_frame = ctk.CTkFrame(dialog, fg_color="transparent")
@@ -773,12 +765,13 @@ class CategoriesPage(ctk.CTkFrame):
     
     def show_filter_dialog(self):
         """Show filter options dialog"""
-        dialog = ctk.CTkToplevel(self)
+        dialog = ctk.CTkToplevel()
         dialog.title("Filter Categories")
         dialog.geometry("400x300")
         dialog.resizable(False, False)
-        dialog.transient(self)
+        dialog.transient(self.winfo_toplevel())  # Set the main window as parent
         dialog.grab_set()
+        dialog.focus_set()  # Give focus to the dialog
         
         # Center the dialog
         dialog.update_idletasks()
