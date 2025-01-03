@@ -67,7 +67,6 @@ class AdminDashboard(ctk.CTk):
         logo_image = Image.open(logo_path)
         logo = ctk.CTkImage(
             light_image=logo_image,
-            dark_image=logo_image,
             size=(32, 32)
         )
         
@@ -114,12 +113,10 @@ class AdminDashboard(ctk.CTk):
             # Create both normal and active icons
             normal_icon = ctk.CTkImage(
                 light_image=icon_image,
-                dark_image=icon_image,
                 size=(24, 24)
             )
             active_icon = ctk.CTkImage(
                 light_image=active_image,
-                dark_image=active_image,
                 size=(24, 24)
             )
             
@@ -166,7 +163,6 @@ class AdminDashboard(ctk.CTk):
         
         logout_icon = ctk.CTkImage(
             light_image=red_icon,
-            dark_image=red_icon,
             size=(24, 24)
         )
         
@@ -244,7 +240,6 @@ class AdminDashboard(ctk.CTk):
         chevron_image = Image.open(chevron_path)
         chevron_icon = ctk.CTkImage(
             light_image=chevron_image,
-            dark_image=chevron_image,
             size=(16, 16)
         )
         

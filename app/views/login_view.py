@@ -60,7 +60,6 @@ class LoginView(ctk.CTkFrame):
             screen_width = self.winfo_screenwidth()
             warehouse_img = ctk.CTkImage(
                 light_image=Image.open(relative_to_assets("warehouse.png")),
-                dark_image=Image.open(relative_to_assets("warehouse.png")),
                 size=(screen_width // 2, screen_height)  # Half width, full height
             )
             self.image_label = ctk.CTkLabel(
@@ -94,7 +93,6 @@ class LoginView(ctk.CTkFrame):
         try:
             logo_img = ctk.CTkImage(
                 light_image=Image.open(relative_to_assets("logo.png")),
-                dark_image=Image.open(relative_to_assets("logo.png")),
                 size=(50, 50)
             )
             self.logo_label = ctk.CTkLabel(

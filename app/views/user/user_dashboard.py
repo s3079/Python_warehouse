@@ -76,16 +76,6 @@ class UserDashboard(ttk.Frame):
             btn.grid(row=i, column=0, sticky="ew", pady=2)
             self.menu_buttons[text] = btn
         
-        # Theme switcher at bottom
-        theme_frame = ttk.Frame(sidebar, style='Sidebar.TFrame')
-        theme_frame.grid(row=2, column=0, sticky="ew", padx=10, pady=20)
-        
-        light_btn = ttk.Button(theme_frame, text="Light", style='Menu.TButton')
-        light_btn.grid(row=0, column=0, padx=2)
-        
-        dark_btn = ttk.Button(theme_frame, text="Dark", style='Menu.TButton')
-        dark_btn.grid(row=0, column=1, padx=2)
-        
     def _create_content_area(self):
         """Create main content area"""
         self.content_frame = ttk.Frame(self, style='Content.TFrame')
