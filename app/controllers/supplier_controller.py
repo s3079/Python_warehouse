@@ -1,87 +1,40 @@
-from app.controllers.base_controller import BaseController
 from app.models.supplier_model import SupplierModel
-from app.views.supplier_view import SupplierView
 
-class SupplierController(BaseController):
-    def __init__(self, parent):
-        super().__init__()
-        self._model = SupplierModel()
-        self._view = SupplierView(parent)
-        self._view.controller = self
-        self.initialize()
-    
-    def initialize(self):
-        """Initialize the controller"""
-        self.refresh_view()
-    
-    def refresh_view(self):
-        """Refresh the view with current data"""
-        try:
-            suppliers = self.get_all()
-            self._view.refresh(suppliers)
-        except Exception as e:
-            self.handle_error(e, "refreshing suppliers")
-    
-    def get_all(self):
-        """Get all suppliers"""
-        try:
-            return self._model.get_all()
-        except Exception as e:
-            self.handle_error(e, "getting suppliers")
-            return []
+class SupplierController:
+    def __init__(self):
+        self.model = SupplierModel()
 
-    def get_total_count(self):
-        """Get total number of suppliers"""
+    def get_all_suppliers(self):
+        """Retrieve all suppliers"""
         try:
-            suppliers = self._model.get_all()
-            return len(suppliers) if suppliers else 0
+            return self.model.get_all()
         except Exception as e:
-            self.handle_error(e, "getting supplier count")
-            return 0
+            raise Exception(f"Failed to retrieve suppliers: {str(e)}")
 
-    def add_supplier(self, name: str, contact_name: str = None, 
-                    address: str = None, phone: str = None, email: str = None):
+    def add_supplier(self, name, contact_name=None, address=None, phone=None, email=None):
         """Add a new supplier"""
         try:
-            if not name:
-                raise ValueError("Supplier name is required")
-                
-            self._model.add(name, contact_name, address, phone, email)
-            self._view.show_success("Supplier added successfully")
-            self.refresh_view()
-            self._view._on_clear()  # Clear form after successful add
-            
+            return self.model.add(name, contact_name, address, phone, email)
         except Exception as e:
-            self.handle_error(e, "adding supplier")
-    
-    def update_supplier(self, supplier_id: int, name: str, contact_name: str = None, 
-                       address: str = None, phone: str = None, email: str = None):
+            raise Exception(f"Failed to add supplier: {str(e)}")
+
+    def update_supplier(self, supplier_id, name, contact_name=None, address=None, phone=None, email=None):
         """Update an existing supplier"""
         try:
-            if not name:
-                raise ValueError("Supplier name is required")
-                
-            self._model.update(supplier_id, name, contact_name, address, phone, email)
-            self._view.show_success("Supplier updated successfully")
-            self.refresh_view()
-            
+            return self.model.update(supplier_id, name, contact_name, address, phone, email)
         except Exception as e:
-            self.handle_error(e, "updating supplier")
-    
-    def delete_supplier(self, supplier_id: int):
+            raise Exception(f"Failed to update supplier: {str(e)}")
+
+    def delete_supplier(self, supplier_id):
         """Delete a supplier"""
         try:
-            self._model.delete(supplier_id)
-            self._view.show_success("Supplier deleted successfully")
-            self.refresh_view()
-            self._view._on_clear()  # Clear form after successful delete
-            
+            return self.model.delete(supplier_id)
         except Exception as e:
-            self.handle_error(e, "deleting supplier")
+            raise Exception(f"Failed to delete supplier: {str(e)}")
 
-    def handle_error(self, error, action):
-        """Handle errors in the controller"""
-        error_message = f"Error {action}: {str(error)}"
-        print(error_message)  # Log the error
-        if self._view and hasattr(self._view, 'show_error'):
-            self._view.show_error(error_message)
+    def get_supplier_by_id(self, supplier_id):
+        """Get a supplier by ID"""
+        try:
+            return self.model.get_by_id(supplier_id)
+        except Exception as e:
+            raise Exception(f"Failed to retrieve supplier: {str(e)}") 

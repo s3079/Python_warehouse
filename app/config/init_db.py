@@ -5,7 +5,6 @@ import os
 from app.config.config import Config
 
 def init_database():
-    # First, create database if it doesn't exist
     try:
         # Connect without database name first
         conn = mysql.connector.connect(
@@ -36,12 +35,14 @@ def init_database():
                 
                 for statement in statements:
                     if statement.strip():
-                        cursor.execute(statement)
+                        try:
+                            cursor.execute(statement)
+                        except Error as e:
+                            print(f"Error executing statement: {e}")
                 conn.commit()
             print("Database schema created successfully.")
             
             # Create admin user if it doesn't exist
-            # First check if admin exists
             cursor.execute("SELECT user_id FROM users WHERE username = 'admin'")
             admin_exists = cursor.fetchone()
             

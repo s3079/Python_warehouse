@@ -5,7 +5,7 @@ class CategoryController:
         self._model = CategoryModel()
     
     def get_all_categories(self):
-        """Get all categories with their product counts"""
+        """Get all categories with their product counts""" 
         try:
             categories = self._model.get_all()
             if not categories:

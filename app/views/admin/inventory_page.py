@@ -12,7 +12,7 @@ class InventoryPage(ctk.CTkFrame):
         self.current_page = 1
         self.items_per_page = 10
         self.total_items = 0
-        self.search_query = ""  # Add search query variable
+        self.search_query = ""  # Add search query variable 
         
         # Load icons
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'

@@ -5,6 +5,7 @@ from PIL import Image
 from app.views.admin.products_page import ProductsPage
 from app.views.admin.categories_page import CategoriesPage
 from app.views.admin.inventory_page import InventoryPage
+from app.views.admin.supplier_page import SupplierPage
 
 
 class AdminDashboard(ctk.CTk):
@@ -310,6 +311,8 @@ class AdminDashboard(ctk.CTk):
             page = CategoriesPage(self.content_area, self)
         elif page_name == "Inventory":
             page = InventoryPage(self.content_area, self)
+        elif page_name == "Supplier":
+            page = SupplierPage(self.content_area, self)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         

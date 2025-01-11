@@ -1,17 +1,18 @@
 import customtkinter as ctk
+from datetime import datetime
 
-class CategoryDialog(ctk.CTkToplevel):
-    def __init__(self, parent, category=None, on_save=None):
+class SupplierDialog(ctk.CTkToplevel):
+    def __init__(self, parent, supplier=None, on_save=None):
         super().__init__(parent)
         
         # Set up the dialog window
-        self.title("Add Category" if not category else "Edit Category")
-        self.geometry("500x380")
+        self.title("Add Supplier" if not supplier else "Edit Supplier")
+        self.geometry("500x600")  
         self.resizable(False, False)
         
-        # Store callback and category
+        # Store callback and supplier
         self.on_save = on_save
-        self.category = category
+        self.supplier = supplier
         
         # Make dialog modal
         self.transient(parent)
@@ -26,7 +27,7 @@ class CategoryDialog(ctk.CTkToplevel):
         main_container.grid_columnconfigure(0, weight=1)
         
         # Add header
-        header_text = "Add New Category" if not category else "Edit Category"
+        header_text = "Add New Supplier" if not supplier else "Edit Supplier"
         header = ctk.CTkLabel(
             main_container,
             text=header_text,
@@ -35,7 +36,6 @@ class CategoryDialog(ctk.CTkToplevel):
         )
         header.grid(row=0, column=0, sticky="w", pady=(0, 20))
         
-        # Add form fields
         # Name field
         name_label = ctk.CTkLabel(
             main_container,
@@ -47,34 +47,88 @@ class CategoryDialog(ctk.CTkToplevel):
         
         self.name_entry = ctk.CTkEntry(
             main_container,
-            placeholder_text="Enter category name",
+            placeholder_text="Enter supplier name",
             height=40,
             font=("", 13),
             corner_radius=8
         )
         self.name_entry.grid(row=2, column=0, sticky="ew", pady=(0, 15))
         
-        # Description field
-        description_label = ctk.CTkLabel(
+        # Contact Name field
+        contact_name_label = ctk.CTkLabel(
             main_container,
-            text="Description",
+            text="Contact Name",
             font=("", 13, "bold"),
             text_color="#16151C"
         )
-        description_label.grid(row=3, column=0, sticky="w", pady=(0, 5))
+        contact_name_label.grid(row=3, column=0, sticky="w", pady=(0, 5))
         
-        self.description_text = ctk.CTkTextbox(
+        self.contact_name_entry = ctk.CTkEntry(
             main_container,
-            height=120,
+            placeholder_text="Enter contact name",
+            height=40,
             font=("", 13),
-            corner_radius=8,
-            wrap="word"
+            corner_radius=8
         )
-        self.description_text.grid(row=4, column=0, sticky="ew", pady=(0, 20))
+        self.contact_name_entry.grid(row=4, column=0, sticky="ew", pady=(0, 15))
+        
+        # Email field
+        email_label = ctk.CTkLabel(
+            main_container,
+            text="Email",
+            font=("", 13, "bold"),
+            text_color="#16151C"
+        )
+        email_label.grid(row=5, column=0, sticky="w", pady=(0, 5))
+        
+        self.email_entry = ctk.CTkEntry(
+            main_container,
+            placeholder_text="Enter email address",
+            height=40,
+            font=("", 13),
+            corner_radius=8
+        )
+        self.email_entry.grid(row=6, column=0, sticky="ew", pady=(0, 15))
+        
+        # Phone field
+        phone_label = ctk.CTkLabel(
+            main_container,
+            text="Phone",
+            font=("", 13, "bold"),
+            text_color="#16151C"
+        )
+        phone_label.grid(row=7, column=0, sticky="w", pady=(0, 5))
+        
+        self.phone_entry = ctk.CTkEntry(
+            main_container,
+            placeholder_text="Enter phone number",
+            height=40,
+            font=("", 13),
+            corner_radius=8
+        )
+        self.phone_entry.grid(row=8, column=0, sticky="ew", pady=(0, 15))
+        
+        # Address field
+        address_label = ctk.CTkLabel(
+            main_container,
+            text="Address",
+            font=("", 13, "bold"),
+            text_color="#16151C"
+        )
+        address_label.grid(row=9, column=0, sticky="w", pady=(0, 5))
+        
+        self.address_entry = ctk.CTkEntry(
+            main_container,
+            placeholder_text="Enter address",
+            height=40,
+            font=("", 13),
+            corner_radius=8
+        )
+        self.address_entry.grid(row=10, column=0, sticky="ew", pady=(0, 20))
         
         # Add buttons container
         buttons_frame = ctk.CTkFrame(main_container, fg_color="transparent")
-        buttons_frame.grid(row=5, column=0, sticky="ew")
+        buttons_frame.grid(row=11, column=0, sticky="ew")
         buttons_frame.grid_columnconfigure(0, weight=1)
         
         # Cancel button
@@ -93,49 +147,58 @@ class CategoryDialog(ctk.CTkToplevel):
         # Save button
         save_button = ctk.CTkButton(
             buttons_frame,
-            text="Save Category",
+            text="Save Supplier",
             fg_color="#006EC4",
             text_color="white",
             hover_color="#0059A1",
             height=45,
             corner_radius=8,
-            command=self.save_category
+            command=self.save_supplier
         )
         save_button.grid(row=0, column=1, sticky="e")
         
         # If editing, populate fields with existing data
-        if category:
-            self.name_entry.insert(0, category["name"])
-            if category["description"]:
-                self.description_text.insert("1.0", category["description"])
+        if supplier:
+            self.name_entry.insert(0, supplier.get("name", ""))
+            self.contact_name_entry.insert(0, supplier.get("contact_name", ""))
+            self.email_entry.insert(0, supplier.get("email", ""))
+            self.phone_entry.insert(0, supplier.get("phone", ""))
+            self.address_entry.insert(0, supplier.get("address", ""))
         
         # Focus on name entry
         self.name_entry.focus_set()
     
-    def save_category(self):
-        """Validate and save category data"""
+    def save_supplier(self):
+        """Validate and save supplier data"""
         name = self.name_entry.get().strip()
-        description = self.description_text.get("1.0", "end-1c").strip()
+        contact_name = self.contact_name_entry.get().strip()
+        email = self.email_entry.get().strip()
+        phone = self.phone_entry.get().strip()
+        address = self.address_entry.get().strip()
         
         # Validate name
         if not name:
             self.show_error("Name is required")
             return
         
-        # Prepare category data
-        category_data = {
+        # Prepare supplier data
+        supplier_data = {
             "name": name,
-            "description": description
+            "contact_name": contact_name,
+            "email": email,
+            "phone": phone,
+            "address": address,
+            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
         }
         
-        # If editing, include category_id
-        if self.category:
-            category_data["category_id"] = self.category["category_id"]
+        # If editing, include supplier_id
+        if self.supplier:
+            supplier_data["supplier_id"] = self.supplier.get("supplier_id")
         
         # Call save callback
         if self.on_save:
             try:
-                self.on_save(category_data)
+                self.on_save(supplier_data)
                 self.destroy()
             except Exception as e:
                 self.show_error(str(e))
