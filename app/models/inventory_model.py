@@ -85,3 +85,8 @@ class InventoryModel(BaseModel):
             ORDER BY i.quantity ASC
         """
         return self._execute_query(query, (threshold,))
+    
+    def get_all_products(self):
+        """Get all products"""
+        query = "SELECT product_id, name FROM products ORDER BY name"
+        return self._execute_query(query)

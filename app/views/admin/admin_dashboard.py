@@ -4,6 +4,8 @@ from pathlib import Path
 from PIL import Image
 from app.views.admin.products_page import ProductsPage
 from app.views.admin.categories_page import CategoriesPage
+from app.views.admin.inventory_page import InventoryPage
+
 
 class AdminDashboard(ctk.CTk):
     def __init__(self, user_data):
@@ -306,6 +308,8 @@ class AdminDashboard(ctk.CTk):
             page = ProductsPage(self.content_area, self)
         elif page_name == "Category":  
             page = CategoriesPage(self.content_area, self)
+        elif page_name == "Inventory":
+            page = InventoryPage(self.content_area, self)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         
