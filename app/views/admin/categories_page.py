@@ -652,31 +652,7 @@ class CategoriesPage(ctk.CTkFrame):
             
     def delete_category(self, category):
         """Delete a category after confirmation"""
-        # Create confirmation dialog
-        dialog = ctk.CTkToplevel()
-        dialog.title("Delete Category")
-        dialog.geometry("400x200")
-        dialog.resizable(False, False)
-        dialog.transient(self.winfo_toplevel())  # Set the main window as parent
-        dialog.grab_set()
-        dialog.focus_set()  # Give focus to the dialog
-        
-        # Center the dialog
-        dialog.update_idletasks()
-        width = dialog.winfo_width()
-        height = dialog.winfo_height()
-        x = (dialog.winfo_screenwidth() // 2) - (width // 2)
-        y = (dialog.winfo_screenheight() // 2) - (height // 2)
-        dialog.geometry(f"{width}x{height}+{x}+{y}")
-        
-        def confirm():
-            try:
-                self.controller.delete(category["category_id"])
-                self.load_categories()
-                dialog.destroy()
-            except Exception as e:
-                self.show_error_dialog("Error", f"Failed to delete category: {str(e)}")
-                dialog.destroy()
+        dialog = CenterDialog(self, "Delete Category")
         
         # Add message
         message_frame = ctk.CTkFrame(dialog, fg_color="transparent")
@@ -728,18 +704,23 @@ class CategoriesPage(ctk.CTkFrame):
             width=100,
             height=40,
             corner_radius=8,
-            command=confirm
+            command=lambda: self.confirm_delete(category, dialog)
         )
         delete_button.pack(side="left")
     
+    def confirm_delete(self, category, dialog):
+        """Confirm the deletion of a category"""
+        try:
+            self.controller.delete(category["category_id"])
+            self.load_categories()
+            dialog.destroy()
+        except Exception as e:
+            self.show_error_dialog("Error", f"Failed to delete category: {str(e)}")
+            dialog.destroy()
+    
     def show_error_dialog(self, title, message):
         """Show an error dialog"""
-        dialog = ctk.CTkToplevel(self)
-        dialog.title(title)
-        dialog.geometry("300x150")
-        dialog.resizable(False, False)
-        dialog.transient(self)
-        dialog.grab_set()
+        dialog = CenterDialog(self, title, "300x150")
         
         # Add error message
         message_label = ctk.CTkLabel(
@@ -765,21 +746,7 @@ class CategoriesPage(ctk.CTkFrame):
     
     def show_filter_dialog(self):
         """Show filter options dialog"""
-        dialog = ctk.CTkToplevel()
-        dialog.title("Filter Categories")
-        dialog.geometry("400x300")
-        dialog.resizable(False, False)
-        dialog.transient(self.winfo_toplevel())  # Set the main window as parent
-        dialog.grab_set()
-        dialog.focus_set()  # Give focus to the dialog
-        
-        # Center the dialog
-        dialog.update_idletasks()
-        width = dialog.winfo_width()
-        height = dialog.winfo_height()
-        x = (dialog.winfo_screenwidth() // 2) - (width // 2)
-        y = (dialog.winfo_screenheight() // 2) - (height // 2)
-        dialog.geometry(f"{width}x{height}+{x}+{y}")
+        dialog = CenterDialog(self, "Filter Categories", "400x300")
         
         # Store filter states
         self.name_sort = tk.StringVar(value="none")  # none, asc, desc
@@ -919,3 +886,41 @@ class CategoriesPage(ctk.CTkFrame):
         dialog.destroy()
         self.current_page = 1  # Reset to first page
         self.load_categories()
+
+class CenterDialog(ctk.CTkToplevel):
+    def __init__(self, parent, title, size="400x200"):
+        super().__init__(parent)
+        self.title(title)
+        self.geometry(size)
+        self.resizable(False, False)
+        self.transient(parent)  # Set the main window as parent
+        self.grab_set()
+        self.focus_set()  # Give focus to the dialog
+        
+        # Center the dialog
+        self.center_dialog()
+    
+    def center_dialog(self):
+        """Center dialog window relative to its parent window"""
+        def _center():
+            self.update_idletasks()
+            
+            # Get dialog dimensions
+            dialog_width = self.winfo_width()
+            dialog_height = self.winfo_height()
+            
+            # Get parent window position and dimensions
+            parent_x = self.master.winfo_rootx()
+            parent_y = self.master.winfo_rooty()
+            parent_width = self.master.winfo_width()
+            parent_height = self.master.winfo_height()
+            
+            # Calculate position
+            x = parent_x + (parent_width - dialog_width) // 2
+            y = parent_y + (parent_height - dialog_height) // 2
+            
+            # Set dialog position
+            self.geometry(f"{dialog_width}x{dialog_height}+{x}+{y}")
+        
+        # Schedule centering after the dialog is rendered
+        self.after(10, _center)

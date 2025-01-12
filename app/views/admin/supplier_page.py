@@ -760,7 +760,7 @@ class SupplierPage(ctk.CTkFrame):
         """Show filter options dialog"""
         dialog = ctk.CTkToplevel(self)
         dialog.title("Filter Suppliers")
-        dialog.geometry("400x400")
+        dialog.geometry("400x600")
         dialog.resizable(False, False)
         dialog.transient(self)
         dialog.grab_set()

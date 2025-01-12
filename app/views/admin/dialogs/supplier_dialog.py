@@ -170,25 +170,26 @@ class SupplierDialog(ctk.CTkToplevel):
     
     def save_supplier(self):
         """Validate and save supplier data"""
+        # Get values from fields
         name = self.name_entry.get().strip()
         contact_name = self.contact_name_entry.get().strip()
         email = self.email_entry.get().strip()
         phone = self.phone_entry.get().strip()
         address = self.address_entry.get().strip()
-        
+
         # Validate name
         if not name:
             self.show_error("Name is required")
             return
         
-        # Prepare supplier data
+        # Prepare supplier data with correct field names
         supplier_data = {
-            "name": name,
-            "contact_name": contact_name,
-            "email": email,
-            "phone": phone,
-            "address": address,
-            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
+            "supplier_name": name,
+            "supplier_contact_name": contact_name,
+            "supplier_address": address,
+            "supplier_phone": phone,
+            "supplier_email": email,
+            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         
         # If editing, include supplier_id
