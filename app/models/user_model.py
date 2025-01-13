@@ -48,12 +48,12 @@ class UserModel(BaseModel):
         return cursor.fetchall()
 
     def approve_user(self, user_id):
-        """Approve a user"""
+        """Approve a user and set role_id to 3"""
         try:
             cursor = self.conn.cursor()
             cursor.execute("""
                 UPDATE users 
-                SET is_approved = TRUE 
+                SET is_approved = TRUE, role_id = 3
                 WHERE user_id = %s
             """, (user_id,))
             self.conn.commit()
@@ -230,5 +230,89 @@ class UserModel(BaseModel):
         except Exception as e:
             self.conn.rollback()
             raise e
+        finally:
+            cursor.close()
+
+    def get_roles(self):
+        """Get all user roles except administrator"""
+        try:
+            cursor = self.conn.cursor(dictionary=True)
+            cursor.execute("""
+                SELECT * FROM user_roles
+                WHERE role_name IN ('user', 'manager')
+                ORDER BY role_name
+            """)
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error getting roles: {str(e)}")
+            return []
+
+    def get_approved_users(self):
+        """Get approved users"""
+        try:
+            cursor = self.conn.cursor(dictionary=True)
+            cursor.execute("""
+                SELECT u.*, r.role_name 
+                FROM users u
+                JOIN user_roles r ON u.role_id = r.role_id
+                WHERE u.is_approved = TRUE
+                ORDER BY u.username
+            """)
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error getting approved users: {str(e)}")
+            return []
+
+    def get_users_with_pagination(self, offset=0, limit=10, search_query=""):
+        """Get users with pagination and optional search query"""
+        cursor = self.conn.cursor(dictionary=True)
+        try:
+            # Build the base query
+            query = """
+                SELECT u.*, r.role_name 
+                FROM users u
+                JOIN user_roles r ON u.role_id = r.role_id
+            """
+            # Add search condition if search_query is provided
+            if search_query:
+                query += " WHERE u.username LIKE %s OR u.email LIKE %s"
+                search_term = f"%{search_query}%"
+                cursor.execute(query + " ORDER BY u.username LIMIT %s OFFSET %s", (search_term, search_term, limit, offset))
+            else:
+                cursor.execute(query + " ORDER BY u.username LIMIT %s OFFSET %s", (limit, offset))
+            
+            users = cursor.fetchall()
+
+            # Get total count for pagination
+            cursor.execute("SELECT COUNT(*) FROM users")
+            total_count = cursor.fetchone()['COUNT(*)']
+
+            return users, total_count
+        except Exception as e:
+            print(f"Error fetching users with pagination: {str(e)}")
+            return [], 0
+        finally:
+            cursor.close()
+
+    def set_user_role(self, user_id, new_role):
+        """Update the role of a user identified by user_id."""
+        try:
+            cursor = self.conn.cursor(dictionary=True)
+            
+            # Fetch the role_id for the new_role
+            cursor.execute("SELECT role_id FROM user_roles WHERE role_name = %s", (new_role,))
+            role = cursor.fetchone()
+            if not role:
+                print(f"Role '{new_role}' not found.")
+                return False
+
+            # Update the user's role_id
+            cursor.execute("UPDATE users SET role_id = %s WHERE user_id = %s", (role['role_id'], user_id))
+            self.conn.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Error in UserModel.set_user_role: {e}")
+            return False
         finally:
             cursor.close()

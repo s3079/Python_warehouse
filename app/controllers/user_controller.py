@@ -149,3 +149,44 @@ class UserController:
             
         except Exception as e:
             return False, f"Error changing password: {str(e)}"
+
+    def get_roles(self):
+        """Get all user roles"""
+        try:
+            return self.model.get_roles()
+        except Exception as e:
+            print(f"Error getting roles: {str(e)}")
+            return []
+
+    def get_approved_users(self):
+        """Get approved users"""
+        try:
+            return self.model.get_approved_users()
+        except Exception as e:
+            print(f"Error getting approved users: {str(e)}")
+            return []
+
+    def get_users_paginated(self, offset=0, limit=10, search_query=""):
+        """Fetch users with pagination and optional search query"""
+        try:
+            users, total_count = self.model.get_users_with_pagination(
+                offset=offset,
+                limit=limit,
+                search_query=search_query
+            )
+            return users, total_count
+        except Exception as e:
+            print(f"Error fetching paginated users: {str(e)}")
+            return [], 0
+
+    def set_user_role(self, user_id, new_role):
+        """Set the role of a user identified by user_id to new_role."""
+        try:
+            # Use UserModel to update the user's role
+            success = self.model.set_user_role(user_id, new_role)
+            if success:
+                return True
+            return False
+        except Exception as e:
+            print(f"Error updating user role: {e}")
+            return False

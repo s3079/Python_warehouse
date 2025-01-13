@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS user_roles (
 -- Insert default roles
 INSERT INTO user_roles (role_name, description) VALUES
 ('administrator', 'Full access to all system features'),
-('registered_user', 'Limited access to basic features');
+('registered_user', 'Wait for approval'),
+('user', 'View only'),
+('manager', 'Rights to manage all except users'); 
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (

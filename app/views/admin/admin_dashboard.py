@@ -6,6 +6,7 @@ from app.views.admin.products_page import ProductsPage
 from app.views.admin.categories_page import CategoriesPage
 from app.views.admin.inventory_page import InventoryPage
 from app.views.admin.supplier_page import SupplierPage
+from app.views.admin.users_page import UsersPage
 
 
 class AdminDashboard(ctk.CTk):
@@ -267,7 +268,18 @@ class AdminDashboard(ctk.CTk):
         self.show_page('Dashboard')
 
     def logout(self):
-        self.quit()  # For now, just close the window. You can add proper logout logic here.
+        """Log out the user and return to the login screen."""
+        from tkinter import messagebox
+
+        # Show confirmation dialog
+        if messagebox.askyesno("Confirm Logout", "Are you sure you want to log out?"):
+            self.destroy()  # Close the current dashboard window
+
+            # Import and open the login screen
+            from app.views.login_view import LoginView
+            root = tk.Tk()
+            login_screen = LoginView(root)
+            root.mainloop()
 
     def on_resize(self, event):
         self.update_idletasks()
@@ -313,6 +325,8 @@ class AdminDashboard(ctk.CTk):
             page = InventoryPage(self.content_area, self)
         elif page_name == "Supplier":
             page = SupplierPage(self.content_area, self)
+        elif page_name == "Users":
+            page = UsersPage(self.content_area, self)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         
