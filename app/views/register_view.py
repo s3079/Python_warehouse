@@ -252,7 +252,7 @@ class RegisterView(ctk.CTkFrame):
             messagebox.showerror("Error", "Mật khẩu không khớp")
             return
 
-        success = self._controller.register(username, email, password)
+        success = self._controller.register(username,password, email)
         if success:
             messagebox.showinfo("Success", "Đăng ký thành công")
             self._on_login_click()

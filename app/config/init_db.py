@@ -18,7 +18,7 @@ def init_database():
             
             # Create database if it doesn't exist
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {Config.DB_NAME}")
-            print(f"Database '{Config.DB_NAME}' created or already exists.")
+            print(f"Cơ sở dữ liệu '{Config.DB_NAME}' đã được tạo hoặc đã tồn tại.")
             
             # Switch to the database
             cursor.execute(f"USE {Config.DB_NAME}")
@@ -40,7 +40,7 @@ def init_database():
                         except Error as e:
                             print(f"Error executing statement: {e}")
                 conn.commit()
-            print("Database schema created successfully.")
+            print("Cấu trúc cơ sở dữ liệu đã được tạo thành công.")
             
             # Create admin user if it doesn't exist
             cursor.execute("SELECT user_id FROM users WHERE username = 'admin'")
@@ -62,14 +62,14 @@ def init_database():
                         VALUES (%s, %s, %s, %s)
                     """, ('admin', hashed_password, 'admin@warehouse.com', admin_role[0]))
                     conn.commit()
-                    print("Admin account created successfully.")
+                    print("Tài khoản quản trị viên đã được tạo thành công.")
                 else:
-                    print("Error: Administrator role not found.")
+                    print("Lỗi: Không tìm thấy vai trò quản trị viên.")
             else:
-                print("Admin account already exists.")
+                print("Tài khoản quản trị viên đã tồn tại.")
                 
     except Error as e:
-        print(f"Error: {e}")
+        print(f"Lỗi: {e}")
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()

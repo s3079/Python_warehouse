@@ -16,6 +16,10 @@ def main():
     root = tk.Tk()
     root.title("Quản lý kho hàng")
     
+    # Set default font for the application
+    default_font = ('Helvetica', 12)
+    root.option_add("*Font", default_font)
+    
     # Set initial window size
     window_width = 1024
     window_height = 768

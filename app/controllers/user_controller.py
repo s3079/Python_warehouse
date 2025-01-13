@@ -56,7 +56,6 @@ class UserController:
 
             # Remove password from user data before returning
             user_data = {k: v for k, v in user.items() if k != 'password'}
-            print("User logged in:", user_data)
             return True, user_data
 
         except Exception as e:

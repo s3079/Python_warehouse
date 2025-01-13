@@ -1,215 +1,174 @@
-import tkinter as tk
-from tkinter import ttk
-from PIL import Image, ImageTk
-import os
-from app.controllers.product_controller import ProductController
+import customtkinter as ctk
+from pathlib import Path
+from PIL import Image
+from app.views.admin.products_page import ProductsPage
+from app.views.admin.categories_page import CategoriesPage
+from app.views.admin.inventory_page import InventoryPage
+from app.views.admin.supplier_page import SupplierPage
 
-class UserDashboard(ttk.Frame):
-    def __init__(self, parent=None, user_data=None):
-        super().__init__(parent)
-        self.user_data = user_data
-        self._init_controllers()
-        self._setup_ui()
+class UserDashboard(ctk.CTk):
+    def __init__(self, user_data):
+        super().__init__()
+        ctk.set_appearance_mode("light")
+        self.title('User Dashboard')
+        self.geometry('1200x700')
+        self.configure(fg_color="white")
         
-    def _init_controllers(self):
-        """Initialize controllers"""
-        self._product_controller = ProductController(self)
-
-    def _setup_ui(self):
-        """Setup the user dashboard interface"""
         # Configure grid
-        self.grid(sticky="nsew")
-        self.grid_columnconfigure(1, weight=1)  # Content area expands
+        self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
         
-        # Create and configure style
-        self.style = ttk.Style()
-        self.style.configure('Sidebar.TFrame', background='#EBF3FA')
-        self.style.configure('Content.TFrame', background='white')
-        self.style.configure('Header.TLabel', font=('Helvetica', 20, 'bold'))
-        self.style.configure('Menu.TButton', font=('Helvetica', 12), padding=10)
-        
-        # Create main frames
-        self._create_sidebar()
-        self._create_content_area()
-        
-    def _create_sidebar(self):
-        """Create sidebar with navigation"""
-        sidebar = ttk.Frame(self, style='Sidebar.TFrame', width=250)
-        sidebar.grid(row=0, column=0, sticky="ns")
+        # Main container
+        main_container = ctk.CTkFrame(self, fg_color="white")
+        main_container.grid(row=0, column=0, columnspan=2, sticky="nsew", padx=20, pady=20)
+        main_container.grid_columnconfigure(1, weight=1)
+        main_container.grid_rowconfigure(0, weight=1)
+
+        # Sidebar
+        sidebar = ctk.CTkFrame(main_container, fg_color="#E8FAFF", corner_radius=20)
+        sidebar.grid(row=0, column=0, sticky="nsew", padx=(0, 30))
+        sidebar.grid_columnconfigure(0, weight=1)
         sidebar.grid_propagate(False)
+        sidebar.configure(width=280)
+
+        # Icons
+        self.buttons = []
+        self.icons = {}
+        self.active_icons = {}
+        icon_files = {
+            'Dashboard': 'dashboard.png',
+            'Products': 'products.png',
+            'Category': 'category.png',
+            'Inventory': 'inventory.png',
+            'Supplier': 'supplier.png',
+            'Logout': 'logout.png'
+        }
+        assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
         
-        # Logo and title
-        logo_frame = ttk.Frame(sidebar, style='Sidebar.TFrame')
-        logo_frame.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+        # Sidebar content
+        sidebar_content = ctk.CTkFrame(sidebar, fg_color="transparent")
+        sidebar_content.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # Load and display logo if exists
-        try:
-            logo_img = Image.open("app/assets/logo.png")
-            logo_img = logo_img.resize((32, 32), Image.Resampling.LANCZOS)
-            logo_photo = ImageTk.PhotoImage(logo_img)
-            logo_label = ttk.Label(logo_frame, image=logo_photo, style='Sidebar.TFrame')
-            logo_label.image = logo_photo  # Keep reference
-            logo_label.grid(row=0, column=0, padx=(0, 10))
-        except:
-            pass  # Skip logo if file not found
+        # Logo
+        logo_frame = ctk.CTkFrame(sidebar_content, fg_color="transparent")
+        logo_frame.pack(fill="x", pady=(0, 30))
+        logo_path = str(Path(__file__).parent.parent.parent / 'assets' / 'logo.png')
+        logo_image = Image.open(logo_path)
+        logo = ctk.CTkImage(light_image=logo_image, size=(32, 32))
+        logo_label = ctk.CTkLabel(logo_frame, image=logo, text="")
+        logo_label.pack(side="left", padx=(0, 10))
+        project_name = ctk.CTkLabel(logo_frame, text="Warehouse", font=("", 20, "bold"), text_color="#16151C")
+        project_name.pack(side="left")
         
-        title_label = ttk.Label(logo_frame, text="Inventory", 
-                              style='Header.TLabel')
-        title_label.grid(row=0, column=1)
-        
-        # Menu items
-        menu_frame = ttk.Frame(sidebar, style='Sidebar.TFrame')
-        menu_frame.grid(row=1, column=0, sticky="ew", padx=10)
-        
-        self.menu_buttons = {}
-        menu_items = [
-            ("Dashboard", "grid.png"),
-            ("Products", "box.png"),
-            ("Inventory", "package.png"),
-            ("Settings", "settings.png")
-        ]
-        
-        for i, (text, _) in enumerate(menu_items):
-            btn = ttk.Button(menu_frame, text=text, style='Menu.TButton',
-                           command=lambda t=text: self._handle_menu_click(t))
-            btn.grid(row=i, column=0, sticky="ew", pady=2)
-            self.menu_buttons[text] = btn
-        
-    def _create_content_area(self):
-        """Create main content area"""
-        self.content_frame = ttk.Frame(self, style='Content.TFrame')
-        self.content_frame.grid(row=0, column=1, sticky="nsew")
-        self.content_frame.grid_columnconfigure(0, weight=1)
-        self.content_frame.grid_rowconfigure(1, weight=1)
-        
-        # Create pages
-        self.pages = {}
-        self._setup_items_page()  # Initial page
-        
-    def _setup_items_page(self):
-        """Set up the items page with view-only functionality"""
-        page = ttk.Frame(self.content_frame)
-        page.grid(row=0, column=0, sticky="nsew")
-        page.grid_columnconfigure(0, weight=1)
-        
-        # Header section
-        header_frame = ttk.Frame(page)
-        header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
-        header_frame.grid_columnconfigure(1, weight=1)
-        
-        # Title area
-        title_frame = ttk.Frame(header_frame)
-        title_frame.grid(row=0, column=0, sticky="w")
-        
-        page_title = ttk.Label(title_frame, text="Available Items",
-                             style='Header.TLabel')
-        page_title.grid(row=0, column=0, sticky="w")
-        
-        subtitle = ttk.Label(title_frame, text="View available items and their details")
-        subtitle.grid(row=1, column=0, sticky="w")
-        
-        # Search and user area
-        search_frame = ttk.Frame(header_frame)
-        search_frame.grid(row=0, column=1, sticky="e")
-        
-        search_entry = ttk.Entry(search_frame, width=30)
-        search_entry.insert(0, "Search")
-        search_entry.grid(row=0, column=0, padx=5)
-        
-        notif_btn = ttk.Button(search_frame, text="🔔")
-        notif_btn.grid(row=0, column=1, padx=5)
-        
-        user_btn = ttk.Button(search_frame, text="User")
-        user_btn.grid(row=0, column=2, padx=5)
-        
-        # Toolbar
-        toolbar_frame = ttk.Frame(page)
-        toolbar_frame.grid(row=1, column=0, sticky="ew", padx=20, pady=10)
-        toolbar_frame.grid_columnconfigure(1, weight=1)
-        
-        # Item search
-        item_search = ttk.Entry(toolbar_frame, width=40)
-        item_search.insert(0, "Search Item")
-        item_search.grid(row=0, column=0, padx=5)
-        
-        # Filter button
-        filter_btn = ttk.Button(toolbar_frame, text="Filter")
-        filter_btn.grid(row=0, column=2, padx=5)
-        
-        # Table
-        table_frame = ttk.Frame(page)
-        table_frame.grid(row=2, column=0, sticky="nsew", padx=20, pady=10)
-        table_frame.grid_columnconfigure(0, weight=1)
-        table_frame.grid_rowconfigure(0, weight=1)
-        
-        columns = ("name", "model", "type", "store", "amount", "status")
-        self.table = ttk.Treeview(table_frame, columns=columns, show="headings")
-        
-        # Configure columns
-        self.table.heading("name", text="Item Name")
-        self.table.heading("model", text="Model")
-        self.table.heading("type", text="Type")
-        self.table.heading("store", text="Store")
-        self.table.heading("amount", text="Amount")
-        self.table.heading("status", text="Status")
-        
-        # Add scrollbars
-        y_scroll = ttk.Scrollbar(table_frame, orient="vertical",
-                               command=self.table.yview)
-        x_scroll = ttk.Scrollbar(table_frame, orient="horizontal",
-                               command=self.table.xview)
-        self.table.configure(yscrollcommand=y_scroll.set,
-                           xscrollcommand=x_scroll.set)
-        
-        # Grid table and scrollbars
-        self.table.grid(row=0, column=0, sticky="nsew")
-        y_scroll.grid(row=0, column=1, sticky="ns")
-        x_scroll.grid(row=1, column=0, sticky="ew")
-        
-        # Load items
-        self._load_items()
-        
-        # Pagination
-        pagination_frame = ttk.Frame(page)
-        pagination_frame.grid(row=3, column=0, sticky="ew", padx=20, pady=10)
-        pagination_frame.grid_columnconfigure(1, weight=1)
-        
-        showing_label = ttk.Label(pagination_frame,
-                                text="Showing 1 to 10 out of 40 records")
-        showing_label.grid(row=0, column=0, sticky="w")
-        
-        page_combo = ttk.Combobox(pagination_frame, values=["10", "20", "30", "40", "50"],
-                                width=10, state="readonly")
-        page_combo.set("10")
-        page_combo.grid(row=0, column=2, sticky="e")
-        
-        self.pages['Products'] = page
-        
-    def _load_items(self):
-        """Load items into the table"""
-        # Clear existing items
-        for item in self.table.get_children():
-            self.table.delete(item)
-            
-        # Load new items
-        items = self._product_controller.get_all()
-        for item in items:
-            self.table.insert("", "end", values=(
-                item['name'],
-                item.get('model', ''),
-                item.get('type', 'IE Project Items'),
-                item.get('store', 'HQ Main Store'),
-                f"{item.get('quantity', 0)} pcs",
-                item.get('status', 'Available')
-            ))
-            
-    def _handle_menu_click(self, menu_text):
-        """Handle menu button clicks"""
-        if menu_text in self.pages:
-            for page in self.pages.values():
-                page.grid_remove()
-            self.pages[menu_text].grid()
+        # Menu
+        menu_container = ctk.CTkFrame(sidebar_content, fg_color="transparent")
+        menu_container.pack(fill="both", expand=True)
+        sidebar_items = ['Dashboard', 'Products', 'Category', 'Inventory', 'Supplier']
+        for item in sidebar_items:
+            icon_path = str(assets_path / icon_files[item])
+            icon_image = Image.open(icon_path)
+            active_image = icon_image.copy().convert('RGBA')
+            data = active_image.getdata()
+            new_data = [(17, 24, 39, item_data[3]) if item_data[3] != 0 else item_data for item_data in data]
+            active_image.putdata(new_data)
+            normal_icon = ctk.CTkImage(light_image=icon_image, size=(24, 24))
+            active_icon = ctk.CTkImage(light_image=active_image, size=(24, 24))
+            self.icons[item] = normal_icon
+            self.active_icons[item] = active_icon
+            button = ctk.CTkButton(menu_container, text=item, command=lambda i=item: self.show_page(i),
+                                   fg_color="transparent", text_color="#16151C", image=normal_icon,
+                                   compound="left", anchor="w", height=40, corner_radius=8, font=("", 13))
+            button.pack(fill='x', pady=5)
+            self.buttons.append(button)
+
+        # Logout button
+        logout_frame = ctk.CTkFrame(sidebar_content, fg_color="transparent", height=50)
+        logout_frame.pack(fill="x", side="bottom")
+        logout_icon_path = str(assets_path / 'logout.png')
+        logout_icon_image = Image.open(logout_icon_path)
+        red_icon = logout_icon_image.copy().convert('RGBA')
+        data = red_icon.getdata()
+        new_data = [(255, 72, 66, item[3]) if item[3] != 0 else item for item in data]
+        red_icon.putdata(new_data)
+        logout_icon = ctk.CTkImage(light_image=red_icon, size=(24, 24))
+        logout_button = ctk.CTkButton(logout_frame, text="Log Out", command=self.logout,
+                                      fg_color="transparent", text_color="#FF4842", image=logout_icon,
+                                      compound="left", anchor="w", height=40, corner_radius=8, font=("", 13),
+                                      hover=True, hover_color="#FFE8E7")
+        logout_button.pack(fill="x")
+
+        # Right container
+        right_container = ctk.CTkFrame(main_container, fg_color="transparent")
+        right_container.grid(row=0, column=1, sticky="nsew")
+        right_container.grid_rowconfigure(1, weight=1)
+        right_container.grid_columnconfigure(0, weight=1)
+
+        # Header
+        header = ctk.CTkFrame(right_container, fg_color="transparent")
+        header.grid(row=0, column=0, sticky="ew", padx=20, pady=(20, 0))
+        header.grid_columnconfigure(1, weight=1)
+        self.page_title = ctk.CTkLabel(header, text="Dashboard", font=("", 24, "bold"), text_color="#16151C")
+        self.page_title.grid(row=0, column=0, sticky="w")
+        user_info_frame = ctk.CTkFrame(header, fg_color="transparent", border_color="#F0F0F0", border_width=2, corner_radius=8)
+        user_info_frame.grid(row=0, column=2, sticky="e", padx=(20, 0))
+        user_details_frame = ctk.CTkFrame(user_info_frame, fg_color="transparent")
+        user_details_frame.pack(side="left", padx=10, pady=2)
+        username_label = ctk.CTkLabel(user_details_frame, text=user_data["username"], font=("", 13, "bold"), text_color="#16151C")
+        username_label.pack(anchor="w")
+        role_label = ctk.CTkLabel(user_details_frame, text="User", font=("", 12), text_color="#6F6E77")
+        role_label.pack(anchor="w")
+        chevron_path = str(assets_path / 'chevron-down.png')
+        chevron_image = Image.open(chevron_path)
+        chevron_icon = ctk.CTkImage(light_image=chevron_image, size=(16, 16))
+        chevron_label = ctk.CTkLabel(user_info_frame, text="", image=chevron_icon)
+        chevron_label.pack(side="right", padx=10, pady=8)
+
+        # Content area
+        self.content_area = ctk.CTkFrame(right_container, fg_color="transparent")
+        self.content_area.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        self.content_area.grid_columnconfigure(0, weight=1)
+        self.content_area.grid_rowconfigure(0, weight=1)
+
+        # Bind resize event
+        self.bind("<Configure>", self.on_resize)
+
+        # Activate Dashboard by default
+        self.show_page('Dashboard')
+
+    def logout(self):
+        from tkinter import messagebox
+        if messagebox.askyesno("Confirm Logout", "Are you sure you want to log out?"):
+            self.destroy()
+            from app.views.login_view import LoginView
+            root = tk.Tk()
+            login_screen = LoginView(root)
+            root.mainloop()
+
+    def on_resize(self, event):
+        self.update_idletasks()
+
+    def show_page(self, page_name):
+        for button in self.buttons:
+            button_text = button.cget("text")
+            button.configure(fg_color="transparent", text_color="#16151C", image=self.icons[button_text], font=("", 13))
+        active_button = next(btn for btn in self.buttons if btn.cget("text") == page_name)
+        active_button.configure(fg_color="#C9F1FF", text_color="#006EC4", image=self.active_icons[page_name], font=("", 13, "bold"))
+        self.page_title.configure(text=page_name)
+        for widget in self.content_area.winfo_children():
+            widget.destroy()
+        if page_name == "Products":
+            page = ProductsPage(self.content_area, self)
+        elif page_name == "Category":
+            page = CategoriesPage(self.content_area, self)
+        elif page_name == "Inventory":
+            page = InventoryPage(self.content_area, self)
+        elif page_name == "Supplier":
+            page = SupplierPage(self.content_area, self)
         else:
-            tk.messagebox.showinfo("Info", 
-                                 f"The {menu_text} page is not implemented yet.")
+            page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
+        page.pack(expand=True, fill="both")
+
+if __name__ == '__main__':
+    test_user_data = {"username": "User"}
+    app = UserDashboard(user_data=test_user_data)
+    app.mainloop()

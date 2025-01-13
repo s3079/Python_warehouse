@@ -25,50 +25,50 @@ class CategoryController:
                 formatted_categories.append(category_dict)
             return formatted_categories
         except Exception as e:
-            print(f"Error getting categories: {e}")
-            self.handle_error(e, "getting categories")
+            print(f"Lỗi khi lấy danh mục: {e}")
+            self.handle_error(e, "lấy danh mục")
             return []
     
     def add(self, name, description=""):
         """Add a new category"""
         try:
             if not name:
-                raise ValueError("Category name is required")
+                raise ValueError("Tên danh mục là bắt buộc")
             return self._model.add(name, description)
         except Exception as e:
-            self.handle_error(e, "adding category")
+            self.handle_error(e, "thêm danh mục")
             raise
     
     def update(self, category_id, name, description=""):
         """Update an existing category"""
         try:
             if not category_id:
-                raise ValueError("Category ID is required")
+                raise ValueError("ID danh mục là bắt buộc")
             if not name:
-                raise ValueError("Category name is required")
+                raise ValueError("Tên danh mục là bắt buộc")
             return self._model.update(category_id, name, description)
         except Exception as e:
-            self.handle_error(e, "updating category")
+            self.handle_error(e, "cập nhật danh mục")
             raise
     
     def delete(self, category_id):
         """Delete a category"""
         try:
             if not category_id:
-                raise ValueError("Category ID is required")
+                raise ValueError("ID danh mục là bắt buộc")
                 
             # Check if category has products
             product_count = self._model.count_products(category_id)
             if product_count > 0:
-                raise ValueError(f"Cannot delete category with {product_count} products")
+                raise ValueError(f"Không thể xóa danh mục có {product_count} sản phẩm")
                 
             return self._model.delete(category_id)
         except Exception as e:
-            self.handle_error(e, "deleting category")
+            self.handle_error(e, "xóa danh mục")
             raise
     
     def handle_error(self, error, action):
         """Handle errors in the controller"""
-        error_message = f"Error {action}: {str(error)}"
+        error_message = f"Lỗi {action}: {str(error)}"
         print(error_message)  # Log the error
         return error_message

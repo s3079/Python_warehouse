@@ -97,8 +97,6 @@ class UserView(BaseView):
         success, result = self._controller.login(username, password)
         if success:
             self.show_success("Login successful!")
-            # Here you would typically store the user session and redirect to main app
-            print("User logged in:", result)
         else:
             self.show_error(result)
 

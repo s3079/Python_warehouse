@@ -5,6 +5,7 @@ from PIL import Image
 from app.controllers.user_controller import UserController
 from app.views.admin.admin_dashboard import AdminDashboard
 from app.views.user.user_dashboard import UserDashboard
+from app.views.manager.manager_dashboard import ManagerDashboard
 from tkinter import messagebox
 
 OUTPUT_PATH = Path(__file__).parent.parent
@@ -168,19 +169,6 @@ class LoginView(ctk.CTkFrame):
         self.password_entry.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
-        # Remember Me Checkbox
-        self.remember_checkbox = ctk.CTkCheckBox(
-            login_form_frame,
-            text="Ghi nhớ",
-            font=("Helvetica", 12),
-            text_color="#16141B",
-            checkbox_width=20,
-            checkbox_height=20,
-            corner_radius=4
-        )
-        self.remember_checkbox.grid(row=form_row, column=0, sticky="w", pady=(10, 0))
-        form_row += 1
-
         # Login Button
         self.login_button = ctk.CTkButton(
             login_form_frame,
@@ -213,17 +201,24 @@ class LoginView(ctk.CTkFrame):
         email = self.email_entry.get()
         password = self.password_entry.get()
         success, user_data = self._controller.login(email, password)
+
         
         if success:
+            if user_data['role_name'] == "registered_user":
+                messagebox.showerror("Notice", "Tài khoản cần được phê duyệt để có thể vào ứng dụng!")
+                return
             # First destroy the login view
             self.destroy()
             # Then destroy the parent window if it exists
             if hasattr(self, 'parent') and self.parent:
                 self.parent.destroy()
             
-            # Create the appropriate dashboard
+            # Create the appropriate dashboard or show notice
             if user_data['role_name'] == "administrator":
                 app = AdminDashboard(user_data=user_data)
+                app.mainloop()
+            elif user_data['role_name'] == "manager":
+                app = ManagerDashboard(user_data=user_data)
                 app.mainloop()
             else:
                 app = UserDashboard(user_data=user_data)
