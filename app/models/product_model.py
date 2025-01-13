@@ -155,3 +155,22 @@ class ProductModel(BaseModel):
         except Exception as e:
             print(f"Error getting paginated products: {e}")
             return [], 0
+    
+    def get_all_products(self):
+        """Get all products"""
+        query = f"SELECT product_id, name FROM {self._table_name} ORDER BY name"
+        try:
+            return self._execute_query(query) or []
+        except Exception as e:
+            print(f"Error in get_all_products: {str(e)}")
+            return []
+    
+    def get_by_name(self, product_name):
+        """Get a product by name"""
+        query = f"SELECT product_id, name FROM {self._table_name} WHERE name = %s"
+        try:
+            cursor = self._execute_query(query, (product_name,))
+            return cursor.fetchone() if cursor else None
+        except Exception as e:
+            print(f"Error in get_by_name: {str(e)}")
+            return None

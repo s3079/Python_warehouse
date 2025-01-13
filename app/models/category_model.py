@@ -1,7 +1,9 @@
 from app.utils.database import Database
+from app.models.base_model import BaseModel
 
-class CategoryModel:
+class CategoryModel(BaseModel):
     def __init__(self):
+        super().__init__()
         self._table_name = "categories"
         self._db = Database()
         self._db.connect()  # Ensure connection is established
@@ -56,3 +58,12 @@ class CategoryModel:
         query = f"SELECT * FROM {self._table_name} WHERE category_id = %s"
         result = self._execute_query(query, (category_id,))
         return result[0] if result else None
+    
+    def get_all_categories(self):
+        """Get all categories"""
+        query = f"SELECT category_id, name FROM {self._table_name} ORDER BY name"
+        try:
+            return self._execute_query(query) or []
+        except Exception as e:
+            print(f"Error in get_all_categories: {str(e)}")
+            return []

@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS suppliers (
     supplier_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
-    contact_name VARCHAR(100),
     email VARCHAR(255),
     phone VARCHAR(20),
     address TEXT,

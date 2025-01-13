@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from datetime import datetime
 
 class SupplierDialog(ctk.CTkToplevel):
     def __init__(self, parent, supplier=None, on_save=None):
@@ -53,24 +52,6 @@ class SupplierDialog(ctk.CTkToplevel):
             corner_radius=8
         )
         self.name_entry.grid(row=2, column=0, sticky="ew", pady=(0, 15))
-        
-        # Contact Name field
-        contact_name_label = ctk.CTkLabel(
-            main_container,
-            text="Contact Name",
-            font=("", 13, "bold"),
-            text_color="#16151C"
-        )
-        contact_name_label.grid(row=3, column=0, sticky="w", pady=(0, 5))
-        
-        self.contact_name_entry = ctk.CTkEntry(
-            main_container,
-            placeholder_text="Enter contact name",
-            height=40,
-            font=("", 13),
-            corner_radius=8
-        )
-        self.contact_name_entry.grid(row=4, column=0, sticky="ew", pady=(0, 15))
         
         # Email field
         email_label = ctk.CTkLabel(
@@ -160,7 +141,6 @@ class SupplierDialog(ctk.CTkToplevel):
         # If editing, populate fields with existing data
         if supplier:
             self.name_entry.insert(0, supplier.get("name", ""))
-            self.contact_name_entry.insert(0, supplier.get("contact_name", ""))
             self.email_entry.insert(0, supplier.get("email", ""))
             self.phone_entry.insert(0, supplier.get("phone", ""))
             self.address_entry.insert(0, supplier.get("address", ""))
@@ -172,7 +152,6 @@ class SupplierDialog(ctk.CTkToplevel):
         """Validate and save supplier data"""
         # Get values from fields
         name = self.name_entry.get().strip()
-        contact_name = self.contact_name_entry.get().strip()
         email = self.email_entry.get().strip()
         phone = self.phone_entry.get().strip()
         address = self.address_entry.get().strip()
@@ -184,12 +163,10 @@ class SupplierDialog(ctk.CTkToplevel):
         
         # Prepare supplier data with correct field names
         supplier_data = {
-            "supplier_name": name,
-            "supplier_contact_name": contact_name,
-            "supplier_address": address,
-            "supplier_phone": phone,
-            "supplier_email": email,
-            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "name": name,
+            "address": address,
+            "phone": phone,
+            "email": email,
         }
         
         # If editing, include supplier_id
