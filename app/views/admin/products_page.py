@@ -267,8 +267,15 @@ class ProductsPage(ctk.CTkFrame):
                     label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
                     
                 else:
-                    # Regular text columns
+                    # Regular text columns with truncation
                     value = str(product.get(col["key"], "") or "")
+                    full_text = value  # Store full text for tooltip
+                    
+                    # Truncate text if too long
+                    max_chars = col["width"] // 8  # Approximate characters that fit in width
+                    if len(value) > max_chars:
+                        value = value[:max_chars-3] + "..."
+                    
                     label = ctk.CTkLabel(
                         row_frame,
                         text=value,
@@ -276,6 +283,10 @@ class ProductsPage(ctk.CTkFrame):
                         width=col["width"]
                     )
                     label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
+                    
+                    # Create tooltip for truncated text
+                    if len(value) != len(full_text):
+                        self.create_tooltip(label, full_text)
             
             # Add separator
             separator = ctk.CTkFrame(
@@ -880,3 +891,23 @@ class ProductsPage(ctk.CTkFrame):
         except Exception as e:
             from tkinter import messagebox
             messagebox.showerror("Error", f"Failed to save product: {str(e)}")
+
+    def create_tooltip(self, widget, text):
+        """Create a tooltip for a given widget"""
+        def show_tooltip(event):
+            tooltip = tk.Toplevel()
+            tooltip.wm_overrideredirect(True)
+            tooltip.wm_geometry(f"+{event.x_root+10}+{event.y_root+10}")
+            
+            label = tk.Label(tooltip, text=text, justify='left',
+                            background="#ffffe0", relief='solid', borderwidth=1)
+            label.pack()
+            
+            def hide_tooltip():
+                tooltip.destroy()
+            
+            widget.tooltip = tooltip
+            widget.bind('<Leave>', lambda e: hide_tooltip())
+            tooltip.bind('<Leave>', lambda e: hide_tooltip())
+        
+        widget.bind('<Enter>', show_tooltip)
