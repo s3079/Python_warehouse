@@ -3,7 +3,6 @@ from app.controllers.user_controller import UserController
 from PIL import Image
 from pathlib import Path
 import tkinter as tk
-from tkinter import messagebox
 
 class UsersPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -14,7 +13,6 @@ class UsersPage(ctk.CTkFrame):
         self.total_items = 0
         self.search_query = ""
         
-        # Load icons
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
         self.search_icon = ctk.CTkImage(
             light_image=Image.open(str(assets_path / 'search.png')),
@@ -45,16 +43,13 @@ class UsersPage(ctk.CTkFrame):
             size=(20, 20)
         )
         
-        # Configure grid layout
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
         
-        # Create top section with search and buttons
         top_section = ctk.CTkFrame(self, fg_color="transparent")
         top_section.grid(row=0, column=0, sticky="ew", padx=20, pady=(0, 20))
         top_section.grid_columnconfigure(1, weight=1)
         
-        # Create search frame
         search_frame = ctk.CTkFrame(
             top_section,
             fg_color="#F8F9FA",
@@ -64,7 +59,6 @@ class UsersPage(ctk.CTkFrame):
         )
         search_frame.grid(row=0, column=0, sticky="w")
         
-        # Add search icon and entry
         search_icon_label = ctk.CTkLabel(
             search_frame,
             text="",
@@ -74,23 +68,21 @@ class UsersPage(ctk.CTkFrame):
         
         self.search_entry = ctk.CTkEntry(
             search_frame,
-            placeholder_text="Search users...",
+            placeholder_text="Tìm kiếm...",
             border_width=0,
             fg_color="transparent",
             width=300,
             height=35
         )
         self.search_entry.pack(side="left", padx=(0, 15), pady=10)
-        self.search_entry.bind("<Return>", self.on_search)
+        self.search_entry.bind("<Return>", self.tim_kiem)
         
-        # Create buttons container
         buttons_frame = ctk.CTkFrame(top_section, fg_color="transparent")
         buttons_frame.grid(row=0, column=1, sticky="e")
         
-        # Add filter button
         filter_button = ctk.CTkButton(
             buttons_frame,
-            text="Filter",
+            text="Bộ lọc",
             image=self.filter_icon,
             compound="left",
             fg_color="#F8F9FA",
@@ -99,11 +91,10 @@ class UsersPage(ctk.CTkFrame):
             width=100,
             height=45,
             corner_radius=8,
-            command=self.show_filter_dialog  # This should be a method to handle filter actions
+            command=self.hien_thi_hop_thoai_loc
         )
         filter_button.pack(side="left", padx=(0, 10))
         
-        # Create table container
         table_container = ctk.CTkFrame(
             self,
             fg_color="white",
@@ -115,14 +106,12 @@ class UsersPage(ctk.CTkFrame):
         table_container.grid_columnconfigure(0, weight=1)
         table_container.grid_rowconfigure(0, weight=1)
 
-        # Create scrollable frame for table
         self.table_frame = ctk.CTkScrollableFrame(
             table_container,
             fg_color="transparent"
         )
         self.table_frame.grid(row=0, column=0, sticky="nsew", padx=1, pady=1)
         
-        # Define column configurations
         self.columns = [
             {"name": "Tên đăng nhập", "key": "ten_dang_nhap", "width": 100},
             {"name": "Họ và tên", "key": "ho_ten", "width": 150},
@@ -131,7 +120,6 @@ class UsersPage(ctk.CTkFrame):
             {"name": "Thao tác", "key": "actions", "width": 100}
         ]
         
-        # Create table header
         header_frame = ctk.CTkFrame(
             self.table_frame,
             fg_color="#F8F9FA",
@@ -140,7 +128,6 @@ class UsersPage(ctk.CTkFrame):
         header_frame.pack(fill="x", expand=True)
         header_frame.pack_propagate(False)
         
-        # Add header labels
         for i, col in enumerate(self.columns):
             label = ctk.CTkLabel(
                 header_frame,
@@ -152,32 +139,25 @@ class UsersPage(ctk.CTkFrame):
             )
             label.grid(row=0, column=i, padx=(20 if i == 0 else 10, 10), pady=15, sticky="w")
             
-        # Create frame for table content
         self.content_frame = ctk.CTkFrame(
             self.table_frame,
             fg_color="transparent"
         )
         self.content_frame.pack(fill="both", expand=True)
         
-        # Load initial data
-        self.load_users()
+        self.tai_danh_sach_nguoi_dung()
     
-    def on_search(self, event=None):
-        """Handle search when Enter is pressed"""
+    def tim_kiem(self, event=None):
         self.search_query = self.search_entry.get().strip()
-        self.current_page = 1  # Reset to first page
-        self.load_users()
+        self.current_page = 1 
+        self.tai_danh_sach_nguoi_dung()
 
-    def load_users(self):
-        """Load users into the table"""
-        # Clear existing content
+    def tai_danh_sach_nguoi_dung(self):
         for widget in self.content_frame.winfo_children():
             widget.destroy()
             
-        # Calculate pagination
         offset = (self.current_page - 1) * self.items_per_page
         
-        # Get users from controller with pagination
         users, total_count = self.controller.layNguoiDungPhanTrang(
             offset=offset,
             limit=self.items_per_page,
@@ -185,12 +165,10 @@ class UsersPage(ctk.CTkFrame):
         )
         
         self.total_items = total_count
-        total_pages = -(-total_count // self.items_per_page)  # Ceiling division
+        total_pages = -(-total_count // self.items_per_page)
         
-        # Configure grid columns for content frame
         self.content_frame.grid_columnconfigure(tuple(range(len(self.columns))), weight=1)
         
-        # Create rows for each user
         for i, user in enumerate(users):
             row_frame = ctk.CTkFrame(
                 self.content_frame,
@@ -199,11 +177,9 @@ class UsersPage(ctk.CTkFrame):
             )
             row_frame.pack(fill="x")
             
-            # Add user data
             for j, col in enumerate(self.columns):
                 if col["key"] == "actions":
-                    # Skip action buttons for admin accounts
-                    if user['role_name'].lower() == 'administrator':
+                    if user['ten_quyen'].lower() == 'administrator':
                         continue
 
                     # Create actions frame
@@ -213,61 +189,56 @@ class UsersPage(ctk.CTkFrame):
                     )
                     actions_frame.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
                     
-                    if user['is_approved']:
-                        # Set Role button with edit icon
+                    if user['da_duyet']:
                         set_role_btn = ctk.CTkButton(
                             actions_frame,
-                            text="",  # No text, only icon
+                            text="",    
                             image=self.edit_icon,
-                            width=30,  # Adjust width to fit icon
+                            width=30, 
                             height=30,
                             fg_color="#006EC4",
                             hover_color="#0059A1",
-                            command=lambda u=user: self.set_role(u)
+                            command=lambda u=user: self.dat_vai_tro(u)
                         )
                         set_role_btn.pack(side="left", padx=(0, 5))
                         
-                        # Delete button with trash icon
                         delete_btn = ctk.CTkButton(
                             actions_frame,
-                            text="",  # No text, only icon
+                            text="",
                             image=self.trash_icon,
-                            width=30,  # Adjust width to fit icon
+                            width=30,
                             height=30,
                             fg_color="#e03137",
                             hover_color="#b32429",
-                            command=lambda u=user: self.delete_user(u)
+                            command=lambda u=user: self.xoa_nguoi_dung(u)
                         )
                         delete_btn.pack(side="left")
                     else:
-                        # Approve button
                         approve_btn = ctk.CTkButton(
                             actions_frame,
-                            text="Approve",
+                            text="Duyệt",
                             width=60,
                             height=30,
                             fg_color="#006EC4",
                             text_color="white",
                             hover_color="#0059A1",
-                            command=lambda u=user: self.approve_user(u)
+                            command=lambda u=user: self.duyet_nguoi_dung(u)
                         )
                         approve_btn.pack(side="left", padx=(0, 5))
                         
-                        # Reject button
                         reject_btn = ctk.CTkButton(
                             actions_frame,
-                            text="Reject",
+                            text="Từ chối",
                             width=60,
                             height=30,
                             fg_color="#e03137",
                             text_color="white",
                             hover_color="#b32429",
-                            command=lambda u=user: self.reject_user(u)
+                            command=lambda u=user: self.tu_choi_nguoi_dung(u)
                         )
                         reject_btn.pack(side="left")
                     
                 else:
-                    # Regular text columns
                     value = str(user.get(col["key"], "") or "")
                     label = ctk.CTkLabel(
                         row_frame,
@@ -277,7 +248,6 @@ class UsersPage(ctk.CTkFrame):
                     )
                     label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
             
-            # Add separator
             separator = ctk.CTkFrame(
                 self.content_frame,
                 fg_color="#E5E5E5",
@@ -285,12 +255,10 @@ class UsersPage(ctk.CTkFrame):
             )
             separator.pack(fill="x")
 
-        # Add pagination controls at the bottom
-        self.create_pagination_controls(total_pages)
+        self.tao_dieu_khien_phan_trang(total_pages)
 
-    def create_pagination_controls(self, total_pages):
-        """Create pagination controls"""
-        # Create or clear pagination frame
+    def tao_dieu_khien_phan_trang(self, total_pages):
+        """Tạo điều khiển phân trang"""
         if hasattr(self, 'pagination_frame'):
             for widget in self.pagination_frame.winfo_children():
                 widget.destroy()
@@ -299,11 +267,9 @@ class UsersPage(ctk.CTkFrame):
             self.pagination_frame.grid(row=2, column=0, sticky="ew", padx=20, pady=(0, 20))
             self.pagination_frame.grid_propagate(False)
         
-        # Create container for pagination elements
         controls_frame = ctk.CTkFrame(self.pagination_frame, fg_color="transparent")
         controls_frame.pack(expand=True, fill="both")
         
-        # Left side - showing entries info
         left_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
         left_frame.pack(side="left", padx=20)
         
@@ -317,11 +283,9 @@ class UsersPage(ctk.CTkFrame):
         )
         showing_label.pack(side="left")
         
-        # Right side - pagination buttons
         right_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
         right_frame.pack(side="right", padx=20)
         
-        # Previous page button
         prev_button = ctk.CTkButton(
             right_frame,
             text="",
@@ -331,11 +295,10 @@ class UsersPage(ctk.CTkFrame):
             fg_color="#F8F9FA" if self.current_page > 1 else "#E9ECEF",
             text_color="#16151C",
             hover_color="#E8E9EA",
-            command=self.previous_page if self.current_page > 1 else None
+            command=self.trang_truoc if self.current_page > 1 else None
         )
         prev_button.pack(side="left", padx=(0, 5))
         
-        # Page number buttons
         visible_pages = 5
         start_page = max(1, min(self.current_page - visible_pages // 2,
                                total_pages - visible_pages + 1))
@@ -351,11 +314,10 @@ class UsersPage(ctk.CTkFrame):
                 fg_color="#006EC4" if is_current else "#F8F9FA",
                 text_color="white" if is_current else "#16151C",
                 hover_color="#0059A1" if is_current else "#E8E9EA",
-                command=lambda p=page: self.go_to_page(p)
+                command=lambda p=page: self.den_trang(p)
             )
             page_button.pack(side="left", padx=2)
         
-        # Next page button
         next_button = ctk.CTkButton(
             right_frame,
             text="",
@@ -365,87 +327,72 @@ class UsersPage(ctk.CTkFrame):
             fg_color="#F8F9FA" if self.current_page < total_pages else "#E9ECEF",
             text_color="#16151C",
             hover_color="#E8E9EA",
-            command=self.next_page if self.current_page < total_pages else None
+            command=self.trang_sau if self.current_page < total_pages else None
         )
         next_button.pack(side="left", padx=(5, 0))
 
-    def previous_page(self):
-        """Go to previous page"""
+    def trang_truoc(self):
         if self.current_page > 1:
             self.current_page -= 1
-            self.load_users()
+            self.tai_danh_sach_nguoi_dung()
 
-    def next_page(self):
-        """Go to next page"""
+    def trang_sau(self):
         self.current_page += 1
-        self.load_users()
+        self.tai_danh_sach_nguoi_dung()
 
-    def go_to_page(self, page):
-        """Go to specific page"""
+    def den_trang(self, page):
         self.current_page = page
-        self.load_users()
+        self.tai_danh_sach_nguoi_dung()
 
-    def approve_user(self, user):
-        """Approve a user"""
-        if self.controller.duyetNguoiDung(user["user_id"]):
-            self.load_users()  # Refresh the list
+    def duyet_nguoi_dung(self, user):
+        if self.controller.duyetNguoiDung(user["ma_nguoi_dung"]):
+            self.tai_danh_sach_nguoi_dung()
 
-    def reject_user(self, user):
-        """Reject a user"""
-        if self.controller.tuChoiNguoiDung(user["user_id"]):
-            self.load_users()  # Refresh the list
+    def tu_choi_nguoi_dung(self, user):
+        if self.controller.tuChoiNguoiDung(user["ma_nguoi_dung"]):
+            self.tai_danh_sach_nguoi_dung()
 
-    def show_filter_dialog(self):
-        """Show filter options dialog"""
-        # Implement the logic to show a filter dialog or apply filters
-        print("Filter dialog opened")
+    def hien_thi_hop_thoai_loc(self):
+        print("Đã mở hộp thoại lọc")
 
-    def set_role(self, user):
-        """Open a dialog to set the user's role"""
-        # Create a new dialog window
+    def dat_vai_tro(self, user):
         dialog = ctk.CTkToplevel(self)
-        dialog.title("Set Role")
-        dialog.geometry("300x200")  # Adjusted height to accommodate additional label
+        dialog.title("Đặt vai trò")
+        dialog.geometry("300x200")
         
-        # Display the current role
-        current_role_label = ctk.CTkLabel(dialog, text=f"Current Role: {user.get('role_name', 'Unknown')}")
+        current_role_label = ctk.CTkLabel(dialog, text=f"Vai trò hiện tại: {user.get('ten_quyen', 'Chưa xác định')}")
         current_role_label.pack(pady=10)
         
-        # Add a label for role selection
-        label = ctk.CTkLabel(dialog, text="Select a new role for the user:")
+        label = ctk.CTkLabel(dialog, text="Chọn vai trò mới cho người dùng:")
         label.pack(pady=10)
         
-        # Initialize role_var with the user's current role
-        current_role = user.get("role_name", "user")  # Fetch the current role from the user data
-        role_var = ctk.StringVar(value=current_role)  # Set initial value to current role
+        current_role = user.get("ten_quyen", "user")
+        role_var = ctk.StringVar(value=current_role)
         
-        # Create a frame to hold the radio buttons with a transparent background
         radio_frame = ctk.CTkFrame(dialog, fg_color="transparent")
         radio_frame.pack(pady=10)
         
-        # Create radio buttons for each role
-        user_radio = ctk.CTkRadioButton(radio_frame, text="User", variable=role_var, value="user")
-        manager_radio = ctk.CTkRadioButton(radio_frame, text="Manager", variable=role_var, value="manager")
+        user_radio = ctk.CTkRadioButton(radio_frame, text="Người dùng", variable=role_var, value="user")
+        manager_radio = ctk.CTkRadioButton(radio_frame, text="Quản lý", variable=role_var, value="manager")
         
-        # Pack the radio buttons horizontally
         user_radio.pack(side="left", padx=10)
         manager_radio.pack(side="left", padx=10)
         
-        # Add a button to confirm the role change
         confirm_button = ctk.CTkButton(
             dialog,
-            text="Confirm",
-            command=lambda: self.confirm_role_change(user, role_var.get(), dialog)
+            text="Xác nhận",
+            command=lambda: self.xac_nhan_thay_doi_vai_tro(user, role_var.get(), dialog)
         )
         confirm_button.pack(pady=10)
 
-    def confirm_role_change(self, user, new_role, dialog):
-        """Confirm the role change and update the user"""
-        if self.controller.datVaiTroNguoiDung(user["user_id"], new_role):
-            self.load_users()  # Refresh the list to show updated role
+    def xac_nhan_thay_doi_vai_tro(self, user, new_role, dialog):
+        if self.controller.datVaiTroNguoiDung(user["ma_nguoi_dung"], new_role):
+            self.tai_danh_sach_nguoi_dung()
             dialog.destroy()
-            # Show a success message using tkinter
-            tk.messagebox.showinfo("Success", "User role updated successfully.")
+            tk.messagebox.showinfo("Thành công", "Đã cập nhật vai trò người dùng thành công.")
         else:
-            # Show an error message using tkinter
-            tk.messagebox.showerror("Error", "Failed to update user role.")
+            tk.messagebox.showerror("Lỗi", "Không thể cập nhật vai trò người dùng.")
+
+    def xoa_nguoi_dung(self, user):
+        if self.controller.xoaNguoiDung(user["ma_nguoi_dung"]):
+            self.tai_danh_sach_nguoi_dung()

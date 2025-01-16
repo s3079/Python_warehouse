@@ -6,7 +6,6 @@ class UserController:
         self.model = UserModel()
 
     def layTatCa(self):
-        """Get all users"""
         try:
             return self.model.layTatCa()
         except Exception as e:
@@ -14,7 +13,6 @@ class UserController:
             return []
 
     def layNguoiDungChoDuyet(self):
-        """Get users pending approval"""
         try:
             return self.model.layNguoiDungChoDuyet()
         except Exception as e:
@@ -22,7 +20,6 @@ class UserController:
             return []
 
     def duyetNguoiDung(self, ma_nguoi_dung):
-        """Approve a user"""
         try:
             return self.model.duyetNguoiDung(ma_nguoi_dung)
         except Exception as e:
@@ -30,7 +27,6 @@ class UserController:
             return False
 
     def tuChoiNguoiDung(self, ma_nguoi_dung):
-        """Reject a user"""
         try:
             return self.model.tuChoiNguoiDung(ma_nguoi_dung)
         except Exception as e:
@@ -38,23 +34,14 @@ class UserController:
             return False
 
     def dangNhap(self, ten_dang_nhap, mat_khau):
-        """
-        Authenticate user login
-        Returns: (success, result)
-            - If success is True, result is user data
-            - If success is False, result is error message
-        """
         try:
-            # Get user by username
             nguoi_dung = self.model.layTheoTenDangNhap(ten_dang_nhap)
             if not nguoi_dung:
                 return False, "Tên đăng nhập hoặc mật khẩu không đúng"
-
-            # Check password
+    
             if not bcrypt.checkpw(mat_khau.encode('utf-8'), nguoi_dung['mat_khau'].encode('utf-8')):
                 return False, "Tên đăng nhập hoặc mật khẩu không đúng"
-
-            # Remove password from user data before returning
+    
             user_data = {k: v for k, v in nguoi_dung.items() if k != 'mat_khau'}
             return True, user_data
 
@@ -62,23 +49,15 @@ class UserController:
             return False, f"Lỗi đăng nhập: {str(e)}"
 
     def dangKy(self, ten_dang_nhap, mat_khau, ho_ten):
-        """
-        Register a new user
-        Returns: (success, message)
-        """
         try:
-            # Check if username already exists
             if self.model.layTheoTenDangNhap(ten_dang_nhap):
                 return False, "Tên đăng nhập đã tồn tại"
 
-            # Check if full name already exists
             if self.model.layTheoHoTen(ho_ten):
                 return False, "Họ tên đã tồn tại"
 
-            # Hash password
             hashed = bcrypt.hashpw(mat_khau.encode('utf-8'), bcrypt.gensalt())
             
-            # Create user (default to non-admin)
             self.model.taoNguoiDung(ten_dang_nhap, hashed.decode('utf-8'), ho_ten, la_admin=False)
             
             return True, "Đăng ký thành công! Vui lòng chờ quản trị viên duyệt."
@@ -87,11 +66,9 @@ class UserController:
             return False, f"Lỗi đăng ký: {str(e)}"
 
     def layTheoId(self, ma_nguoi_dung):
-        """Get user by ID"""
         try:
             nguoi_dung = self.model.layTheoId(ma_nguoi_dung)
             if nguoi_dung:
-                # Remove password from user data
                 user_data = {k: v for k, v in nguoi_dung.items() if k != 'mat_khau'}
                 return True, user_data
             return False, "Không tìm thấy người dùng"
@@ -102,7 +79,6 @@ class UserController:
         """Update user information"""
         try:
             if 'mat_khau' in data:
-                # Hash new password if provided
                 data['mat_khau'] = bcrypt.hashpw(
                     data['mat_khau'].encode('utf-8'), 
                     bcrypt.gensalt()
@@ -116,7 +92,6 @@ class UserController:
             return False, f"Lỗi khi cập nhật người dùng: {str(e)}"
 
     def xoaNguoiDung(self, ma_nguoi_dung):
-        """Delete a user"""
         try:
             success = self.model.xoaNguoiDung(ma_nguoi_dung)
             if success:
@@ -126,19 +101,15 @@ class UserController:
             return False, f"Lỗi khi xóa người dùng: {str(e)}"
 
     def doiMatKhau(self, ma_nguoi_dung, mat_khau_cu, mat_khau_moi):
-        """Change user password"""
         try:
-            # Get user
             nguoi_dung = self.model.layTheoId(ma_nguoi_dung)
             if not nguoi_dung:
                 return False, "Không tìm thấy người dùng"
 
-            # Verify old password
             if not bcrypt.checkpw(mat_khau_cu.encode('utf-8'), 
                                 nguoi_dung['mat_khau'].encode('utf-8')):
                 return False, "Mật khẩu hiện tại không đúng"
 
-            # Hash and update new password
             hashed = bcrypt.hashpw(mat_khau_moi.encode('utf-8'), bcrypt.gensalt())
             success = self.model.capNhatMatKhau(ma_nguoi_dung, hashed.decode('utf-8'))
             
@@ -150,7 +121,6 @@ class UserController:
             return False, f"Lỗi khi đổi mật khẩu: {str(e)}"
 
     def layVaiTro(self):
-        """Get all user roles"""
         try:
             return self.model.layVaiTro()
         except Exception as e:
@@ -158,7 +128,6 @@ class UserController:
             return []
 
     def layNguoiDungDaDuyet(self):
-        """Get approved users"""
         try:
             return self.model.layNguoiDungDaDuyet()
         except Exception as e:
@@ -166,7 +135,6 @@ class UserController:
             return []
 
     def layNguoiDungPhanTrang(self, offset=0, limit=10, search_query=""):
-        """Fetch users with pagination and optional search query"""
         try:
             users, total_count = self.model.layNguoiDungPhanTrang(
                 offset=offset,
@@ -179,7 +147,6 @@ class UserController:
             return [], 0
 
     def datVaiTroNguoiDung(self, ma_nguoi_dung, vai_tro_moi):
-        """Set the role of a user identified by user_id to new_role."""
         try:
             success = self.model.datVaiTroNguoiDung(ma_nguoi_dung, vai_tro_moi)
             if success:
