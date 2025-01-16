@@ -83,6 +83,42 @@ class OrdersPage(ctk.CTkFrame):
         self.search_entry.pack(side="left", padx=(0, 15), pady=10)
         self.search_entry.bind("<Return>", self.on_search)
         
+        # Create buttons container
+        buttons_frame = ctk.CTkFrame(top_section, fg_color="transparent")
+        buttons_frame.grid(row=0, column=1, sticky="e")
+        
+        # # Add filter button
+        # filter_button = ctk.CTkButton(
+        #     buttons_frame,
+        #     text="Filter",
+        #     image=self.filter_icon,
+        #     compound="left",
+        #     fg_color="#F8F9FA",
+        #     text_color="#16151C",
+        #     hover_color="#E8E9EA",
+        #     width=100,
+        #     height=45,
+        #     corner_radius=8,
+        #     # command=self.show_filter_dialog
+        # )
+        # filter_button.pack(side="left", padx=(0, 10))
+        
+        # Add new order button
+        new_order_button = ctk.CTkButton(
+            buttons_frame,
+            text="Add Order",
+            image=self.plus_icon,
+            compound="left",
+            fg_color="#006EC4",
+            text_color="white",
+            hover_color="#0059A1",
+            width=140,
+            height=45,
+            corner_radius=8,
+            command=self.show_add_order_dialog
+        )
+        new_order_button.pack(side="left")
+        
         # Create table container
         table_container = ctk.CTkFrame(
             self,
@@ -140,18 +176,6 @@ class OrdersPage(ctk.CTkFrame):
         
         # Load initial data
         self.load_orders()
-        
-        # Add "Add Order" button
-        add_order_button = ctk.CTkButton(
-            top_section,
-            text="Add Order",
-            image=self.plus_icon,
-            fg_color="#006EC4",
-            text_color="white",
-            hover_color="#0059A1",
-            command=self.show_add_order_dialog
-        )
-        add_order_button.grid(row=0, column=2, padx=(10, 0), pady=10, sticky="e")
     
     def on_search(self, event=None):
         """Handle search when Enter is pressed"""
