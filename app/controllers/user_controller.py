@@ -96,8 +96,11 @@ class UserController:
             success = self.model.xoaNguoiDung(ma_nguoi_dung)
             if success:
                 return True, "Xóa người dùng thành công"
-            return False, "Xóa người dùng thất bại"
+            return False, "Không thể xóa người dùng. Vui lòng thử lại sau."
         except Exception as e:
+            # Check for foreign key constraint violation (MySQL error 1451)
+            if "1451" in str(e):
+                return False, "Không thể xóa người dùng này vì họ đã có đơn hàng trong hệ thống. Vui lòng xóa các đơn hàng trước khi xóa người dùng."
             return False, f"Lỗi khi xóa người dùng: {str(e)}"
 
     def doiMatKhau(self, ma_nguoi_dung, mat_khau_cu, mat_khau_moi):

@@ -76,19 +76,19 @@ class OrderModel(BaseModel):
             return True
         return False
     
-    def xoa(self, order_id: int):
+    def xoa(self, ma_don_hang: int):
         """Delete an order and its details"""
         cursor = None
         try:
             cursor = self.conn.cursor()
             
-            # First delete from order_details (child table)
-            details_query = "DELETE FROM order_details WHERE order_id = %s"
-            cursor.execute(details_query, (order_id,))
+            # First delete from chi_tiet_don_hang (child table)
+            details_query = "DELETE FROM chi_tiet_don_hang WHERE ma_don_hang = %s"
+            cursor.execute(details_query, (ma_don_hang,))
             
-            # Then delete from orders (parent table)
-            order_query = f"DELETE FROM {self._table_name} WHERE order_id = %s"
-            cursor.execute(order_query, (order_id,))
+            # Then delete from don_hang (parent table)
+            order_query = f"DELETE FROM {self._table_name} WHERE ma_don_hang = %s"
+            cursor.execute(order_query, (ma_don_hang,))
             
             # Commit the transaction
             self.conn.commit()

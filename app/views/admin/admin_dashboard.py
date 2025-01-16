@@ -49,13 +49,13 @@ class AdminDashboard(ctk.CTk):
 
         # Define icons for each item
         icon_files = {
-            'Products': 'products.png',
-            'Category': 'category.png',
-            'Inventory': 'inventory.png',
-            'Supplier': 'supplier.png',
-            'Orders': 'order.png',
-            'Users': 'users.png',
-            'Logout': 'logout.png'
+            'Sản Phẩm': 'products.png',
+            'Danh Mục': 'category.png',
+            'Kho': 'inventory.png',
+            'Nhà Cung Cấp': 'supplier.png',
+            'Đơn Hàng': 'order.png',
+            'Tài Khoản': 'users.png',
+            'Đăng Xuất': 'logout.png'
         }
 
         # Load icons
@@ -98,7 +98,7 @@ class AdminDashboard(ctk.CTk):
         menu_container.pack(fill="both", expand=True)
         
         # Sidebar items
-        sidebar_items = ['Products', 'Category', 'Inventory', 'Supplier', 'Orders', 'Users']
+        sidebar_items = ['Sản Phẩm', 'Danh Mục', 'Kho', 'Nhà Cung Cấp', 'Đơn Hàng', 'Tài Khoản']
         for item in sidebar_items:
             # Load and create both normal and active state icons
             icon_path = str(assets_path / icon_files[item])
@@ -319,17 +319,17 @@ class AdminDashboard(ctk.CTk):
             widget.destroy()
             
         # Create and show the appropriate page
-        if page_name == "Products":
+        if page_name == "Sản Phẩm":
             page = ProductsPage(self.content_area, self)
-        elif page_name == "Category":  
+        elif page_name == "Danh Mục":  
             page = CategoriesPage(self.content_area, self)
-        elif page_name == "Inventory":
+        elif page_name == "Kho":
             page = InventoryPage(self.content_area, self)
-        elif page_name == "Supplier":
+        elif page_name == "Nhà Cung Cấp":
             page = SupplierPage(self.content_area, self)
-        elif page_name == "Users":
+        elif page_name == "Tài Khoản":
             page = UsersPage(self.content_area, self)
-        elif page_name == "Orders":
+        elif page_name == "Đơn Hàng":
             page = OrdersPage(self.content_area, self, self.user_data)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')

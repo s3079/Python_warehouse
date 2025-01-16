@@ -201,11 +201,11 @@ class UserModel(BaseModel):
         try:
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute("""
-                SELECT u.*, r.role_name 
-                FROM users u
-                JOIN user_roles r ON u.role_id = r.role_id
-                WHERE u.is_approved = TRUE
-                ORDER BY u.username
+                SELECT u.*, r.ten_quyen 
+                FROM nguoi_dung u
+                JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
+                WHERE u.da_duyet = TRUE
+                ORDER BY u.ten_dang_nhap
             """)
             return cursor.fetchall()
         except Exception as e:
@@ -242,19 +242,19 @@ class UserModel(BaseModel):
         finally:
             cursor.close()
 
-    def datVaiTroNguoiDung(self, user_id, new_role):
-        """Update the role of a user identified by user_id."""
+    def datVaiTroNguoiDung(self, ma_nguoi_dung, ten_quyen):
+        """Update the role of a user identified by ma_nguoi_dung."""
         try:
             cursor = self.conn.cursor(dictionary=True)
             
-            cursor.execute("SELECT role_id FROM user_roles WHERE role_name = %s", (new_role,))
-            role = cursor.fetchone()
-            if not role:
-                print(f"Role '{new_role}' not found.")
+            cursor.execute("SELECT ma_quyen FROM phan_quyen WHERE ten_quyen = %s", (ten_quyen,))
+            quyen = cursor.fetchone()
+            if not quyen:
+                print(f"Quyền '{ten_quyen}' không tìm thấy.")
                 return False
 
-            cursor.execute("UPDATE users SET role_id = %s WHERE user_id = %s", 
-                         (role['role_id'], user_id))
+            cursor.execute("UPDATE nguoi_dung SET ma_quyen = %s WHERE ma_nguoi_dung = %s", 
+                         (quyen['ma_quyen'], ma_nguoi_dung))
             self.conn.commit()
             return cursor.rowcount > 0
         except Exception as e:
@@ -264,15 +264,15 @@ class UserModel(BaseModel):
         finally:
             cursor.close()
 
-    def layTheoHoTen(self, fullName):
+    def layTheoHoTen(self, ho_ten):
         """Get user by full name"""
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT u.*, r.role_name 
-            FROM users u
-            JOIN user_roles r ON u.role_id = r.role_id
-            WHERE u.fullName = %s
-        """, (fullName,))
+            SELECT u.*, r.ten_quyen 
+            FROM nguoi_dung u
+            JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
+            WHERE u.ho_ten = %s
+        """, (ho_ten,))
         result = cursor.fetchone()
         cursor.close()
         return result

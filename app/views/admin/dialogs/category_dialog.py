@@ -5,7 +5,7 @@ class CategoryDialog(ctk.CTkToplevel):
         super().__init__(parent)
         
         # Set up the dialog window
-        self.title("Add Category" if not category else "Edit Category")
+        self.title("Thêm Danh Mục Mới" if not category else "Sửa Danh Mục")
         self.geometry("500x380")
         self.resizable(False, False)
         
@@ -26,7 +26,7 @@ class CategoryDialog(ctk.CTkToplevel):
         main_container.grid_columnconfigure(0, weight=1)
         
         # Add header
-        header_text = "Add New Category" if not category else "Edit Category"
+        header_text = "Thêm Danh Mục Mới" if not category else "Sửa Danh Mục"
         header = ctk.CTkLabel(
             main_container,
             text=header_text,
@@ -39,7 +39,7 @@ class CategoryDialog(ctk.CTkToplevel):
         # Name field
         name_label = ctk.CTkLabel(
             main_container,
-            text="Name",
+            text="Tên Danh Mục",
             font=("", 13, "bold"),
             text_color="#16151C"
         )
@@ -47,7 +47,7 @@ class CategoryDialog(ctk.CTkToplevel):
         
         self.name_entry = ctk.CTkEntry(
             main_container,
-            placeholder_text="Enter category name",
+            placeholder_text="Nhập tên danh mục",
             height=40,
             font=("", 13),
             corner_radius=8
@@ -57,7 +57,7 @@ class CategoryDialog(ctk.CTkToplevel):
         # Description field
         description_label = ctk.CTkLabel(
             main_container,
-            text="Description",
+            text="Mô Tả",
             font=("", 13, "bold"),
             text_color="#16151C"
         )
@@ -80,7 +80,7 @@ class CategoryDialog(ctk.CTkToplevel):
         # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_frame,
-            text="Cancel",
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -93,7 +93,7 @@ class CategoryDialog(ctk.CTkToplevel):
         # Save button
         save_button = ctk.CTkButton(
             buttons_frame,
-            text="Save Category",
+            text="Lưu Danh Mục",
             fg_color="#006EC4",
             text_color="white",
             hover_color="#0059A1",
@@ -119,7 +119,7 @@ class CategoryDialog(ctk.CTkToplevel):
         
         # Validate name
         if not name:
-            self.show_error("Name is required")
+            self.show_error("Tên danh mục là bắt buộc")
             return
         
         # Prepare category data
@@ -143,7 +143,7 @@ class CategoryDialog(ctk.CTkToplevel):
     def show_error(self, message):
         """Show error message in a dialog"""
         error_dialog = ctk.CTkToplevel(self)
-        error_dialog.title("Error")
+        error_dialog.title("Lỗi")
         error_dialog.geometry("300x150")
         error_dialog.resizable(False, False)
         error_dialog.transient(self)

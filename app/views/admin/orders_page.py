@@ -83,7 +83,7 @@ class OrdersPage(ctk.CTkFrame):
         
         self.search_entry = ctk.CTkEntry(
             search_frame,
-            placeholder_text="Search orders...",
+            placeholder_text="Tìm kiếm đơn hàng...",
             border_width=0,
             fg_color="transparent",
             width=300,
@@ -115,7 +115,7 @@ class OrdersPage(ctk.CTkFrame):
         # Add new order button
         new_order_button = ctk.CTkButton(
             buttons_frame,
-            text="Add Order",
+            text="Thêm Đơn Hàng",
             image=self.plus_icon,
             compound="left",
             fg_color="#006EC4",
@@ -325,7 +325,7 @@ class OrdersPage(ctk.CTkFrame):
         
         showing_label = ctk.CTkLabel(
             left_frame,
-            text=f"Showing {start_index}-{end_index} of {self.total_items} entries",
+            text=f"Hiển thị {start_index}-{end_index} trong {self.total_items} đơn hàng",
             text_color="#6F6E77"
         )
         showing_label.pack(side="left")
@@ -429,7 +429,7 @@ class OrdersPage(ctk.CTkFrame):
         # Warning icon or text
         warning_label = ctk.CTkLabel(
             content_frame,
-            text="⚠️ Warning",
+            text="⚠️ Cảnh báo",
             font=("", 16, "bold"),
             text_color="#e03137"
         )
@@ -438,7 +438,7 @@ class OrdersPage(ctk.CTkFrame):
         # Confirmation message
         message_label = ctk.CTkLabel(
             content_frame,
-            text=f"Are you sure you want to delete order '{order['ma_don_hang']}'?\nThis action cannot be undone.",
+            text=f"Bạn có chắc chắn muốn xóa đơn hàng '{order['ma_don_hang']}'?\nHành động này không thể hoàn tác.",
             font=("", 13),
             text_color="#16151C"
         )
@@ -452,7 +452,7 @@ class OrdersPage(ctk.CTkFrame):
         # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_frame,
-            text="Cancel",
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -475,7 +475,7 @@ class OrdersPage(ctk.CTkFrame):
             corner_radius=8,
             command=lambda: self.confirm_delete(dialog, order)
         )
-        delete_button.pack(side="left")
+        delete_button.pack(side="right")
 
     def save_order_changes(self, dialog, ma_don_hang, ngay_dat, tong_tien):
         """Save order changes and close dialog"""

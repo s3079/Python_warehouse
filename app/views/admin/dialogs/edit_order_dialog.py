@@ -195,7 +195,7 @@ class EditOrderDialog(CenterDialog):
         # Save button
         save_button = ctk.CTkButton(
             buttons_container,
-            text="Save",
+            text="Lưu",
             fg_color="#006EC4",
             text_color="white",
             hover_color="#0059A1",

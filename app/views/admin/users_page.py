@@ -77,24 +77,6 @@ class UsersPage(ctk.CTkFrame):
         self.search_entry.pack(side="left", padx=(0, 15), pady=10)
         self.search_entry.bind("<Return>", self.tim_kiem)
         
-        buttons_frame = ctk.CTkFrame(top_section, fg_color="transparent")
-        buttons_frame.grid(row=0, column=1, sticky="e")
-        
-        filter_button = ctk.CTkButton(
-            buttons_frame,
-            text="Bộ lọc",
-            image=self.filter_icon,
-            compound="left",
-            fg_color="#F8F9FA",
-            text_color="#16151C",
-            hover_color="#E8E9EA",
-            width=100,
-            height=45,
-            corner_radius=8,
-            command=self.hien_thi_hop_thoai_loc
-        )
-        filter_button.pack(side="left", padx=(0, 10))
-        
         table_container = ctk.CTkFrame(
             self,
             fg_color="white",
@@ -278,7 +260,7 @@ class UsersPage(ctk.CTkFrame):
         
         showing_label = ctk.CTkLabel(
             left_frame,
-            text=f"Showing {start_index}-{end_index} of {self.total_items} entries",
+            text=f"Hiển thị {start_index}-{end_index} trong {self.total_items} người dùng",
             text_color="#6F6E77"
         )
         showing_label.pack(side="left")
@@ -394,5 +376,74 @@ class UsersPage(ctk.CTkFrame):
             tk.messagebox.showerror("Lỗi", "Không thể cập nhật vai trò người dùng.")
 
     def xoa_nguoi_dung(self, user):
-        if self.controller.xoaNguoiDung(user["ma_nguoi_dung"]):
+        # Create confirmation dialog
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("Xác nhận xóa")
+        dialog.geometry("400x200")
+        dialog.transient(self)
+        dialog.grab_set()
+        
+        # Center the dialog on screen
+        dialog.update_idletasks()
+        width = dialog.winfo_width()
+        height = dialog.winfo_height()
+        x = (dialog.winfo_screenwidth() // 2) - (width // 2)
+        y = (dialog.winfo_screenheight() // 2) - (height // 2)
+        dialog.geometry(f'{width}x{height}+{x}+{y}')
+        
+        # Message
+        message = ctk.CTkLabel(
+            dialog,
+            text=f"Bạn có chắc chắn muốn xóa người dùng '{user['ho_ten']}'?\nHành động này không thể hoàn tác.",
+            font=("", 13)
+        )
+        message.pack(pady=(20, 0))
+        
+        # Buttons frame
+        buttons_frame = ctk.CTkFrame(dialog, fg_color="transparent", height=60)
+        buttons_frame.pack(fill="x", padx=20, pady=(20, 20))
+        buttons_frame.pack_propagate(False)
+        
+        # Container for right-aligned buttons
+        button_container = ctk.CTkFrame(buttons_frame, fg_color="transparent")
+        button_container.pack(side="right")
+        button_containerC = ctk.CTkFrame(buttons_frame, fg_color="transparent")
+        button_containerC.pack(side="left")
+        # Cancel button
+        cancel_button = ctk.CTkButton(
+            button_containerC,
+            text="Hủy",
+            fg_color="#F8F9FA",
+            text_color="#16151C",
+            hover_color="#E8E9EA",
+            width=100,
+            height=40,
+            corner_radius=8,
+            command=dialog.destroy
+        )
+        cancel_button.pack(side="left", padx=(0, 10))
+        
+        # Delete button
+        delete_button = ctk.CTkButton(
+            button_container,
+            text="Xóa",
+            fg_color="#e03137",
+            text_color="white",
+            hover_color="#b32429",
+            width=100,
+            height=40,
+            corner_radius=8,
+            command=lambda: self.xac_nhan_xoa_nguoi_dung(dialog, user)
+        )
+        delete_button.pack(side="left")
+
+    def xac_nhan_xoa_nguoi_dung(self, dialog, user):
+        """Confirm and execute user deletion"""
+        success, message = self.controller.xoaNguoiDung(user["ma_nguoi_dung"])
+        if success:
+            dialog.destroy()
             self.tai_danh_sach_nguoi_dung()
+            tk.messagebox.showinfo("Thành công", message)
+        else:
+            tk.messagebox.showerror("Lỗi", message)
+            dialog.destroy()

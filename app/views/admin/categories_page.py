@@ -76,7 +76,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         self.search_entry = ctk.CTkEntry(
             search_frame,
-            placeholder_text="Search categories...",
+            placeholder_text="Tìm kiếm danh mục...",
             border_width=0,
             fg_color="transparent",
             width=300,
@@ -92,7 +92,7 @@ class CategoriesPage(ctk.CTkFrame):
         # Add filter button
         filter_button = ctk.CTkButton(
             buttons_frame,
-            text="Filter",
+            text="Lọc",
             image=self.filter_icon,
             compound="left",
             fg_color="#F8F9FA",
@@ -108,7 +108,7 @@ class CategoriesPage(ctk.CTkFrame):
         # Add new category button
         new_category_button = ctk.CTkButton(
             buttons_frame,
-            text="Add Category",
+            text="Thêm Danh Mục",
             image=self.plus_icon,
             compound="left",
             fg_color="#006EC4",
@@ -306,7 +306,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         showing_label = ctk.CTkLabel(
             left_frame,
-            text=f"Showing {start_index}-{end_index} of {self.tong_so_muc} entries",
+            text=f"Hiển thị {start_index}-{end_index} trong {self.tong_so_muc} danh mục",
             text_color="#6F6E77"
         )
         showing_label.pack(side="left")
@@ -397,7 +397,7 @@ class CategoriesPage(ctk.CTkFrame):
 
     def xoa_danh_muc(self, danh_muc):
         """Hiển thị hộp thoại xác nhận và xóa danh mục"""
-        dialog = CenterDialog(self, "Delete Category")
+        dialog = CenterDialog(self, "Xoá Danh Mục")
         
         # Create content frame
         content_frame = ctk.CTkFrame(dialog, fg_color="transparent")
@@ -406,7 +406,7 @@ class CategoriesPage(ctk.CTkFrame):
         # Warning icon or text
         warning_label = ctk.CTkLabel(
             content_frame,
-            text="⚠️ Warning",
+            text="⚠️ Cảnh Báo",
             font=("", 16, "bold"),
             text_color="#e03137"
         )
@@ -415,21 +415,26 @@ class CategoriesPage(ctk.CTkFrame):
         # Confirmation message
         message_label = ctk.CTkLabel(
             content_frame,
-            text=f"Are you sure you want to delete '{danh_muc['ten']}'?\nThis action cannot be undone.",
+            text=f"Bạn có chắc chắn muốn xóa '{danh_muc['ten']}' không?\nKhông thể hoàn tác hành động này.",
             font=("", 13),
             text_color="#16151C"
         )
         message_label.pack(pady=(0, 20))
         
-        # Buttons frame
+        # Buttons frame with proper spacing
         buttons_frame = ctk.CTkFrame(dialog, fg_color="transparent", height=60)
         buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
         buttons_frame.pack_propagate(False)
         
+        # Container for right-aligned buttons
+        button_container = ctk.CTkFrame(buttons_frame, fg_color="transparent")
+        button_container.pack(side="right")
+        button_containerCancel = ctk.CTkFrame(buttons_frame, fg_color="transparent")
+        button_containerCancel.pack(side="left")
         # Cancel button
         cancel_button = ctk.CTkButton(
-            buttons_frame,
-            text="Cancel",
+            button_containerCancel,
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -442,8 +447,8 @@ class CategoriesPage(ctk.CTkFrame):
         
         # Delete button
         delete_button = ctk.CTkButton(
-            buttons_frame,
-            text="Delete",
+            button_container,
+            text="Xóa",
             fg_color="#e03137",
             text_color="white",
             hover_color="#b32429",
@@ -501,7 +506,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         name_label = ctk.CTkLabel(
             name_frame,
-            text="Name",
+            text="Tên Danh Mục",
             font=("", 14, "bold"),
             text_color="#16151C"
         )
@@ -513,7 +518,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         name_all = ctk.CTkRadioButton(
             name_options_frame,
-            text="All",
+            text="Tất Cả",
             variable=self.name_sort,
             value="none",
             font=("", 13),
@@ -523,7 +528,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         name_asc = ctk.CTkRadioButton(
             name_options_frame,
-            text="A-Z",
+            text="Từ A-Z",
             variable=self.name_sort,
             value="asc",
             font=("", 13),
@@ -533,7 +538,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         name_desc = ctk.CTkRadioButton(
             name_options_frame,
-            text="Z-A",
+            text="Từ Z-A",
             variable=self.name_sort,
             value="desc",
             font=("", 13),
@@ -547,7 +552,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         desc_label = ctk.CTkLabel(
             desc_frame,
-            text="Description",
+            text="Mô Tả",
             font=("", 14, "bold"),
             text_color="#16151C"
         )
@@ -559,7 +564,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         desc_all = ctk.CTkRadioButton(
             desc_options_frame,
-            text="All",
+            text="Tất Cả",
             variable=self.desc_sort,
             value="none",
             font=("", 13),
@@ -569,7 +574,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         desc_asc = ctk.CTkRadioButton(
             desc_options_frame,
-            text="A-Z",
+            text="Từ A-Z",
             variable=self.desc_sort,
             value="asc",
             font=("", 13),
@@ -579,7 +584,7 @@ class CategoriesPage(ctk.CTkFrame):
         
         desc_desc = ctk.CTkRadioButton(
             desc_options_frame,
-            text="Z-A",
+            text="Từ Z-A",
             variable=self.desc_sort,
             value="desc",
             font=("", 13),
@@ -595,7 +600,7 @@ class CategoriesPage(ctk.CTkFrame):
         # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_frame,
-            text="Cancel",
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -609,7 +614,7 @@ class CategoriesPage(ctk.CTkFrame):
         # Apply button
         apply_button = ctk.CTkButton(
             buttons_frame,
-            text="Apply",
+            text="Áp Dụng",
             fg_color="#006EC4",
             text_color="white",
             hover_color="#0059A1",

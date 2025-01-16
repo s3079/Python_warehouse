@@ -163,7 +163,7 @@ class AddOrderDialog(CenterDialog):
         # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_container,
-            text="Cancel",
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -177,7 +177,7 @@ class AddOrderDialog(CenterDialog):
         # Save button
         save_button = ctk.CTkButton(
             buttons_container,
-            text="Save",
+            text="Lưu",
             fg_color="#006EC4",
             text_color="white",
             hover_color="#0059A1",
