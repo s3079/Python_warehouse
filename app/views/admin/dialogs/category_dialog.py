@@ -88,7 +88,7 @@ class CategoryDialog(ctk.CTkToplevel):
             corner_radius=8,
             command=self.destroy
         )
-        cancel_button.grid(row=0, column=0, sticky="e", padx=(0, 10))
+        cancel_button.grid(row=0, column=0, sticky="w", padx=(0, 10))
         
         # Save button
         save_button = ctk.CTkButton(
@@ -101,13 +101,13 @@ class CategoryDialog(ctk.CTkToplevel):
             corner_radius=8,
             command=self.save_category
         )
-        save_button.grid(row=0, column=1, sticky="e")
+        save_button.grid(row=0, column=1, sticky="w")
         
         # If editing, populate fields with existing data
         if category:
-            self.name_entry.insert(0, category["name"])
-            if category["description"]:
-                self.description_text.insert("1.0", category["description"])
+            self.name_entry.insert(0, category["ten"])
+            if category["mo_ta"]:
+                self.description_text.insert("1.0", category["mo_ta"])
         
         # Focus on name entry
         self.name_entry.focus_set()
@@ -124,13 +124,13 @@ class CategoryDialog(ctk.CTkToplevel):
         
         # Prepare category data
         category_data = {
-            "name": name,
-            "description": description
+            "ten": name,
+            "mo_ta": description
         }
         
         # If editing, include category_id
         if self.category:
-            category_data["category_id"] = self.category["category_id"]
+            category_data["ma_danh_muc"] = self.category["ma_danh_muc"]
         
         # Call save callback
         if self.on_save:
