@@ -5,6 +5,8 @@ import tkinter as tk
 from app.controllers.product_controller import ProductController
 from app.views.admin.dialogs.product_dialog import ProductDialog
 from app.views.admin.dialogs.center_dialog import CenterDialog
+from app.views.admin.dialogs.delete_dialog import DeleteDialog
+from app.views.admin.dialogs.filter_dialog import FilterDialog
 
 class ProductsPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -256,8 +258,8 @@ class ProductsPage(ctk.CTkFrame):
                     delete_btn.pack(side="left")
                     
                 elif col["key"] == "don_gia":
-                    # Format price with currency
-                    value = f"${float(product[col['key']]):.2f}"
+                    # Format price in VND
+                    value = f"{float(product[col['key']]):,.0f} ₫"
                     label = ctk.CTkLabel(
                         row_frame,
                         text=value,
@@ -404,429 +406,54 @@ class ProductsPage(ctk.CTkFrame):
         )
 
     def show_edit_dialog(self, product):
+        print("product", product)
         """Show dialog to edit a product"""
-        dialog = CenterDialog(self, "Edit Product","500X800")
+        # Create product data dictionary with the required format
+        product_data = {
+            "ma_san_pham": product["ma_san_pham"],
+            "ten": product["ten"],
+            "mo_ta": product["mo_ta"],
+            "don_gia": product["don_gia"],
+            "ma_danh_muc": product["ma_danh_muc"],
+            "ma_ncc": product["ma_ncc"]
+        }
         
-        # Create main content frame
-        content_frame = ctk.CTkFrame(dialog, fg_color="transparent",)
-        content_frame.pack(fill="both", expand=True, padx=20, pady=20)
-        
-        # Product name
-        name_label = ctk.CTkLabel(
-            content_frame,
-            text="Name",
-            font=("", 13, "bold"),
-            text_color="#16151C"
+        dialog = ProductDialog(
+            self,
+            product=product_data,  # Pass existing product data
+            on_save=self.save_product,
         )
-        name_label.pack(anchor="w", pady=(0, 5))
-        
-        name_entry = ctk.CTkEntry(
-            content_frame,
-            placeholder_text="Enter product name",
-            height=40,
-            width=400
-        )
-        name_entry.pack(fill="x", pady=(0, 15))
-        name_entry.insert(0, product["name"])
-        
-        # Description
-        desc_label = ctk.CTkLabel(
-            content_frame,
-            text="Description",
-            font=("", 13, "bold"),
-            text_color="#16151C"
-        )
-        desc_label.pack(anchor="w", pady=(0, 5))
-        
-        desc_entry = ctk.CTkEntry(
-            content_frame,
-            placeholder_text="Enter product description",
-            height=40,
-            width=400
-        )
-        desc_entry.pack(fill="x", pady=(0, 15))
-        desc_entry.insert(0, product["description"] if product["description"] else "")
-
-        # Category
-        category_label = ctk.CTkLabel(
-            content_frame,
-            text="Category",
-            font=("", 13, "bold"),
-            text_color="#16151C"
-        )
-        category_label.pack(anchor="w", pady=(0, 5))
-
-        # Get categories from controller
-        from app.controllers.category_controller import CategoryController
-        category_controller = CategoryController()
-        categories = category_controller.get_all_categories()
-        category_names = [cat["name"] for cat in categories]
-        
-        category_combobox = ctk.CTkOptionMenu(
-            content_frame,
-            values=category_names,
-            height=40,
-            width=400,
-            fg_color="white",
-            text_color="#16151C",
-            button_color="#F0F0F0",
-            button_hover_color="#E8E9EA"
-        )
-        category_combobox.pack(fill="x", pady=(0, 15))
-        category_combobox.set(product["category_name"] if product["category_name"] else "Select Category")
-
-        # Supplier
-        supplier_label = ctk.CTkLabel(
-            content_frame,
-            text="Supplier",
-            font=("", 13, "bold"),
-            text_color="#16151C"
-        )
-        supplier_label.pack(anchor="w", pady=(0, 5))
-
-        # Get suppliers from controller
-        from app.controllers.supplier_controller import SupplierController
-        supplier_controller = SupplierController()
-        suppliers = supplier_controller.layTatCaNhaCungCap()
-        supplier_names = [sup["name"] for sup in suppliers]
-        
-        supplier_combobox = ctk.CTkOptionMenu(
-            content_frame,
-            values=supplier_names,
-            height=40,
-            width=400,
-            fg_color="white",
-            text_color="#16151C",
-            button_color="#F0F0F0",
-            button_hover_color="#E8E9EA"
-        )
-        supplier_combobox.pack(fill="x", pady=(0, 15))
-        supplier_combobox.set(product["supplier_name"] if product["supplier_name"] else "Select Supplier")
-        
-        # Price
-        price_label = ctk.CTkLabel(
-            content_frame,
-            text="Price",
-            font=("", 13, "bold"),
-            text_color="#16151C"
-        )
-        price_label.pack(anchor="w", pady=(0, 5))
-        
-        price_entry = ctk.CTkEntry(
-            content_frame,
-            placeholder_text="Enter product price",
-            height=40,
-            width=400
-        )
-        price_entry.pack(fill="x", pady=(0, 15))
-        price_entry.insert(0, str(product["unit_price"]))
-        
-        # Add buttons frame
-        buttons_frame = ctk.CTkFrame(dialog, fg_color="transparent", height=60)
-        buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
-        buttons_frame.pack_propagate(False)
-        
-        # Cancel button
-        cancel_button = ctk.CTkButton(
-            buttons_frame,
-            text="Cancel",
-            fg_color="#F8F9FA",
-            text_color="#16151C",
-            hover_color="#E8E9EA",
-            width=100,
-            height=40,
-            corner_radius=8,
-            command=dialog.destroy
-        )
-        cancel_button.pack(side="left", padx=(0, 10))
-        
-        # Save button
-        save_button = ctk.CTkButton(
-            buttons_frame,
-            text="Save",
-            fg_color="#006EC4",
-            text_color="white",
-            hover_color="#0059A1",
-            width=100,
-            height=40,
-            corner_radius=8,
-            command=lambda: self.save_product_changes(
-                dialog,
-                product["product_id"],
-                name_entry.get(),
-                desc_entry.get(),
-                price_entry.get(),
-                category_combobox.get(),
-                supplier_combobox.get()
-            )
-        )
-        save_button.pack(side="left")
 
     def delete_product(self, product):
         """Show confirmation dialog and delete product"""
-        dialog = CenterDialog(self, "Delete Product")
-        
-        # Create content frame
-        content_frame = ctk.CTkFrame(dialog, fg_color="transparent")
-        content_frame.pack(fill="both", expand=True, padx=20, pady=20)
-        
-        # Warning icon or text
-        warning_label = ctk.CTkLabel(
-            content_frame,
-            text="⚠️ Warning",
-            font=("", 16, "bold"),
-            text_color="#e03137"
-        )
-        warning_label.pack(pady=(0, 10))
-        
-        # Confirmation message
-        message_label = ctk.CTkLabel(
-            content_frame,
-            text=f"Are you sure you want to delete '{product['name']}'?\nThis action cannot be undone.",
-            font=("", 13),
-            text_color="#16151C"
-        )
-        message_label.pack(pady=(0, 20))
-        
-        # Buttons frame
-        buttons_frame = ctk.CTkFrame(dialog, fg_color="transparent", height=60)
-        buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
-        buttons_frame.pack_propagate(False)
-        
-        # Cancel button
-        cancel_button = ctk.CTkButton(
-            buttons_frame,
-            text="Cancel",
-            fg_color="#F8F9FA",
-            text_color="#16151C",
-            hover_color="#E8E9EA",
-            width=100,
-            height=40,
-            corner_radius=8,
-            command=dialog.destroy
-        )
-        cancel_button.pack(side="left", padx=(0, 10))
-        
-        # Delete button
-        delete_button = ctk.CTkButton(
-            buttons_frame,
-            text="Delete",
-            fg_color="#e03137",
-            text_color="white",
-            hover_color="#b32429",
-            width=100,
-            height=40,
-            corner_radius=8,
-            command=lambda: self.confirm_delete(dialog, product)
-        )
-        delete_button.pack(side="left")
-
-    def save_product_changes(self, dialog, product_id, name, description, price, category_name, supplier_name):
-        """Save product changes and close dialog"""
-        try:
-            # Validate inputs
-            if not name:
-                raise ValueError("Product name is required")
-            if not category_name or category_name == "Select Category":
-                raise ValueError("Category is required")
-            if not supplier_name or supplier_name == "Select Supplier":
-                raise ValueError("Supplier is required")
+        def handle_delete():
             try:
-                price = float(price)
-            except ValueError:
-                raise ValueError("Price must be a valid number")
-            
-            # Get category_id from category_name
-            from app.controllers.category_controller import CategoryController
-            category_controller = CategoryController()
-            categories = category_controller.layTatCaDanhMuc()
-            category = next((cat for cat in categories if cat["name"] == category_name), None)
-            if not category:
-                raise ValueError("Invalid category selected")
-
-            # Get supplier_id from supplier_name
-            from app.controllers.supplier_controller import SupplierController
-            supplier_controller = SupplierController()
-            suppliers = supplier_controller.layTatCaNhaCungCap()
-            supplier = next((sup for sup in suppliers if sup["name"] == supplier_name), None)
-            if not supplier:
-                raise ValueError("Invalid supplier selected")
-            
-            # Update product
-            success = self.controller.capNhatSanPham(product_id, {
-                "name": name,
-                "description": description,
-                "unit_price": price,
-                "category_id": category["category_id"],
-                "supplier_id": supplier["supplier_id"]
-            })
-            
-            if success:
-                dialog.destroy()
-                self.load_products()  # Refresh the list
-            else:
+                success, message = self.controller.xoaSanPham(product["ma_san_pham"])
+                if success:
+                    self.load_products()  # Refresh the list
+                else:
+                    from tkinter import messagebox
+                    messagebox.showerror("Lỗi", message)
+            except Exception as e:
                 from tkinter import messagebox
-                messagebox.showerror("Error", "Failed to update product")
-                
-        except Exception as e:
-            from tkinter import messagebox
-            messagebox.showerror("Error", str(e))
-
-    def confirm_delete(self, dialog, product):
-        """Execute delete operation and close dialog"""
-        try:
-            if self.controller.xoaSanPham(product["product_id"]):
-                dialog.destroy()
-                self.load_products()  # Refresh the list
-            else:
-                from tkinter import messagebox
-                messagebox.showerror("Error", "Failed to delete product")
-        except Exception as e:
-            from tkinter import messagebox
-            messagebox.showerror("Error", str(e))
+                messagebox.showerror("Lỗi", str(e))
+        
+        DeleteDialog(
+            self,
+            product["ten"],
+            on_confirm=handle_delete
+        )
 
     def show_filter_dialog(self):
         """Show filter options dialog"""
-        dialog = CenterDialog(self, "Filter Products", "400x300")
+        def handle_filters(filters):
+            self.current_page = 1
+            self.load_products()
         
-        # Store filter states
-        self.name_sort = tk.StringVar(value="none")  # none, asc, desc
-        self.price_sort = tk.StringVar(value="none")  # none, asc, desc
-        
-        # Create main content frame
-        content_frame = ctk.CTkFrame(dialog, fg_color="transparent")
-        content_frame.pack(fill="both", expand=True, padx=20, pady=20)
-        
-        # Name filter section
-        name_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
-        name_frame.pack(fill="x", pady=(0, 15))
-        
-        name_label = ctk.CTkLabel(
-            name_frame,
-            text="Name",
-            font=("", 14, "bold"),
-            text_color="#16151C"
+        FilterDialog(
+            self,
+            on_apply=handle_filters
         )
-        name_label.pack(anchor="w", pady=(0, 10))
-        
-        # Name radio buttons
-        name_options_frame = ctk.CTkFrame(name_frame, fg_color="transparent")
-        name_options_frame.pack(fill="x")
-        
-        name_all = ctk.CTkRadioButton(
-            name_options_frame,
-            text="All",
-            variable=self.name_sort,
-            value="none",
-            font=("", 13),
-            text_color="#16151C"
-        )
-        name_all.pack(side="left", padx=(0, 15))
-        
-        name_asc = ctk.CTkRadioButton(
-            name_options_frame,
-            text="A-Z",
-            variable=self.name_sort,
-            value="asc",
-            font=("", 13),
-            text_color="#16151C"
-        )
-        name_asc.pack(side="left", padx=(0, 15))
-        
-        name_desc = ctk.CTkRadioButton(
-            name_options_frame,
-            text="Z-A",
-            variable=self.name_sort,
-            value="desc",
-            font=("", 13),
-            text_color="#16151C"
-        )
-        name_desc.pack(side="left")
-        
-        # Price filter section
-        price_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
-        price_frame.pack(fill="x", pady=(0, 20))
-        
-        price_label = ctk.CTkLabel(
-            price_frame,
-            text="Price",
-            font=("", 14, "bold"),
-            text_color="#16151C"
-        )
-        price_label.pack(anchor="w", pady=(0, 10))
-        
-        # Price radio buttons
-        price_options_frame = ctk.CTkFrame(price_frame, fg_color="transparent")
-        price_options_frame.pack(fill="x")
-        
-        price_all = ctk.CTkRadioButton(
-            price_options_frame,
-            text="All",
-            variable=self.price_sort,
-            value="none",
-            font=("", 13),
-            text_color="#16151C"
-        )
-        price_all.pack(side="left", padx=(0, 15))
-        
-        price_asc = ctk.CTkRadioButton(
-            price_options_frame,
-            text="Low to High",
-            variable=self.price_sort,
-            value="asc",
-            font=("", 13),
-            text_color="#16151C"
-        )
-        price_asc.pack(side="left", padx=(0, 15))
-        
-        price_desc = ctk.CTkRadioButton(
-            price_options_frame,
-            text="High to Low",
-            variable=self.price_sort,
-            value="desc",
-            font=("", 13),
-            text_color="#16151C"
-        )
-        price_desc.pack(side="left")
-        
-        # Add buttons
-        buttons_frame = ctk.CTkFrame(dialog, fg_color="transparent", height=60)
-        buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
-        buttons_frame.pack_propagate(False)
-        
-        # Cancel button
-        cancel_button = ctk.CTkButton(
-            buttons_frame,
-            text="Cancel",
-            fg_color="#F8F9FA",
-            text_color="#16151C",
-            hover_color="#E8E9EA",
-            width=100,
-            height=40,
-            corner_radius=8,
-            command=dialog.destroy
-        )
-        cancel_button.pack(side="left", padx=(0, 10))
-        
-        # Apply button
-        apply_button = ctk.CTkButton(
-            buttons_frame,
-            text="Apply",
-            fg_color="#006EC4",
-            text_color="white",
-            hover_color="#0059A1",
-            width=100,
-            height=40,
-            corner_radius=8,
-            command=lambda: self.apply_filters(dialog)
-        )
-        apply_button.pack(side="left")
-
-    def apply_filters(self, dialog):
-        """Apply the selected filters and refresh the table"""
-        dialog.destroy()
-        self.current_page = 1  # Reset to first page
-        self.load_products()
 
     def save_product(self, data):
         """Save or update product"""
@@ -834,13 +461,15 @@ class ProductsPage(ctk.CTkFrame):
             # Validate price format and range
             try:
                 price = float(data['don_gia'])
-                if price < 0 or price > 999999.99:
-                    raise ValueError("Price must be between 0 and 999,999.99")
-                price = round(price, 2)
+                if price < 0 or price > 999999999:  # Increased max value for VND
+                    raise ValueError("Giá phải nằm trong khoảng từ 0 đến 999,999,999 ₫")
+                price = round(price, 0)  # Round to whole numbers for VND
             except ValueError as e:
-                if "must be between" in str(e):
+                if "phải nằm trong khoảng" in str(e):
                     raise e
-                raise ValueError("Price must be a valid number")
+                raise ValueError("Giá phải là một số hợp lệ")
+
+            print("data---", data)
 
             # Map the dialog data to match the schema field names
             product_data = {
@@ -850,26 +479,6 @@ class ProductsPage(ctk.CTkFrame):
                 'ma_danh_muc': data['ma_danh_muc'],
                 'ma_ncc': data['ma_ncc']
             }
-
-            # Get ma_danh_muc from category_name
-            from app.controllers.category_controller import CategoryController
-            category_controller = CategoryController()
-            categories = category_controller.layTatCaDanhMuc()
-            category = next((cat for cat in categories if cat["ten"] == data['ten_danh_muc']), None)
-            if category:
-                product_data['ma_danh_muc'] = category['ma_danh_muc']
-            else:
-                raise ValueError("Invalid category selected")
-
-            # Get ma_ncc from supplier_name
-            from app.controllers.supplier_controller import SupplierController
-            supplier_controller = SupplierController()
-            suppliers = supplier_controller.layTatCaNhaCungCap()
-            supplier = next((sup for sup in suppliers if sup["ten"] == data['ten_ncc']), None)
-            if supplier:
-                product_data['ma_ncc'] = supplier['ma_ncc']
-            else:
-                raise ValueError("Invalid supplier selected")
 
             if "ma_san_pham" in data:
                 # Update existing product

@@ -59,7 +59,7 @@ class ProductDialog(CenterDialog):
         # Price field
         price_label = ctk.CTkLabel(
             content_frame,
-            text="Price*",
+            text="Price (VND)*",
             font=("", 13),
             text_color="#16151C"
         )
@@ -67,7 +67,7 @@ class ProductDialog(CenterDialog):
         
         self.price_entry = ctk.CTkEntry(
             content_frame,
-            placeholder_text="Enter product price",
+            placeholder_text="Enter price in VND",
             height=40,
             width=460
         )
@@ -154,15 +154,22 @@ class ProductDialog(CenterDialog):
             command=self.save_product
         )
         save_button.pack(side="left")
+        print("product", product)
         
         # If editing, populate fields with existing data
         if product:
             self.name_entry.insert(0, product["ten"])
             if product["mo_ta"]:
                 self.desc_entry.insert("1.0", product["mo_ta"])
-            self.price_entry.insert(0, str(product["don_gia"]))
-            self.category_var.set(product["ten_danh_muc"])
-            self.supplier_var.set(product["ten_ncc"])
+            self.price_entry.insert(0, f"{int(product['don_gia']):,}")
+            from app.controllers.category_controller import CategoryController
+            from app.controllers.supplier_controller import SupplierController
+            category_controller = CategoryController()
+            supplier_controller = SupplierController()
+            category_data = category_controller.lay_danh_muc_theo_id(product["ma_danh_muc"])
+            supplier_data = supplier_controller.lay_nha_cung_cap_theo_id(product["ma_ncc"])
+            self.category_var.set(category_data["ten"])
+            self.supplier_var.set(supplier_data["ten"])
     
     def get_categories(self):
         """Get list of categories for dropdown"""
@@ -184,7 +191,7 @@ class ProductDialog(CenterDialog):
             # Get values from form
             ten = self.name_entry.get().strip()
             mo_ta = self.desc_entry.get("1.0", "end-1c").strip()
-            don_gia = self.price_entry.get().strip()
+            don_gia = self.price_entry.get().strip().replace(',', '')
             category = self.category_var.get()
             supplier = self.supplier_var.get()
             
@@ -203,7 +210,12 @@ class ProductDialog(CenterDialog):
                 don_gia = float(don_gia)
                 if don_gia < 0:
                     raise ValueError
-            except ValueError:
+                if don_gia > 999999999:
+                    raise ValueError("Đơn giá không được vượt quá 999,999,999 VND")
+                don_gia = round(don_gia)
+            except ValueError as e:
+                if "không được vượt quá" in str(e):
+                    raise e
                 raise ValueError("Đơn giá phải là số dương")
             
             # Get category and supplier IDs from names

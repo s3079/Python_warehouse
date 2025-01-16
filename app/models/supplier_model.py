@@ -61,12 +61,12 @@ class SupplierModel(BaseModel):
             self.conn.commit()
             return True
         return False
-    
+
     def layTheoId(self, ma_ncc: int):
-        """Get a supplier by ID"""
+        """Get a supplier by id"""
         query = f"SELECT * FROM {self._table_name} WHERE ma_ncc = %s"
-        cursor = self._thucThiTruyVan(query, (ma_ncc,))
-        return cursor.fetchone() if cursor else None
+        result = self._thucThiTruyVan(query, (ma_ncc,))
+        return result[0] if result else None
     
     def layNhaCungCapPhanTrang(self, offset=0, limit=10, search_query=""):
         """Get paginated suppliers with optional search"""

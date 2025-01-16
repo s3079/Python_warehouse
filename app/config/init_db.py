@@ -24,37 +24,37 @@ def init_database():
             cursor.execute(f"USE {Config.DB_NAME}")
             
             # Get the absolute path to schema.sql
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            schema_path = os.path.join(current_dir, 'schema.sql')
-            
-            # Read and execute schema.sql
-            with open(schema_path, 'r') as schema_file:
-                schema_script = schema_file.read()
-                # Split the script into individual statements
-                statements = schema_script.split(';')
-                
-                for statement in statements:
-                    if statement.strip():
-                        try:
-                            cursor.execute(statement)
-                        except Error as e:
-                            print(f"Error executing statement: {e}")
-                conn.commit()
-            print("Cấu trúc cơ sở dữ liệu đã được tạo thành công.")
-            
-            # Load sample data
-            sample_data_path = os.path.join(current_dir, 'sample_data.sql')
-            with open(sample_data_path, 'r') as sample_file:
-                sample_script = sample_file.read()
-                statements = sample_script.split(';')
-                
-                for statement in statements:
-                    if statement.strip():
-                        try:
-                            cursor.execute(statement)
-                        except Error as e:
-                            print(f"Error executing statement: {e}")
-                conn.commit()
+            # current_dir = os.path.dirname(os.path.abspath(__file__))
+            # schema_path = os.path.join(current_dir, 'schema.sql')
+            #
+            # # Read and execute schema.sql
+            # with open(schema_path, 'r') as schema_file:
+            #     schema_script = schema_file.read()
+            #     # Split the script into individual statements
+            #     statements = schema_script.split(';')
+            #
+            #     for statement in statements:
+            #         if statement.strip():
+            #             try:
+            #                 cursor.execute(statement)
+            #             except Error as e:
+            #                 print(f"Error executing statement: {e}")
+            #     conn.commit()
+            # print("Cấu trúc cơ sở dữ liệu đã được tạo thành công.")
+            #
+            # # Load sample data
+            # sample_data_path = os.path.join(current_dir, 'sample_data.sql')
+            # with open(sample_data_path, 'r') as sample_file:
+            #     sample_script = sample_file.read()
+            #     statements = sample_script.split(';')
+            #
+            #     for statement in statements:
+            #         if statement.strip():
+            #             try:
+            #                 cursor.execute(statement)
+            #             except Error as e:
+            #                 print(f"Error executing statement: {e}")
+            #     conn.commit()
             print("Dữ liệu mẫu đã được chèn thành công.")
             
             # Create admin user if it doesn't exist

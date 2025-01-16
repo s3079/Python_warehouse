@@ -58,3 +58,15 @@ class SupplierController:
             self.handle_error(e, "lấy danh sách nhà cung cấp phân trang")
             return [], 0
 
+    def lay_nha_cung_cap_theo_id(self, ma_ncc):
+        """Get a supplier by ID"""
+        try:
+            if not ma_ncc:
+                raise ValueError("ID nhà cung cấp là bắt buộc")
+            return self.model.layTheoId(ma_ncc)
+        except Exception as e:
+            self.handle_error(e, "lấy nhà cung cấp theo ID")
+            raise
+
+
+

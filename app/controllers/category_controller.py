@@ -64,9 +64,20 @@ class CategoryController:
         except Exception as e:
             self.handle_error(e, "xóa danh mục")
             raise
+
+    def lay_danh_muc_theo_id(self, ma_danh_muc):
+        """Get a category by ID"""
+        try:
+            if not ma_danh_muc:
+                raise ValueError("ID danh mục là bắt buộc")
+            return self._model.layTheoId(ma_danh_muc)
+        except Exception as e:
+            self.handle_error(e, "lấy danh mục theo ID")
+            raise
     
     def handle_error(self, error, action):
         """Handle errors in the controller"""
         error_message = f"Lỗi {action}: {str(error)}"
         print(error_message)  # Log the error
         return error_message
+

@@ -89,11 +89,16 @@ class ProductModel(BaseModel):
     def xoa(self, ma_san_pham: int):
         """Delete a product"""
         query = f"DELETE FROM {self._table_name} WHERE ma_san_pham = %s"
-        cursor = self._thucThiTruyVan(query, (ma_san_pham,))
-        if cursor:
-            self.conn.commit()
-            return True
-        return False
+        try:
+            cursor = self._thucThiTruyVan(query, (ma_san_pham,))
+            if cursor:
+                self.conn.commit()
+                return True, "Xóa sản phẩm thành công"
+        except Exception as e:
+            if "foreign key constraint fails" in str(e):
+                return False, "Không thể xóa sản phẩm này vì nó đang được sử dụng trong đơn hàng"
+            return False, f"Lỗi khi xóa sản phẩm: {str(e)}"
+        return False, "Xóa sản phẩm thất bại"
     
     def layTheoId(self, ma_san_pham: int):
         """Get a product by ID with category and supplier names"""
