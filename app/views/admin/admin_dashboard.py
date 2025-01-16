@@ -12,9 +12,12 @@ from app.views.admin.orders_page import OrdersPage
 class AdminDashboard(ctk.CTk):
     def __init__(self, user_data):
         super().__init__()
+        self.user_data = user_data  # Store user_data for access by child components
 
         # Set appearance mode to light
         ctk.set_appearance_mode("light")
+
+        print("User data:", self.user_data)
         
         self.title('Admin Dashboard')
         self.geometry('1200x700')
@@ -329,7 +332,7 @@ class AdminDashboard(ctk.CTk):
         elif page_name == "Users":
             page = UsersPage(self.content_area, self)
         elif page_name == "Orders":
-            page = OrdersPage(self.content_area, self)
+            page = OrdersPage(self.content_area, self, self.user_data)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         

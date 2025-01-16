@@ -1,7 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
 from pathlib import Path
-import tkinter as tk
 from app.controllers.inventory_controller import InventoryController
 from app.views.admin.dialogs.inventory_dialog import InventoryDialog
 

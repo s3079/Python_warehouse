@@ -4,6 +4,7 @@ class UserModel(BaseModel):
     def __init__(self):
         super().__init__()
         self._ensure_approval_column()
+        self.current_user_id = None  # This will be set during login
 
     def _ensure_approval_column(self):
         """Ensure the approval_status column exists"""
@@ -329,3 +330,12 @@ class UserModel(BaseModel):
         result = cursor.fetchone()
         cursor.close()
         return result
+
+    def get_current_user_id(self):
+        """Get the ID of the currently logged-in user"""
+        # You might want to get this from a session or stored value
+        return self.current_user_id
+    
+    def set_current_user_id(self, user_id):
+        """Set the current user ID after successful login"""
+        self.current_user_id = user_id

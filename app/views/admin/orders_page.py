@@ -4,15 +4,23 @@ from pathlib import Path
 from app.controllers.order_controller import OrderController
 from app.views.admin.dialogs.order_dialog import OrderDialog
 from app.views.admin.dialogs.center_dialog import CenterDialog
+from app.views.admin.dialogs.add_order_dialog import AddOrderDialog
+from app.views.admin.dialogs.edit_order_dialog import EditOrderDialog
 
 class OrdersPage(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, user_data):
         super().__init__(parent, fg_color="transparent")
         self.controller = OrderController()
+        self.user_data = user_data
+        
+        # Get user_id from parent (AdminDashboard)
+        self.user_id = self.user_data["user_id"]  # Access user_id from the logged-in user data
+        
         self.current_page = 1
         self.items_per_page = 10
         self.total_items = 0
         self.search_query = ""
+
 
         # Load icons
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
@@ -132,6 +140,18 @@ class OrdersPage(ctk.CTkFrame):
         
         # Load initial data
         self.load_orders()
+        
+        # Add "Add Order" button
+        add_order_button = ctk.CTkButton(
+            top_section,
+            text="Add Order",
+            image=self.plus_icon,
+            fg_color="#006EC4",
+            text_color="white",
+            hover_color="#0059A1",
+            command=self.show_add_order_dialog
+        )
+        add_order_button.grid(row=0, column=2, padx=(10, 0), pady=10, sticky="e")
     
     def on_search(self, event=None):
         """Handle search when Enter is pressed"""
@@ -194,7 +214,7 @@ class OrdersPage(ctk.CTkFrame):
                         fg_color="#006EC4",
                         text_color="white",
                         hover_color="#0059A1",
-                        command=lambda o=order: self.show_edit_dialog(o)
+                        command=lambda o=order: self.edit_order(o)
                     )
                     edit_btn.pack(side="left", padx=(0, 5))
                     
@@ -341,13 +361,25 @@ class OrdersPage(ctk.CTkFrame):
         self.current_page = page
         self.load_orders()
 
-    def show_edit_dialog(self, order):
+    def edit_order(self, order_data):
         """Show dialog to edit an order"""
-        dialog = OrderDialog(
-            self,
-            order=order,
-            on_save=self.save_order_changes
-        )
+        dialog = EditOrderDialog(self, order_data, on_save=self.update_order)
+
+    def update_order(self, data):
+        """Update an existing order"""
+        print("data:", data)
+        try:
+            success = self.controller.update_order(data)
+            if success:
+                self.load_orders()  # Refresh the table to show updated data
+                from tkinter import messagebox
+                messagebox.showinfo("Success", "Order updated successfully!")
+            else:
+                from tkinter import messagebox
+                messagebox.showerror("Error", "Failed to update order")
+        except Exception as e:
+            from tkinter import messagebox
+            messagebox.showerror("Error", str(e))
 
     def delete_order(self, order):
         """Show confirmation dialog and delete order"""
@@ -457,3 +489,20 @@ class OrdersPage(ctk.CTkFrame):
         else:
             from tkinter import messagebox
             messagebox.showerror("Error", "Failed to load order details")
+
+    def show_add_order_dialog(self):
+        """Show dialog to add a new order"""
+        dialog = AddOrderDialog(self, user_id=self.user_id, on_save=self.add_order)
+
+    def add_order(self, order_data):
+        """Add a new order and refresh the list"""
+        try:
+            success = self.controller.add_order(order_data)
+            if success:
+                self.load_orders()  # Refresh the list
+            else:
+                from tkinter import messagebox
+                messagebox.showerror("Error", "Failed to add order")
+        except Exception as e:
+            from tkinter import messagebox
+            messagebox.showerror("Error", str(e))
