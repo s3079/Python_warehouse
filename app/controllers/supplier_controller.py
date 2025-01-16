@@ -4,57 +4,57 @@ class SupplierController:
     def __init__(self):
         self.model = SupplierModel()
 
-    def get_all_suppliers(self):
+    def layTatCaNhaCungCap(self):
         """Get all suppliers"""
         try:
-            return self.model.get_all()
+            return self.model.layTatCa()
         except Exception as e:
-            self.handle_error(e, "getting all suppliers")
+            self.handle_error(e, "lấy tất cả nhà cung cấp")
             return []
 
-    def add_supplier(self, data):
+    def themNhaCungCap(self, data):
         """Add a new supplier"""
         try:
-            if not data.get('name'):
-                raise ValueError("Supplier name is required")
-            return self.model.add(**data)
+            if not data.get('ten'):
+                raise ValueError("Tên nhà cung cấp là bắt buộc")
+            return self.model.them(**data)
         except Exception as e:
-            self.handle_error(e, "adding supplier")
+            self.handle_error(e, "thêm nhà cung cấp")
             raise
 
-    def update_supplier(self, supplier_id, data):
+    def capNhatNhaCungCap(self, ma_ncc, data):
         """Update an existing supplier"""
         try:
-            if not supplier_id:
-                raise ValueError("Supplier ID is required")
-            if not data.get('name'):
-                raise ValueError("Supplier name is required")
-            return self.model.update(supplier_id=supplier_id, **data)
+            if not ma_ncc:
+                raise ValueError("Mã nhà cung cấp là bắt buộc")
+            if not data.get('ten'):
+                raise ValueError("Tên nhà cung cấp là bắt buộc")
+            return self.model.capNhat(ma_ncc=ma_ncc, **data)
         except Exception as e:
-            self.handle_error(e, "updating supplier")
+            self.handle_error(e, "cập nhật nhà cung cấp")
             raise
 
-    def delete_supplier(self, supplier_id):
+    def xoaNhaCungCap(self, ma_ncc):
         """Delete a supplier"""
         try:
-            if not supplier_id:
-                raise ValueError("Supplier ID is required")
-            return self.model.delete(supplier_id)
+            if not ma_ncc:
+                raise ValueError("Mã nhà cung cấp là bắt buộc")
+            return self.model.xoa(ma_ncc)
         except Exception as e:
-            self.handle_error(e, "deleting supplier")
+            self.handle_error(e, "xóa nhà cung cấp")
             raise
 
     def handle_error(self, error, action):
         """Handle errors in the controller"""
-        error_message = f"Error {action}: {str(error)}"
+        error_message = f"Lỗi {action}: {str(error)}"
         print(error_message)
         return error_message
 
-    def get_suppliers_paginated(self, offset=0, limit=10, search_query=""):
+    def layNhaCungCapPhanTrang(self, offset=0, limit=10, search_query=""):
         """Get paginated suppliers with optional search"""
         try:
-            return self.model.get_suppliers_paginated(offset, limit, search_query)
+            return self.model.layNhaCungCapPhanTrang(offset, limit, search_query)
         except Exception as e:
-            self.handle_error(e, "getting paginated suppliers")
+            self.handle_error(e, "lấy danh sách nhà cung cấp phân trang")
             return [], 0
 

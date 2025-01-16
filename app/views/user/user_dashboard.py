@@ -1,3 +1,4 @@
+import tkinter as tk
 import customtkinter as ctk
 from pathlib import Path
 from PIL import Image
@@ -11,6 +12,7 @@ class UserDashboard(ctk.CTk):
     def __init__(self, user_data):
         super().__init__()
         ctk.set_appearance_mode("light")
+        self.user_data = user_data
         self.title('User Dashboard')
         self.geometry('1200x700')
         self.configure(fg_color="white")
@@ -166,7 +168,7 @@ class UserDashboard(ctk.CTk):
         elif page_name == "Supplier":
             page = SupplierPage(self.content_area, self)
         elif page_name == "Orders":
-            page = OrdersPage(self.content_area, self)
+            page = OrdersPage(self.content_area, self, self.user_data)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         page.pack(expand=True, fill="both")

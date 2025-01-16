@@ -141,12 +141,12 @@ class ProductsPage(ctk.CTkFrame):
         
         # Define column configurations
         self.columns = [
-            {"name": "Name", "key": "name", "width": 100},
-            {"name": "Description", "key": "description", "width": 150},
-            {"name": "Category", "key": "category_name", "width": 150},
-            {"name": "Supplier", "key": "supplier_name", "width": 100},
-            {"name": "Price", "key": "unit_price", "width": 150},
-            {"name": "Actions", "key": "actions", "width": 100}
+            {"name": "Tên sản phẩm", "key": "ten", "width": 100},
+            {"name": "Mô tả", "key": "mo_ta", "width": 150},
+            {"name": "Danh mục", "key": "ten_danh_muc", "width": 150},
+            {"name": "Nhà cung cấp", "key": "ten_ncc", "width": 100},
+            {"name": "Đơn giá", "key": "don_gia", "width": 150},
+            {"name": "Thao tác", "key": "actions", "width": 100}
         ]
         
         # Create table header
@@ -196,7 +196,7 @@ class ProductsPage(ctk.CTkFrame):
         offset = (self.current_page - 1) * self.items_per_page
         
         # Get products from controller with pagination
-        products, total_count = self.controller.get_products_paginated(
+        products, total_count = self.controller.laySanPhamPhanTrang(
             offset=offset,
             limit=self.items_per_page,
             search_query=self.search_query
@@ -255,7 +255,7 @@ class ProductsPage(ctk.CTkFrame):
                     )
                     delete_btn.pack(side="left")
                     
-                elif col["key"] == "unit_price":
+                elif col["key"] == "don_gia":
                     # Format price with currency
                     value = f"${float(product[col['key']]):.2f}"
                     label = ctk.CTkLabel(
@@ -459,7 +459,7 @@ class ProductsPage(ctk.CTkFrame):
         # Get categories from controller
         from app.controllers.category_controller import CategoryController
         category_controller = CategoryController()
-        categories = category_controller.get_all_categories()
+        categories = category_controller.layTatCaDanhMuc()
         category_names = [cat["name"] for cat in categories]
         
         category_combobox = ctk.CTkOptionMenu(
@@ -487,7 +487,7 @@ class ProductsPage(ctk.CTkFrame):
         # Get suppliers from controller
         from app.controllers.supplier_controller import SupplierController
         supplier_controller = SupplierController()
-        suppliers = supplier_controller.get_all_suppliers()
+        suppliers = supplier_controller.layTatCaNhaCungCap()
         supplier_names = [sup["name"] for sup in suppliers]
         
         supplier_combobox = ctk.CTkOptionMenu(
@@ -639,7 +639,7 @@ class ProductsPage(ctk.CTkFrame):
             # Get category_id from category_name
             from app.controllers.category_controller import CategoryController
             category_controller = CategoryController()
-            categories = category_controller.get_all_categories()
+            categories = category_controller.layTatCaDanhMuc()
             category = next((cat for cat in categories if cat["name"] == category_name), None)
             if not category:
                 raise ValueError("Invalid category selected")
@@ -647,13 +647,13 @@ class ProductsPage(ctk.CTkFrame):
             # Get supplier_id from supplier_name
             from app.controllers.supplier_controller import SupplierController
             supplier_controller = SupplierController()
-            suppliers = supplier_controller.get_all_suppliers()
+            suppliers = supplier_controller.layTatCaNhaCungCap()
             supplier = next((sup for sup in suppliers if sup["name"] == supplier_name), None)
             if not supplier:
                 raise ValueError("Invalid supplier selected")
             
             # Update product
-            success = self.controller.update_product(product_id, {
+            success = self.controller.capNhatSanPham(product_id, {
                 "name": name,
                 "description": description,
                 "unit_price": price,
@@ -675,7 +675,7 @@ class ProductsPage(ctk.CTkFrame):
     def confirm_delete(self, dialog, product):
         """Execute delete operation and close dialog"""
         try:
-            if self.controller.delete_product(product["product_id"]):
+            if self.controller.xoaSanPham(product["product_id"]):
                 dialog.destroy()
                 self.load_products()  # Refresh the list
             else:
@@ -855,7 +855,7 @@ class ProductsPage(ctk.CTkFrame):
             # Get category_id from category_name
             from app.controllers.category_controller import CategoryController
             category_controller = CategoryController()
-            categories = category_controller.get_all_categories()
+            categories = category_controller.layTatCaDanhMuc()
             category = next((cat for cat in categories if cat["name"] == data['category_name']), None)
             if category:
                 product_data['category_id'] = category['category_id']
@@ -865,7 +865,7 @@ class ProductsPage(ctk.CTkFrame):
             # Get supplier_id from supplier_name
             from app.controllers.supplier_controller import SupplierController
             supplier_controller = SupplierController()
-            suppliers = supplier_controller.get_all_suppliers()
+            suppliers = supplier_controller.layTatCaNhaCungCap()
             supplier = next((sup for sup in suppliers if sup["name"] == data['supplier_name']), None)
             if supplier:
                 product_data['supplier_id'] = supplier['supplier_id']
@@ -874,10 +874,10 @@ class ProductsPage(ctk.CTkFrame):
 
             if "product_id" in data:
                 # Update existing product
-                success = self.controller.update_product(data["product_id"], product_data)
+                success = self.controller.capNhatSanPham(data["product_id"], product_data)
             else:
                 # Add new product
-                success = self.controller.add_product(product_data)
+                success = self.controller.themSanPham(product_data)
             
             if success:
                 self.load_products()  # Refresh the products list

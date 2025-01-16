@@ -1,5 +1,4 @@
 from pathlib import Path
-import tkinter as tk
 import customtkinter as ctk
 from PIL import Image
 from app.controllers.user_controller import UserController
@@ -123,7 +122,7 @@ class RegisterView(ctk.CTkFrame):
         # Username field
         self.username_label = ctk.CTkLabel(
             register_form_frame,
-            text="Tên người dùng",
+            text="Tên đăng nhập",
             font=("Helvetica", 12),
             text_color="#006EC4",
             anchor="w"
@@ -135,7 +134,7 @@ class RegisterView(ctk.CTkFrame):
             register_form_frame,
             width=350,
             height=40,
-            placeholder_text="Nhập tên người dùng",
+            placeholder_text="Nhập tên đăng nhập",
             border_width=1,
             corner_radius=8
         )
@@ -239,25 +238,25 @@ class RegisterView(ctk.CTkFrame):
         self.login_button.grid(row=form_row, column=0, sticky="w", pady=(5, 0))
 
     def _on_register_click(self):
-        username = self.username_entry.get()
-        fullName = self.fullName_entry.get()
-        password = self.password_entry.get()
-        confirm_password = self.confirm_password_entry.get()
+        ten_dang_nhap = self.username_entry.get()
+        ho_ten = self.fullName_entry.get()
+        mat_khau = self.password_entry.get()
+        xac_nhan_mat_khau = self.confirm_password_entry.get()
 
-        if not all([username, fullName, password, confirm_password]):
-            messagebox.showerror("Error", "Vui lòng điền đầy đủ thông tin")
+        if not all([ten_dang_nhap, ho_ten, mat_khau, xac_nhan_mat_khau]):
+            messagebox.showerror("Lỗi", "Vui lòng điền đầy đủ thông tin")
             return
 
-        if password != confirm_password:
-            messagebox.showerror("Error", "Mật khẩu không khớp")
+        if mat_khau != xac_nhan_mat_khau:
+            messagebox.showerror("Lỗi", "Mật khẩu không khớp")
             return
 
-        success = self._controller.register(username, password, fullName)
+        success, message = self._controller.dangKy(ten_dang_nhap, mat_khau, ho_ten)
         if success:
-            messagebox.showinfo("Success", "Đăng ký thành công")
+            messagebox.showinfo("Thành công", message)
             self._on_login_click()
         else:
-            messagebox.showerror("Error", "Đăng ký thất bại")
+            messagebox.showerror("Lỗi", message)
 
     def _on_login_click(self):
         from app.views.login_view import LoginView

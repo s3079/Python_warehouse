@@ -14,7 +14,7 @@ class OrdersPage(ctk.CTkFrame):
         self.user_data = user_data
         
         # Get user_id from parent (AdminDashboard)
-        self.user_id = self.user_data["user_id"]  # Access user_id from the logged-in user data
+        self.ma_nguoi_dung = self.user_data["ma_nguoi_dung"]  # Updated from user_id
         
         self.current_page = 1
         self.items_per_page = 10
@@ -149,10 +149,10 @@ class OrdersPage(ctk.CTkFrame):
         
         # Define column configurations
         self.columns = [
-            {"name": "Order ID", "key": "order_id", "width": 100},
-            {"name": "Date", "key": "order_date", "width": 150},
-            {"name": "Total", "key": "total_amount", "width": 100},
-            {"name": "Actions", "key": "actions", "width": 100}
+            {"name": "Mã đơn hàng", "key": "ma_don_hang", "width": 100},  # Updated from order_id
+            {"name": "Ngày đặt", "key": "ngay_dat", "width": 150},        # Updated from order_date
+            {"name": "Tổng tiền", "key": "tong_tien", "width": 100},      # Updated from total_amount
+            {"name": "Thao tác", "key": "actions", "width": 100}          # Updated from Actions
         ]
         
         # Create table header
@@ -202,7 +202,7 @@ class OrdersPage(ctk.CTkFrame):
         offset = (self.current_page - 1) * self.items_per_page
         
         # Get orders from controller with pagination
-        orders, total_count = self.controller.get_orders_paginated(
+        orders, total_count = self.controller.layDonHangPhanTrang(
             offset=offset,
             limit=self.items_per_page,
             search_query=self.search_query
@@ -268,7 +268,7 @@ class OrdersPage(ctk.CTkFrame):
                     )
                     delete_btn.pack(side="left")
                     
-                elif col["key"] == "total_amount":
+                elif col["key"] == "tong_tien":
                     # Format total with currency
                     value = f"${float(order[col['key']]):.2f}"
                     label = ctk.CTkLabel(
@@ -406,7 +406,7 @@ class OrdersPage(ctk.CTkFrame):
         """Update an existing order"""
         print("data:", data)
         try:
-            success = self.controller.update_order(data)
+            success = self.controller.capNhatDonHang(data)
             if success:
                 self.load_orders()  # Refresh the table to show updated data
                 from tkinter import messagebox
@@ -438,7 +438,7 @@ class OrdersPage(ctk.CTkFrame):
         # Confirmation message
         message_label = ctk.CTkLabel(
             content_frame,
-            text=f"Are you sure you want to delete order '{order['order_id']}'?\nThis action cannot be undone.",
+            text=f"Are you sure you want to delete order '{order['ma_don_hang']}'?\nThis action cannot be undone.",
             font=("", 13),
             text_color="#16151C"
         )
@@ -477,20 +477,19 @@ class OrdersPage(ctk.CTkFrame):
         )
         delete_button.pack(side="left")
 
-    def save_order_changes(self, dialog, order_id, order_date, total_amount):
+    def save_order_changes(self, dialog, ma_don_hang, ngay_dat, tong_tien):
         """Save order changes and close dialog"""
         try:
-            if not order_date:
-                raise ValueError("Order date is required")
+            if not ngay_dat:
+                raise ValueError("Ngày đặt là bắt buộc")
             try:
-                total_amount = float(total_amount)
+                tong_tien = float(tong_tien)
             except ValueError:
-                raise ValueError("Total amount must be a valid number")
+                raise ValueError("Tổng tiền phải là số hợp lệ")
             
-            # Update order without customer_name
-            success = self.controller.update_order(order_id, {
-                "order_date": order_date,
-                "total_amount": total_amount
+            success = self.controller.capNhatDonHang(ma_don_hang, {
+                "ngay_dat": ngay_dat,
+                "tong_tien": tong_tien
             })
             
             if success:
@@ -498,48 +497,48 @@ class OrdersPage(ctk.CTkFrame):
                 self.load_orders()  # Refresh the list
             else:
                 from tkinter import messagebox
-                messagebox.showerror("Error", "Failed to update order")
+                messagebox.showerror("Lỗi", "Cập nhật đơn hàng thất bại")
                 
         except Exception as e:
             from tkinter import messagebox
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Lỗi", str(e))
 
     def confirm_delete(self, dialog, order):
         """Execute delete operation and close dialog"""
         try:
-            if self.controller.delete_order(order["order_id"]):
+            if self.controller.xoaDonHang(order["ma_don_hang"]):
                 dialog.destroy()
                 self.load_orders()  # Refresh the list
             else:
                 from tkinter import messagebox
-                messagebox.showerror("Error", "Failed to delete order")
+                messagebox.showerror("Lỗi", "Xóa đơn hàng thất bại")
         except Exception as e:
             from tkinter import messagebox
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Lỗi", str(e))
 
     def show_order_details(self, order):
         """Show a dialog with order details"""
-        order_details = self.controller.get_order_details(order['order_id'])
+        order_details = self.controller.layChiTietDonHang(order['ma_don_hang'])
         if order_details:
             dialog = OrderDialog(self, order=order_details)
             dialog.show()
         else:
             from tkinter import messagebox
-            messagebox.showerror("Error", "Failed to load order details")
+            messagebox.showerror("Lỗi", "Không thể tải chi tiết đơn hàng")
 
     def show_add_order_dialog(self):
         """Show dialog to add a new order"""
-        dialog = AddOrderDialog(self, user_id=self.user_id, on_save=self.add_order)
+        dialog = AddOrderDialog(self, ma_nguoi_dung=self.ma_nguoi_dung, on_save=self.add_order)
 
     def add_order(self, order_data):
         """Add a new order and refresh the list"""
         try:
-            success = self.controller.add_order(order_data)
+            success = self.controller.themDonHang(order_data)
             if success:
                 self.load_orders()  # Refresh the list
             else:
                 from tkinter import messagebox
-                messagebox.showerror("Error", "Failed to add order")
+                messagebox.showerror("Lỗi", "Thêm đơn hàng thất bại")
         except Exception as e:
             from tkinter import messagebox
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Lỗi", str(e))

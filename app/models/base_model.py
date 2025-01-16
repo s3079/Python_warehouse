@@ -3,15 +3,12 @@ import mysql.connector
 from app.config.config import Config
 
 class BaseModel(ABC):
-    """Abstract base class for all models"""
     
     def __init__(self):
-        """Initialize database connection"""
         self.config = Config.get_db_config()
-        self._connect()
+        self._ketNoi()
 
-    def _connect(self):
-        """Create database connection"""
+    def _ketNoi(self):
         try:
             self.conn = mysql.connector.connect(
                 host=self.config['host'],
@@ -26,34 +23,27 @@ class BaseModel(ABC):
             self.conn = None
     
     def __del__(self):
-        """Close database connection"""
         try:
             if hasattr(self, 'conn') and self.conn and self.conn.is_connected():
                 self.conn.close()
         except:
             pass  # Ignore errors during cleanup
     
-    def _execute_query(self, query, params=None):
-        """Protected method to execute database queries"""
+    def _thucThiTruyVan(self, query, params=None):
         cursor = None
         try:
             if not self.conn or not self.conn.is_connected():
-                self._connect()
+                self._ketNoi()
             
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute(query, params)
             
-            # For SELECT queries, return the results
             if query.strip().upper().startswith('SELECT'):
                 return cursor.fetchall()
             
-            # For other queries (INSERT, UPDATE, DELETE), commit and return cursor
             self.conn.commit()
             return cursor
             
-        except mysql.connector.Error as e:
-            print(f"Database error: {str(e)}")
-            raise
         except Exception as e:
             print(f"Error executing query: {str(e)}")
             raise
@@ -61,22 +51,18 @@ class BaseModel(ABC):
             if cursor:
                 cursor.close()
     
-    @abstractmethod
-    def get_all(self):
+    def layTatCa(self):
         """Get all records"""
         pass
     
-    @abstractmethod
-    def add(self, data):
+    def them(self, data):
         """Add a new record"""
         pass
     
-    @abstractmethod
-    def update(self, id, data):
+    def capNhat(self, id, data):
         """Update a record"""
         pass
     
-    @abstractmethod
-    def delete(self, id):
+    def xoa(self, id):
         """Delete a record"""
         pass

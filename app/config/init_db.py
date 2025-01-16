@@ -23,7 +23,7 @@ def init_database():
             # Switch to the database
             cursor.execute(f"USE {Config.DB_NAME}")
             
-            # # Get the absolute path to schema.sql
+            # Get the absolute path to schema.sql
             # current_dir = os.path.dirname(os.path.abspath(__file__))
             # schema_path = os.path.join(current_dir, 'schema.sql')
             
@@ -58,12 +58,12 @@ def init_database():
             # print("Dữ liệu mẫu đã được chèn thành công.")
             
             # Create admin user if it doesn't exist
-            cursor.execute("SELECT user_id FROM users WHERE username = 'admin'")
+            cursor.execute("SELECT ma_nguoi_dung FROM nguoi_dung WHERE ten_dang_nhap = 'admin'")
             admin_exists = cursor.fetchone()
             
             if not admin_exists:
                 # Get admin role id
-                cursor.execute("SELECT role_id FROM user_roles WHERE role_name = 'administrator'")
+                cursor.execute("SELECT ma_quyen FROM phan_quyen WHERE ten_quyen = 'administrator'")
                 admin_role = cursor.fetchone()
                 
                 if admin_role:
@@ -73,9 +73,9 @@ def init_database():
                     
                     # Create admin user
                     cursor.execute("""
-                        INSERT INTO users (username, password, fullName, role_id)
+                        INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, ho_ten, ma_quyen)
                         VALUES (%s, %s, %s, %s)
-                    """, ('admin', hashed_password, 'Admin User', admin_role[0]))
+                    """, ('admin', hashed_password, 'Quản trị viên', admin_role[0]))
                     conn.commit()
                     print("Tài khoản quản trị viên đã được tạo thành công.")
                 else:

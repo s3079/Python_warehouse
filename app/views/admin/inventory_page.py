@@ -131,8 +131,8 @@ class InventoryPage(ctk.CTkFrame):
         
         # Define column configurations
         self.columns = [
-            {"name": "Product Name", "key": "product_name", "width": 200},
-            {"name": "Quantity", "key": "quantity", "width": 100}
+            {"name": "Tên sản phẩm", "key": "ten_san_pham", "width": 200},
+            {"name": "Số lượng", "key": "so_luong", "width": 100}
         ]
         
         # Create table header
@@ -182,7 +182,7 @@ class InventoryPage(ctk.CTkFrame):
         offset = (self.current_page - 1) * self.items_per_page
         
         # Get inventory items from controller with pagination
-        inventory, total_count = self.controller.get_inventory_paginated(
+        inventory, total_count = self.controller.layKhoHangPhanTrang(
             offset=offset,
             limit=self.items_per_page,
             search_query=self.search_query
@@ -329,7 +329,7 @@ class InventoryPage(ctk.CTkFrame):
     def add_inventory_item(self, data):
         """Add inventory item logic"""
         # Directly use the data passed from the dialog, which includes product_id
-        success, message = self.controller.add_inventory(data)
+        success, message = self.controller.themKhoHang(data)
         if success:
             self.load_inventory()  # Refresh the inventory list
         else:

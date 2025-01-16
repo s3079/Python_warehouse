@@ -20,5 +20,5 @@ class BaseController:
 
     def handle_error(self, error, action):
         """Handle errors in the controller"""
-        error_message = f"Error {action}: {str(error)}"
+        error_message = f"Lỗi {action}: {str(error)}"
         print(error_message)  # Log the error

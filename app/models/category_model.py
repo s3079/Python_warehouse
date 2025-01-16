@@ -4,66 +4,66 @@ from app.models.base_model import BaseModel
 class CategoryModel(BaseModel):
     def __init__(self):
         super().__init__()
-        self._table_name = "categories"
+        self._table_name = "danh_muc"
         self._db = Database()
         self._db.connect()  # Ensure connection is established
     
-    def _execute_query(self, query, params=None):
-        """Execute a query and return results"""
-        try:
-            if not self._db._connection or not self._db._connection.is_connected():
-                self._db.connect()
-            return self._db.execute_query(query, params)
-        except Exception as e:
-            print(f"Database error: {e}")
-            return None
+    # def _thucThiTruyVan(self, query, params=None):
+    #     """Execute a query and return results"""
+    #     try:
+    #         if not self._db._connection or not self._db._connection.is_connected():
+    #             self._db.connect()
+    #         return self._db.execute_query(query, params)
+    #     except Exception as e:
+    #         print(f"Database error: {e}")
+    #         return None
     
-    def get_all(self):
+    def layTatCa(self):
         """Get all categories"""
         query = f"""
             SELECT 
-                category_id, name, description, created_at, updated_at
+                ma_danh_muc, ten, mo_ta, ngay_tao, ngay_cap_nhat
             FROM {self._table_name}
-            ORDER BY name
+            ORDER BY ten
         """
-        return self._execute_query(query) or []
+        return self._thucThiTruyVan(query) or []
         
-    def count_products(self, category_id):
+    def demSanPham(self, ma_danh_muc):
         """Count number of products in a category"""
         query = """
-            SELECT COUNT(*) as count
-            FROM products 
-            WHERE category_id = %s
+            SELECT COUNT(*) as so_luong
+            FROM san_pham 
+            WHERE ma_danh_muc = %s
         """
-        result = self._execute_query(query, (category_id,))
-        return result[0]['count'] if result else 0
+        result = self._thucThiTruyVan(query, (ma_danh_muc,))
+        return result[0]['so_luong'] if result else 0
         
-    def add(self, name: str, description: str):
+    def them(self, ten: str, mo_ta: str):
         """Add a new category"""
-        query = f"INSERT INTO {self._table_name} (name, description) VALUES (%s, %s)"
-        return self._execute_query(query, (name, description))
+        query = f"INSERT INTO {self._table_name} (ten, mo_ta) VALUES (%s, %s)"
+        return self._thucThiTruyVan(query, (ten, mo_ta))
     
-    def update(self, category_id: int, name: str, description: str):
+    def capNhat(self, ma_danh_muc: int, ten: str, mo_ta: str):
         """Update a category"""
-        query = f"UPDATE {self._table_name} SET name = %s, description = %s WHERE category_id = %s"
-        return self._execute_query(query, (name, description, category_id))
+        query = f"UPDATE {self._table_name} SET ten = %s, mo_ta = %s WHERE ma_danh_muc = %s"
+        return self._thucThiTruyVan(query, (ten, mo_ta, ma_danh_muc))
     
-    def delete(self, category_id: int):
+    def xoa(self, ma_danh_muc: int):
         """Delete a category"""
-        query = f"DELETE FROM {self._table_name} WHERE category_id = %s"
-        return self._execute_query(query, (category_id,))
+        query = f"DELETE FROM {self._table_name} WHERE ma_danh_muc = %s"
+        return self._thucThiTruyVan(query, (ma_danh_muc,))
     
-    def get_by_id(self, category_id: int):
+    def layTheoId(self, ma_danh_muc: int):
         """Get a category by id"""
-        query = f"SELECT * FROM {self._table_name} WHERE category_id = %s"
-        result = self._execute_query(query, (category_id,))
+        query = f"SELECT * FROM {self._table_name} WHERE ma_danh_muc = %s"
+        result = self._thucThiTruyVan(query, (ma_danh_muc,))
         return result[0] if result else None
     
-    def get_all_categories(self):
+    def layTatCaDanhMuc(self):
         """Get all categories"""
-        query = f"SELECT category_id, name FROM {self._table_name} ORDER BY name"
+        query = f"SELECT ma_danh_muc, ten FROM {self._table_name} ORDER BY ten"
         try:
-            return self._execute_query(query) or []
+            return self._thucThiTruyVan(query) or []
         except Exception as e:
-            print(f"Error in get_all_categories: {str(e)}")
+            print(f"Lỗi trong layTatCaDanhMuc: {str(e)}")
             return []

@@ -1,5 +1,4 @@
 from pathlib import Path
-import tkinter as tk
 import customtkinter as ctk
 from PIL import Image
 from app.controllers.user_controller import UserController
@@ -128,7 +127,7 @@ class LoginView(ctk.CTkFrame):
         # Login Form
         self.username_label = ctk.CTkLabel(
             login_form_frame,
-            text="Username",
+            text="Tên đăng nhập",
             font=("Helvetica", 12),
             text_color="#006EC4",
             anchor="w"
@@ -140,7 +139,7 @@ class LoginView(ctk.CTkFrame):
             login_form_frame,
             width=350,
             height=40,
-            placeholder_text="Enter username",
+            placeholder_text="Nhập tên đăng nhập",
             border_width=1,
             corner_radius=8
         )
@@ -149,7 +148,7 @@ class LoginView(ctk.CTkFrame):
 
         self.password_label = ctk.CTkLabel(
             login_form_frame,
-            text="Password",
+            text="Mật khẩu",
             font=("Helvetica", 12),
             text_color="#006EC4",
             anchor="w"
@@ -198,14 +197,13 @@ class LoginView(ctk.CTkFrame):
         self.register_button.grid(row=form_row, column=0, sticky="w", pady=(5, 0))
 
     def _on_login_click(self):
-        username = self.username_entry.get()
-        password = self.password_entry.get()
-        success, user_data = self._controller.login(username, password)
-
+        ten_dang_nhap = self.username_entry.get()
+        mat_khau = self.password_entry.get()
+        success, user_data = self._controller.dangNhap(ten_dang_nhap, mat_khau)
         
         if success:
-            if user_data['role_name'] == "registered_user":
-                messagebox.showerror("Notice", "Tài khoản cần được phê duyệt để có thể vào ứng dụng!")
+            if user_data['ten_quyen'] == "registered_user":
+                messagebox.showerror("Thông báo", "Tài khoản cần được phê duyệt để có thể vào ứng dụng!")
                 return
             # First destroy the login view
             self.destroy()
@@ -214,17 +212,17 @@ class LoginView(ctk.CTkFrame):
                 self.parent.destroy()
             
             # Create the appropriate dashboard or show notice
-            if user_data['role_name'] == "administrator":
+            if user_data['ten_quyen'] == "administrator":
                 app = AdminDashboard(user_data=user_data)
                 app.mainloop()
-            elif user_data['role_name'] == "manager":
+            elif user_data['ten_quyen'] == "manager":
                 app = ManagerDashboard(user_data=user_data)
                 app.mainloop()
             else:
                 app = UserDashboard(user_data=user_data)
                 app.mainloop()
         else:
-            messagebox.showerror("Error", user_data)  # Show error message
+            messagebox.showerror("Lỗi", user_data)  # Show error message
 
     def _on_register_click(self):
         from app.views.register_view import RegisterView

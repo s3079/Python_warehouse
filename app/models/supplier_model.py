@@ -3,72 +3,72 @@ from app.models.base_model import BaseModel
 class SupplierModel(BaseModel):
     def __init__(self):
         super().__init__()
-        self._table_name = "suppliers"
+        self._table_name = "nha_cung_cap"
     
-    def get_all(self):
+    def layTatCa(self):
         """Get all suppliers"""
-        query = f"SELECT * FROM {self._table_name} ORDER BY name"
+        query = f"SELECT * FROM {self._table_name} ORDER BY ten"
         try:
-            return self._execute_query(query) or []
+            return self._thucThiTruyVan(query) or []
         except Exception as e:
-            print(f"Error in get_all: {str(e)}")
+            print(f"Error in layTatCa: {str(e)}")
             return []
     
-    def add(self, **data):
+    def them(self, **data):
         """Add a new supplier"""
         query = f"""
             INSERT INTO {self._table_name} 
-            (name, address, phone, email) 
+            (ten, dia_chi, dien_thoai, email) 
             VALUES (%s, %s, %s, %s)
         """
         params = (
-            data.get('name'),
-            data.get('address'),
-            data.get('phone'),
+            data.get('ten'),
+            data.get('dia_chi'),
+            data.get('dien_thoai'),
             data.get('email')
         )
-        cursor = self._execute_query(query, params)
+        cursor = self._thucThiTruyVan(query, params)
         if cursor:
             self.conn.commit()
             return True, "Supplier added successfully"
         return False, "Failed to add supplier"
     
-    def update(self, supplier_id: int, **data):
+    def capNhat(self, ma_ncc: int, **data):
         """Update an existing supplier"""
         query = f"""
             UPDATE {self._table_name}
-            SET name = %s, address = %s, phone = %s, email = %s
-            WHERE supplier_id = %s
+            SET ten = %s, dia_chi = %s, dien_thoai = %s, email = %s
+            WHERE ma_ncc = %s
         """
         params = (
-            data.get('name'),
-            data.get('address'),
-            data.get('phone'),
+            data.get('ten'),
+            data.get('dia_chi'),
+            data.get('dien_thoai'),
             data.get('email'),
-            supplier_id
+            ma_ncc
         )
-        cursor = self._execute_query(query, params)
+        cursor = self._thucThiTruyVan(query, params)
         if cursor:
             self.conn.commit()
             return True
         return False
     
-    def delete(self, supplier_id: int):
+    def xoa(self, ma_ncc: int):
         """Delete a supplier"""
-        query = f"DELETE FROM {self._table_name} WHERE supplier_id = %s"
-        cursor = self._execute_query(query, (supplier_id,))
+        query = f"DELETE FROM {self._table_name} WHERE ma_ncc = %s"
+        cursor = self._thucThiTruyVan(query, (ma_ncc,))
         if cursor:
             self.conn.commit()
             return True
         return False
     
-    def get_by_id(self, supplier_id: int):
+    def layTheoId(self, ma_ncc: int):
         """Get a supplier by ID"""
-        query = f"SELECT * FROM {self._table_name} WHERE supplier_id = %s"
-        cursor = self._execute_query(query, (supplier_id,))
+        query = f"SELECT * FROM {self._table_name} WHERE ma_ncc = %s"
+        cursor = self._thucThiTruyVan(query, (ma_ncc,))
         return cursor.fetchone() if cursor else None
     
-    def get_suppliers_paginated(self, offset=0, limit=10, search_query=""):
+    def layNhaCungCapPhanTrang(self, offset=0, limit=10, search_query=""):
         """Get paginated suppliers with optional search"""
         try:
             query = f"SELECT * FROM {self._table_name}"
@@ -77,11 +77,11 @@ class SupplierModel(BaseModel):
             params = []
             
             if search_query:
-                query += " WHERE name LIKE %s OR email LIKE %s"
-                count_query += " WHERE name LIKE %s OR email LIKE %s"
+                query += " WHERE ten LIKE %s OR email LIKE %s"
+                count_query += " WHERE ten LIKE %s OR email LIKE %s"
                 params.extend([f"%{search_query}%", f"%{search_query}%", f"%{search_query}%"])
             
-            query += " ORDER BY name LIMIT %s OFFSET %s"
+            query += " ORDER BY ten LIMIT %s OFFSET %s"
             params.extend([limit, offset])
             
             cursor = self.conn.cursor()
@@ -100,5 +100,5 @@ class SupplierModel(BaseModel):
             return suppliers, total_count
             
         except Exception as e:
-            print(f"Error getting paginated suppliers: {e}")
+            print(f"Lỗi khi lấy nhà cung cấp phân trang: {e}")
             return [], 0

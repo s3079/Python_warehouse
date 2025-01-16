@@ -3,93 +3,93 @@ from app.models.base_model import BaseModel
 class InventoryModel(BaseModel):
     def __init__(self):
         super().__init__()
-        self._table_name = "inventory"
+        self._table_name = "kho_hang"
     
-    def get_all(self):
+    def layTatCa(self):
         """Get all inventory items with product names"""
         query = f"""
             SELECT 
-                i.inventory_id, 
-                p.name as product_name, 
-                i.quantity
+                i.ma_kho,
+                p.ten as ten_san_pham,
+                i.so_luong
             FROM {self._table_name} i
-            LEFT JOIN products p ON i.product_id = p.product_id
-            ORDER BY p.name
+            LEFT JOIN san_pham p ON i.ma_san_pham = p.ma_san_pham
+            ORDER BY p.ten
         """
         try:
-            return self._execute_query(query) or []
+            return self._thucThiTruyVan(query) or []
         except Exception as e:
             print(f"Error in get_all: {str(e)}")
             return []
     
-    def add(self, **data):
+    def them(self, **data):
         """Add a new inventory item"""
         query = f"""
             INSERT INTO {self._table_name} 
-            (product_id, quantity, last_restock_date)
+            (ma_san_pham, so_luong, ngay_nhap_cuoi)
             VALUES (%s, %s, %s)
         """
         params = (
-            data.get('product_id'),
-            data.get('quantity'),
-            data.get('last_restock_date')
+            data.get('ma_san_pham'),
+            data.get('so_luong'),
+            data.get('ngay_nhap_cuoi')
         )
-        cursor = self._execute_query(query, params)
+        cursor = self._thucThiTruyVan(query, params)
         if cursor:
             self.conn.commit()
-            return True, "Inventory item added successfully"
-        return False, "Failed to add inventory item"
+            return True, "Thêm kho hàng thành công"
+        return False, "Thêm kho hàng thất bại"
     
-    def update(self, inventory_id: int, product_id: int, quantity: int):
+    def capNhat(self, ma_kho: int, ma_san_pham: int, so_luong: int):
         """Update an existing inventory item"""
         query = f"""
             UPDATE {self._table_name}
-            SET product_id = %s, quantity = %s
-            WHERE inventory_id = %s
+            SET ma_san_pham = %s, so_luong = %s
+            WHERE ma_kho = %s
         """
-        cursor = self._execute_query(query, (product_id, quantity, inventory_id))
+        cursor = self._thucThiTruyVan(query, (ma_san_pham, so_luong, ma_kho))
         if cursor:
             self.conn.commit()
             return True
         return False
     
-    def delete(self, inventory_id: int):
+    def xoa(self, ma_kho: int):
         """Delete an inventory item"""
-        query = f"DELETE FROM {self._table_name} WHERE inventory_id = %s"
-        cursor = self._execute_query(query, (inventory_id,))
+        query = f"DELETE FROM {self._table_name} WHERE ma_kho = %s"
+        cursor = self._thucThiTruyVan(query, (ma_kho,))
         if cursor:
             self.conn.commit()
             return True
         return False
     
-    def get_by_id(self, inventory_id: int):
+    def layTheoId(self, ma_kho: int):
         """Get an inventory item by ID with product name"""
         query = f"""
             SELECT 
-                i.inventory_id, i.quantity,
-                p.name as product_name
+                i.ma_kho, i.so_luong,
+                p.ten as ten_san_pham
             FROM {self._table_name} i
-            LEFT JOIN products p ON i.product_id = p.product_id
-            WHERE i.inventory_id = %s
+            LEFT JOIN san_pham p ON i.ma_san_pham = p.ma_san_pham
+            WHERE i.ma_kho = %s
         """
-        cursor = self._execute_query(query, (inventory_id,))
+        cursor = self._thucThiTruyVan(query, (ma_kho,))
         return cursor.fetchone() if cursor else None
     
-    def get_inventory_paginated(self, offset=0, limit=10, search_query=""):
+    def layKhoHangPhanTrang(self, offset=0, limit=10, search_query=""):
         """Get paginated inventory items with optional search"""
         try:
             query = """
-                SELECT i.*, p.name as product_name
-                FROM inventory i
-                LEFT JOIN products p ON i.product_id = p.product_id
+                SELECT i.*, p.ten as ten_san_pham
+                FROM kho_hang i
+                LEFT JOIN san_pham p ON i.ma_san_pham = p.ma_san_pham
             """
-            count_query = "SELECT COUNT(*) FROM inventory i"
+            count_query = "SELECT COUNT(*) FROM kho_hang i"
             
             params = []
             
             if search_query:
-                query += " WHERE p.name LIKE %s"
-                count_query += " WHERE p.name LIKE %s"
+                query += " WHERE p.ten LIKE %s"
+                count_query += " LEFT JOIN san_pham p ON i.ma_san_pham = p.ma_san_pham WHERE p.ten LIKE %s"
                 params.append(f"%{search_query}%")
             
             query += " LIMIT %s OFFSET %s"
@@ -111,5 +111,5 @@ class InventoryModel(BaseModel):
             return inventory, total_count
             
         except Exception as e:
-            print(f"Error getting paginated inventory: {e}")
+            print(f"Lỗi khi lấy danh sách kho hàng phân trang: {e}")
             return [], 0

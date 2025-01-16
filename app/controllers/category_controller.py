@@ -4,23 +4,22 @@ class CategoryController:
     def __init__(self):
         self._model = CategoryModel()
     
-    def get_all_categories(self):
+    def layTatCaDanhMuc(self):
         """Get all categories with their product counts""" 
         try:
-            categories = self._model.get_all()
+            categories = self._model.layTatCa()
             if not categories:
                 return []
                 
-            # Results are already in dictionary format
             formatted_categories = []
             for category in categories:
                 category_dict = {
-                    "category_id": category["category_id"],
-                    "name": category["name"],
-                    "description": category["description"] if category["description"] else "",
-                    "created_at": category["created_at"],
-                    "updated_at": category["updated_at"],
-                    "total_products": self._model.count_products(category["category_id"])
+                    "ma_danh_muc": category["ma_danh_muc"],
+                    "ten": category["ten"],
+                    "mo_ta": category["mo_ta"] if category["mo_ta"] else "",
+                    "ngay_tao": category["ngay_tao"],
+                    "ngay_cap_nhat": category["ngay_cap_nhat"],
+                    "tong_san_pham": self._model.demSanPham(category["ma_danh_muc"])
                 }
                 formatted_categories.append(category_dict)
             return formatted_categories
@@ -29,40 +28,39 @@ class CategoryController:
             self.handle_error(e, "lấy danh mục")
             return []
     
-    def add(self, name, description=""):
+    def them(self, ten, mo_ta=""):
         """Add a new category"""
         try:
-            if not name:
+            if not ten:
                 raise ValueError("Tên danh mục là bắt buộc")
-            return self._model.add(name, description)
+            return self._model.them(ten, mo_ta)
         except Exception as e:
             self.handle_error(e, "thêm danh mục")
             raise
     
-    def update(self, category_id, name, description=""):
+    def capNhat(self, ma_danh_muc, ten, mo_ta=""):
         """Update an existing category"""
         try:
-            if not category_id:
+            if not ma_danh_muc:
                 raise ValueError("ID danh mục là bắt buộc")
-            if not name:
+            if not ten:
                 raise ValueError("Tên danh mục là bắt buộc")
-            return self._model.update(category_id, name, description)
+            return self._model.capNhat(ma_danh_muc, ten, mo_ta)
         except Exception as e:
             self.handle_error(e, "cập nhật danh mục")
             raise
     
-    def delete(self, category_id):
+    def xoa(self, ma_danh_muc):
         """Delete a category"""
         try:
-            if not category_id:
+            if not ma_danh_muc:
                 raise ValueError("ID danh mục là bắt buộc")
                 
-            # Check if category has products
-            product_count = self._model.count_products(category_id)
+            product_count = self._model.demSanPham(ma_danh_muc)
             if product_count > 0:
                 raise ValueError(f"Không thể xóa danh mục có {product_count} sản phẩm")
                 
-            return self._model.delete(category_id)
+            return self._model.xoa(ma_danh_muc)
         except Exception as e:
             self.handle_error(e, "xóa danh mục")
             raise

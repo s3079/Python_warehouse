@@ -141,10 +141,10 @@ class CategoriesPage(ctk.CTkFrame):
         
         # Define column configurations
         self.columns = [
-            {"name": "Name", "key": "name", "width": 200},
-            {"name": "Description", "key": "description", "width": 300},
-            {"name": "Total Products", "key": "total_products", "width": 120},
-            {"name": "Actions", "key": "actions", "width": 80}
+            {"name": "Tên danh mục", "key": "ten", "width": 200},
+            {"name": "Mô tả", "key": "mo_ta", "width": 300},
+            {"name": "Tổng sản phẩm", "key": "tong_san_pham", "width": 120},
+            {"name": "Thao tác", "key": "actions", "width": 80}
         ]
         
         # Create table header
@@ -194,7 +194,7 @@ class CategoriesPage(ctk.CTkFrame):
         offset = (self.current_page - 1) * self.items_per_page
         
         # Get categories from controller with pagination
-        all_categories = self.controller.get_all_categories()
+        all_categories = self.controller.layTatCaDanhMuc()
         
         # Filter categories if search query exists
         if self.search_query:
@@ -456,7 +456,7 @@ class CategoriesPage(ctk.CTkFrame):
     def confirm_delete(self, dialog, category):
         """Execute delete operation and close dialog"""
         try:
-            self.controller.delete(category["category_id"])
+            self.controller.xoa(category["category_id"])
             dialog.destroy()
             self.load_categories()  # Refresh the list
         except Exception as e:
@@ -611,14 +611,14 @@ class CategoriesPage(ctk.CTkFrame):
         try:
             if "category_id" in category_data:
                 # Update existing category
-                self.controller.update(
+                self.controller.capNhat(
                     category_data["category_id"],
                     category_data["name"],
                     category_data["description"]
                 )
             else:
                 # Add new category
-                self.controller.add(
+                self.controller.them(
                     category_data["name"],
                     category_data["description"]
                 )

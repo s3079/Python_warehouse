@@ -124,11 +124,11 @@ class UsersPage(ctk.CTkFrame):
         
         # Define column configurations
         self.columns = [
-            {"name": "Username", "key": "username", "width": 100},
-            {"name": "Email", "key": "email", "width": 150},
-            {"name": "Role", "key": "role_name", "width": 100},
-            {"name": "Approved", "key": "is_approved", "width": 100},
-            {"name": "Actions", "key": "actions", "width": 100}
+            {"name": "Tên đăng nhập", "key": "ten_dang_nhap", "width": 100},
+            {"name": "Họ và tên", "key": "ho_ten", "width": 150},
+            {"name": "Vai trò", "key": "ten_quyen", "width": 100},
+            {"name": "Trạng thái", "key": "trang_thai", "width": 100},
+            {"name": "Thao tác", "key": "actions", "width": 100}
         ]
         
         # Create table header
@@ -178,7 +178,7 @@ class UsersPage(ctk.CTkFrame):
         offset = (self.current_page - 1) * self.items_per_page
         
         # Get users from controller with pagination
-        users, total_count = self.controller.get_users_paginated(
+        users, total_count = self.controller.layNguoiDungPhanTrang(
             offset=offset,
             limit=self.items_per_page,
             search_query=self.search_query
@@ -387,12 +387,12 @@ class UsersPage(ctk.CTkFrame):
 
     def approve_user(self, user):
         """Approve a user"""
-        if self.controller.approve_user(user["user_id"]):
+        if self.controller.duyetNguoiDung(user["user_id"]):
             self.load_users()  # Refresh the list
 
     def reject_user(self, user):
         """Reject a user"""
-        if self.controller.reject_user(user["user_id"]):
+        if self.controller.tuChoiNguoiDung(user["user_id"]):
             self.load_users()  # Refresh the list
 
     def show_filter_dialog(self):
@@ -441,7 +441,7 @@ class UsersPage(ctk.CTkFrame):
 
     def confirm_role_change(self, user, new_role, dialog):
         """Confirm the role change and update the user"""
-        if self.controller.set_user_role(user["user_id"], new_role):
+        if self.controller.datVaiTroNguoiDung(user["user_id"], new_role):
             self.load_users()  # Refresh the list to show updated role
             dialog.destroy()
             # Show a success message using tkinter

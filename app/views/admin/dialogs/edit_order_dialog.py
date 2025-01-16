@@ -1,5 +1,4 @@
 import customtkinter as ctk
-
 from app.controllers.order_controller import OrderController
 from app.views.admin.dialogs.center_dialog import CenterDialog
 from tkcalendar import Calendar
@@ -8,15 +7,15 @@ from datetime import datetime
 
 class EditOrderDialog(CenterDialog):
     def __init__(self, parent, order_data, on_save=None):
-        super().__init__(parent, "Edit Order", "500x700")
+        super().__init__(parent, "Sửa đơn hàng", "500x700")
         
         # Get order details and store data
         self.order_data = order_data
         self.on_save = on_save
-        self.order_details = self.get_order_details(order_data['order_id'])
-        self.products = self.get_products()
+        self.chi_tiet_don_hang = self.lay_chi_tiet_don_hang(order_data['ma_don_hang'])
+        self.san_pham = self.lay_tat_ca_san_pham()
 
-        print("order_details:", self.order_details)  # For debugging
+        print("order_details:", self.chi_tiet_don_hang)  # For debugging
         print("order_data:", order_data)  # For debugging
 
         # Create main content frame
@@ -26,7 +25,7 @@ class EditOrderDialog(CenterDialog):
         # Add heading with order ID
         heading_label = ctk.CTkLabel(
             content_frame,
-            text=f"Edit Order #{order_data['order_id']}",
+            text=f"Sửa đơn hàng #{order_data['ma_don_hang']}",
             font=("", 16, "bold"),
             text_color="#16151C"
         )
@@ -35,7 +34,7 @@ class EditOrderDialog(CenterDialog):
         # Order Date field with Date Picker Button
         date_label = ctk.CTkLabel(
             content_frame,
-            text="Order Date*",
+            text="Ngày đặt*",
             font=("", 13),
             text_color="#16151C"
         )
@@ -45,7 +44,7 @@ class EditOrderDialog(CenterDialog):
         date_frame.pack(fill="x", pady=(5, 15))
 
         # Format the order date to yyyy-mm-dd
-        order_date = self.order_details.get('order_date')
+        order_date = self.chi_tiet_don_hang.get('ngay_dat')
         if isinstance(order_date, datetime):
             formatted_date = order_date.strftime('%Y-%m-%d')
         else:
@@ -80,7 +79,7 @@ class EditOrderDialog(CenterDialog):
         # Product dropdown
         product_label = ctk.CTkLabel(
             content_frame,
-            text="Product*",
+            text="Sản phẩm*",
             font=("", 13),
             text_color="#16151C"
         )
@@ -91,14 +90,14 @@ class EditOrderDialog(CenterDialog):
         self.product_prices = {}
         
         # Populate the dictionaries if products exist
-        if self.products:
-            for product in self.products:
-                name = str(product.get('name', ''))  # Use product_name instead of name
-                self.product_names[name] = product.get('product_id')
-                self.product_prices[name] = product.get('unit_price', 0.0)
+        if self.san_pham:
+            for product in self.san_pham:
+                name = str(product.get('ten', ''))  # Use product_name instead of name
+                self.product_names[name] = product.get('ma_san_pham')
+                self.product_prices[name] = product.get('don_gia', 0.0)
 
         # Set product dropdown with current product
-        self.product_var = tk.StringVar(value=self.order_details.get('product_name', ''))
+        self.product_var = tk.StringVar(value=self.chi_tiet_don_hang.get('ten_san_pham', ''))
         self.product_dropdown = ctk.CTkOptionMenu(
             content_frame,
             variable=self.product_var,
@@ -116,13 +115,13 @@ class EditOrderDialog(CenterDialog):
         # Quantity field
         quantity_label = ctk.CTkLabel(
             content_frame,
-            text="Quantity*",
+            text="Số lượng*",
             font=("", 13),
             text_color="#16151C"
         )
         quantity_label.pack(anchor="w")
 
-        self.quantity_var = tk.StringVar(value=str(self.order_details.get('quantity', '')))
+        self.quantity_var = tk.StringVar(value=str(self.chi_tiet_don_hang.get('so_luong', '')))
         self.quantity_entry = ctk.CTkEntry(
             content_frame,
             textvariable=self.quantity_var,
@@ -136,13 +135,13 @@ class EditOrderDialog(CenterDialog):
         # Unit Price field (read-only)
         unit_price_label = ctk.CTkLabel(
             content_frame,
-            text="Unit Price*",
+            text="Đơn giá*",
             font=("", 13),
             text_color="#16151C"
         )
         unit_price_label.pack(anchor="w")
 
-        self.unit_price_var = tk.StringVar(value=str(self.order_details.get('unit_price', '')))
+        self.unit_price_var = tk.StringVar(value=str(self.chi_tiet_don_hang.get('don_gia', '')))
         self.unit_price_entry = ctk.CTkEntry(
             content_frame,
             textvariable=self.unit_price_var,
@@ -155,13 +154,13 @@ class EditOrderDialog(CenterDialog):
         # Total Amount field (read-only)
         total_label = ctk.CTkLabel(
             content_frame,
-            text="Total Amount*",
+            text="Tổng tiền*",
             font=("", 13),
             text_color="#16151C"
         )
         total_label.pack(anchor="w")
 
-        self.total_var = tk.StringVar(value=str(self.order_details.get('total_amount', '')))
+        self.total_var = tk.StringVar(value=str(self.chi_tiet_don_hang.get('tong_tien', '')))
         self.total_entry = ctk.CTkEntry(
             content_frame,
             textvariable=self.total_var,
@@ -207,17 +206,17 @@ class EditOrderDialog(CenterDialog):
         )
         save_button.pack(side="left")
 
-    def get_products(self):
+    def lay_tat_ca_san_pham(self):
         """Get all products with their IDs and prices"""
         from app.controllers.product_controller import ProductController
         controller = ProductController()
-        return controller.get_all_products()
+        return controller.layTatCaSanPham()
     
-    def get_order_details(self, order_id):
+    def lay_chi_tiet_don_hang(self, ma_don_hang):
         """Get order details by order ID"""
         from app.controllers.order_controller import OrderController
         controller = OrderController()
-        return controller.get_order_details(order_id)
+        return controller.layChiTietDonHang(ma_don_hang)
 
     def get_product_name_by_id(self, product_id):
         """Get product name from product ID"""
@@ -333,56 +332,56 @@ class EditOrderDialog(CenterDialog):
         print("Saving order...")  # For debugging
         try:
             # Get values from form
-            order_date = self.date_var.get().strip()
-            total_amount = self.total_var.get().strip()
-            product_name = self.product_var.get()
-            product_id = self.product_names[product_name]
-            quantity = self.quantity_entry.get().strip()
-            unit_price = self.unit_price_var.get().strip()
+            ngay_dat = self.date_var.get().strip()
+            tong_tien = self.total_var.get().strip()
+            ten_san_pham = self.product_var.get()
+            ma_san_pham = self.product_names[ten_san_pham]
+            so_luong = self.quantity_entry.get().strip()
+            don_gia = self.unit_price_var.get().strip()
             
             # Validate required fields
-            if not order_date:
-                raise ValueError("Order date is required")
-            if not total_amount:
-                raise ValueError("Total amount is required")
-            if not product_name:
-                raise ValueError("Product is required")
-            if not quantity:
-                raise ValueError("Quantity is required")
-            if not unit_price:
-                raise ValueError("Unit price is required")
+            if not ngay_dat:
+                raise ValueError("Ngày đặt là bắt buộc")
+            if not tong_tien:
+                raise ValueError("Tổng tiền là bắt buộc")
+            if not ten_san_pham:
+                raise ValueError("Sản phẩm là bắt buộc")
+            if not so_luong:
+                raise ValueError("Số lượng là bắt buộc")
+            if not don_gia:
+                raise ValueError("Đơn giá là bắt buộc")
 
             # Validate numeric fields
             try:
-                total_amount = float(total_amount)
-                if total_amount < 0:
+                tong_tien = float(tong_tien)
+                if tong_tien < 0:
                     raise ValueError
             except ValueError:
-                raise ValueError("Total amount must be a positive number")
+                raise ValueError("Tổng tiền phải là số dương")
 
             try:
-                quantity = int(quantity)
-                if quantity <= 0:
+                so_luong = int(so_luong)
+                if so_luong <= 0:
                     raise ValueError
             except ValueError:
-                raise ValueError("Quantity must be a positive integer")
+                raise ValueError("Số lượng phải là số nguyên dương")
 
             try:
-                unit_price = float(unit_price)
-                if unit_price < 0:
+                don_gia = float(don_gia)
+                if don_gia < 0:
                     raise ValueError
             except ValueError:
-                raise ValueError("Unit price must be a positive number")
+                raise ValueError("Đơn giá phải là số dương")
 
             # Prepare data for saving
             data = {
-                "order_id": self.order_data['order_id'],
-                "order_date": order_date,
-                "total_amount": total_amount,
-                "product_id": product_id,
-                "quantity": quantity,
-                "unit_price": unit_price,
-                "user_id": self.order_data.get('user_id')
+                "ma_don_hang": self.order_data['ma_don_hang'],
+                "ngay_dat": ngay_dat,
+                "tong_tien": tong_tien,
+                "ma_san_pham": ma_san_pham,
+                "so_luong": so_luong,
+                "don_gia": don_gia,
+                "ma_nguoi_dung": self.order_data.get('ma_nguoi_dung')
             }
 
             print("Data:", data)  # For debugging
@@ -396,4 +395,4 @@ class EditOrderDialog(CenterDialog):
             
         except Exception as e:
             from tkinter import messagebox
-            messagebox.showerror("Error", str(e)) 
+            messagebox.showerror("Lỗi", str(e)) 

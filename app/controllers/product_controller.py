@@ -4,76 +4,77 @@ class ProductController:
     def __init__(self):
         self._model = ProductModel()
     
-    def get_all_products(self):
+    def layTatCaSanPham(self):
         """Get all products with their category and supplier names"""
         try:
-            products = self._model.get_all()
-            if not products:
+            san_pham = self._model.layTatCa()
+            print("san_pham", san_pham)
+            if not san_pham:
                 return []
             
             # Results are already in dictionary format from the model
             formatted_products = []
-            for product in products:
+            for product in san_pham:
                 product_dict = {
-                    "product_id": product["product_id"],
-                    "name": product["name"],
-                    "description": product["description"] if product["description"] else "",
-                    "unit_price": product["unit_price"],
-                    "category_id": product["category_id"],
-                    "supplier_id": product["supplier_id"],
-                    "created_at": product["created_at"],
-                    "updated_at": product["updated_at"],
-                    "category_name": product["category_name"] if product["category_name"] else "",
-                    "supplier_name": product["supplier_name"] if product["supplier_name"] else ""
+                    "ma_san_pham": product["ma_san_pham"],
+                    "ten": product["ten"],
+                    "mo_ta": product["mo_ta"] if product["mo_ta"] else "",
+                    "don_gia": product["don_gia"],
+                    "ma_danh_muc": product["ma_danh_muc"],
+                    "ma_ncc": product["ma_ncc"],
+                    "ngay_tao": product["ngay_tao"],
+                    "ngay_cap_nhat": product["ngay_cap_nhat"],
+                    "ten_danh_muc": product["ten_danh_muc"] if product["ten_danh_muc"] else "",
+                    "ten_ncc": product["ten_nha_cung_cap"] if product["ten_nha_cung_cap"] else ""
                 }
                 formatted_products.append(product_dict)
             return formatted_products
         except Exception as e:
-            self.handle_error(e, "getting all products")
+            self.handle_error(e, "lấy tất cả sản phẩm")
             return []
     
-    def add_product(self, data):
+    def themSanPham(self, data):
         """Add a new product"""
         try:
-            if not data.get('name'):
-                raise ValueError("Product name is required")
-            return self._model.add(**data)
+            if not data.get('ten'):
+                raise ValueError("Tên sản phẩm là bắt buộc")
+            return self._model.them(**data)
         except Exception as e:
-            self.handle_error(e, "adding product")
+            self.handle_error(e, "thêm sản phẩm")
             raise
     
-    def update_product(self, product_id, data):
+    def capNhatSanPham(self, ma_san_pham, data):
         """Update an existing product"""
         try:
-            if not product_id:
-                raise ValueError("Product ID is required")
-            if not data.get('name'):
-                raise ValueError("Product name is required")
-            return self._model.update(product_id=product_id, **data)
+            if not ma_san_pham:
+                raise ValueError("Mã sản phẩm là bắt buộc")
+            if not data.get('ten'):
+                raise ValueError("Tên sản phẩm là bắt buộc")
+            return self._model.capNhat(ma_san_pham=ma_san_pham, **data)
         except Exception as e:
-            self.handle_error(e, "updating product")
+            self.handle_error(e, "cập nhật sản phẩm")
             raise
     
-    def delete_product(self, product_id):
+    def xoaSanPham(self, ma_san_pham):
         """Delete a product"""
         try:
-            if not product_id:
-                raise ValueError("Product ID is required")
-            return self._model.delete(product_id)
+            if not ma_san_pham:
+                raise ValueError("Mã sản phẩm là bắt buộc")
+            return self._model.xoa(ma_san_pham)
         except Exception as e:
-            self.handle_error(e, "deleting product")
+            self.handle_error(e, "xóa sản phẩm")
             raise
     
     def handle_error(self, error, action):
         """Handle errors in the controller"""
-        error_message = f"Error {action}: {str(error)}"
+        error_message = f"Lỗi {action}: {str(error)}"
         print(error_message)  # Log the error
         return error_message
     
-    def get_products_paginated(self, offset=0, limit=10, search_query=""):
+    def laySanPhamPhanTrang(self, offset=0, limit=10, search_query=""):
         """Get paginated products with optional search"""
         try:
-            return self._model.get_products_paginated(offset, limit, search_query)
+            return self._model.laySanPhamPhanTrang(offset, limit, search_query)
         except Exception as e:
-            self.handle_error(e, "getting paginated products")
+            self.handle_error(e, "lấy danh sách sản phẩm phân trang")
             return [], 0

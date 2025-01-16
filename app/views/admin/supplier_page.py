@@ -141,11 +141,11 @@ class SupplierPage(ctk.CTkFrame):
         
         # Define column configurations
         self.columns = [
-            {"name": "Name", "key": "name", "width": 200},
+            {"name": "Tên nhà cung cấp", "key": "ten", "width": 200},
             {"name": "Email", "key": "email", "width": 200},
-            {"name": "Phone", "key": "phone", "width": 150},
-            {"name": "Address", "key": "address", "width": 200},
-            {"name": "Actions", "key": "actions", "width": 100}
+            {"name": "Điện thoại", "key": "dien_thoai", "width": 150},
+            {"name": "Địa chỉ", "key": "dia_chi", "width": 200},
+            {"name": "Thao tác", "key": "actions", "width": 100}
         ]
         
         # Create table header
@@ -195,7 +195,7 @@ class SupplierPage(ctk.CTkFrame):
         offset = (self.current_page - 1) * self.items_per_page
         
         # Get suppliers from controller with pagination
-        suppliers, total_count = self.controller.get_suppliers_paginated(
+        suppliers, total_count = self.controller.layNhaCungCapPhanTrang(
             offset=offset,
             limit=self.items_per_page,
             search_query=self.search_query
@@ -450,7 +450,7 @@ class SupplierPage(ctk.CTkFrame):
     def confirm_delete(self, dialog, supplier):
         """Execute delete operation and close dialog"""
         try:
-            self.controller.delete_supplier(supplier["supplier_id"])
+            self.controller.xoaNhaCungCap(supplier["supplier_id"])
             dialog.destroy()
             self.load_suppliers()  # Refresh the list
         except Exception as e:
@@ -611,14 +611,14 @@ class SupplierPage(ctk.CTkFrame):
 
             if "supplier_id" in supplier_data:
                 # Update existing supplier
-                self.controller.update_supplier(
+                self.controller.capNhatNhaCungCap(
                     supplier_data["supplier_id"],
                     supplier_data
                 )
             else:
                 # Add new supplier
                 print("supplier_data", supplier_data)
-                self.controller.add_supplier(
+                self.controller.themNhaCungCap(
                     supplier_data
                 )
             # Refresh the table

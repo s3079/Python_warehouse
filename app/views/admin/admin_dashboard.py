@@ -227,7 +227,7 @@ class AdminDashboard(ctk.CTk):
         # Username
         username_label = ctk.CTkLabel(
             user_details_frame,
-            text=user_data["username"],
+            text=user_data["ten_dang_nhap"],
             font=("", 13, "bold"),
             text_color="#16151C"
         )
@@ -236,7 +236,7 @@ class AdminDashboard(ctk.CTk):
         # Role
         role_label = ctk.CTkLabel(
             user_details_frame,
-            text=user_data["fullName"],
+            text=user_data["ho_ten"],
             font=("", 12),
             text_color="#6F6E77"
         )
@@ -336,7 +336,7 @@ class AdminDashboard(ctk.CTk):
         
         page.pack(expand=True, fill="both")
 
-# if __name__ == '__main__':
-#     test_user_data = {"username": "Mathias"}
-#     app = AdminDashboard(user_data=test_user_data)
-#     app.mainloop()
+if __name__ == '__main__':
+    test_user_data = {"username": "Mathias"}
+    app = AdminDashboard(user_data=test_user_data)
+    app.mainloop()

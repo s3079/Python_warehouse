@@ -4,83 +4,86 @@ class OrderController:
     def __init__(self):
         self._model = OrderModel()
     
-    def get_orders_paginated(self, offset=0, limit=10, search_query=""):
+    def layDonHangPhanTrang(self, offset=0, limit=10, search_query=""):
         """Get paginated orders with optional search"""
         try:
-            return self._model.get_orders_paginated(offset, limit, search_query)
+            return self._model.layDonHangPhanTrang(offset, limit, search_query)
         except Exception as e:
-            self.handle_error(e, "getting paginated orders")
+            self.handle_error(e, "lấy danh sách đơn hàng phân trang")
             return [], 0
     
-    def update_order(self, data):
+    def capNhatDonHang(self, data):
         """Update an existing order"""
         try:
             # Validate data
-            if not all(key in data for key in ['order_id', 'order_date', 'quantity', 'total_amount', 'product_id']):
-                raise ValueError("Missing required fields")
+            required_fields = ['ma_don_hang', 'ngay_dat', 'so_luong', 'tong_tien', 'ma_san_pham']
+            if not all(key in data for key in required_fields):
+                raise ValueError("Thiếu thông tin bắt buộc")
 
-            return self._model.update_order(
-                order_id=data['order_id'],
-                order_date=data['order_date'],
-                quantity=data['quantity'],
-                total_amount=data['total_amount'],
-                product_id=data['product_id'],
-                user_id=data['user_id'],
-                unit_price=data['unit_price']
+            return self._model.capNhatDonHang(
+                ma_don_hang=data['ma_don_hang'],
+                ngay_dat=data['ngay_dat'],
+                so_luong=data['so_luong'],
+                tong_tien=data['tong_tien'],
+                ma_san_pham=data['ma_san_pham'],
+                ma_nguoi_dung=data['ma_nguoi_dung'],
+                don_gia=data['don_gia']
             )
         except Exception as e:
-            print(f"Error in update_order controller: {e}")
+            print(f"Lỗi trong controller capNhatDonHang: {e}")
             return False
     
-    def delete_order(self, order_id):
+    def xoaDonHang(self, ma_don_hang):
         """Delete an order"""
         try:
-            if not order_id:
-                raise ValueError("Order ID is required")
-            return self._model.delete(order_id)
+            if not ma_don_hang:
+                raise ValueError("Mã đơn hàng là bắt buộc")
+            return self._model.xoa(ma_don_hang)
         except Exception as e:
-            self.handle_error(e, "deleting order")
+            self.handle_error(e, "xóa đơn hàng")
             raise
     
     def handle_error(self, error, action):
         """Handle errors in the controller"""
-        error_message = f"Error {action}: {str(error)}"
+        error_message = f"Lỗi {action}: {str(error)}"
         print(error_message)  # Log the error
         return error_message 
     
-    def get_order_details(self, order_id):
+    def layChiTietDonHang(self, ma_don_hang):
         """Get detailed information for a specific order"""
         try:
-            return self._model.get_order_details(order_id)
+            return self._model.layChiTietDonHang(ma_don_hang)
         except Exception as e:
-            self.handle_error(e, "getting order details")
+            self.handle_error(e, "lấy chi tiết đơn hàng")
             return None 
     
-    def add_order(self, data):
-        print("Data:", data)
+    def themDonHang(self, data):
         """Add a new order and its details"""
         try:
-            order_date = data.get("order_date")
-            total_amount = data.get("total_amount")
-            product_id = data.get("product_id")
-            quantity = data.get("quantity")
-            unit_price = data.get("unit_price")
-            user_id = data.get("user_id")
+            ngay_dat = data.get("ngay_dat")
+            tong_tien = data.get("tong_tien")
+            ma_san_pham = data.get("ma_san_pham")
+            so_luong = data.get("so_luong")
+            don_gia = data.get("don_gia")
+            ma_nguoi_dung = data.get("ma_nguoi_dung")
             
             # Add order and get order_id
-            order_id = self._model.add(order_date, total_amount, user_id)
+            ma_don_hang = self._model.them(ngay_dat, tong_tien, ma_nguoi_dung)
             
-            if order_id:
-                    self._model.add_order_detail(order_id, product_id, quantity, unit_price)
+            if ma_don_hang:
+                self._model.themChiTietDonHang(ma_don_hang, ma_san_pham, so_luong, don_gia)
             else:
-                raise ValueError("Failed to add order")
+                raise ValueError("Thêm đơn hàng thất bại")
             
-            return order_id is not None
+            return ma_don_hang is not None
         except Exception as e:
-            self.handle_error(e, "adding order")
+            self.handle_error(e, "thêm đơn hàng")
             raise
 
-    def get_product_id_by_name(self, product_name):
+    def layMaSanPhamTheoTen(self, ten_san_pham):
         """Get product ID by product name"""
-        # Implement logic to retrieve product ID from the database
-        pass 
+        try:
+            return self._model.layMaSanPhamTheoTen(ten_san_pham)
+        except Exception as e:
+            self.handle_error(e, "lấy mã sản phẩm theo tên")
+            return None 
