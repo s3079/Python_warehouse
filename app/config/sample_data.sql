@@ -7,8 +7,8 @@ INSERT INTO phan_quyen (ten_quyen, mo_ta) VALUES
 
 -- Insert users
 INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, ho_ten, ma_quyen) VALUES
-('quanly1', '$2b$12$KIXQ1e1G1J1Q1e1G1J1Q1e1G1J1Q1e1G1J1Q1e1G1J1Q1e1G1J1Q1', 'Nguyễn Văn Quản Lý', 2),
-('nguoidung1', '$2b$12$KIXQ1e1G1J1Q1e1G1J1Q1e1G1J1Q1e1G1J1Q1e1G1J1Q1e1G1J1Q1', 'Trần Thị Người Dùng', 3);
+('quanly1', 'admin@123', 'Nguyễn Văn Quản Lý', 2),
+('nguoidung1', 'admin@123', 'Trần Thị Người Dùng', 3);
 
 -- Insert categories
 INSERT INTO danh_muc (ten, mo_ta) VALUES

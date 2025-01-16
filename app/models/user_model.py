@@ -73,7 +73,7 @@ class UserModel(BaseModel):
         try:
             cursor = self.conn.cursor(dictionary=True)
             # Get role ID
-            ten_quyen = 'quan_tri_vien' if la_admin else 'nguoi_dung_moi'
+            ten_quyen = 'administrator' if la_admin else 'registered_user'
             cursor.execute(
                 "SELECT ma_quyen FROM phan_quyen WHERE ten_quyen = %s",
                 (ten_quyen,)
@@ -83,51 +83,15 @@ class UserModel(BaseModel):
                 raise Exception(f"Role '{ten_quyen}' not found")
 
             cursor.execute("""
-                INSERT INTO users (username, password, fullName, role_id, is_approved)
+                INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, ho_ten, ma_quyen, da_duyet)
                 VALUES (%s, %s, %s, %s, %s)
-            """, (ten_dang_nhap, mat_khau, ho_ten, role['role_id'], la_admin))
+            """, (ten_dang_nhap, mat_khau, ho_ten, role['ma_quyen'], la_admin))
             
             self.conn.commit()
             return cursor.lastrowid
         except Exception as e:
             print(f"Error creating user: {str(e)}")
             return None
-
-    def xacThucDangNhap(self, ten_dang_nhap, mat_khau):
-        """Verify login credentials and approval status"""
-        cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT u.*, r.ten_quyen 
-            FROM nguoi_dung u
-            JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
-            WHERE u.ten_dang_nhap = %s AND u.mat_khau = %s
-        """, (ten_dang_nhap, mat_khau))
-        user = cursor.fetchone()
-        
-        if not user:
-            return False, "Tên đăng nhập hoặc mật khẩu không đúng"
-        
-        if not user['da_duyet'] and user['ten_quyen'] != 'quan_tri_vien':
-            return False, "Tài khoản của bạn đang chờ duyệt"
-            
-        return True, user
-
-    def them(self, data):
-        """Add a new user - implemented through taoNguoiDung method"""
-        return self.taoNguoiDung(
-            username=data['username'],
-            password=data['password'],
-            fullName=data['fullName'],
-            is_admin=data.get('is_admin', False)
-        )
-
-    def capNhat(self, id, data):
-        """Update a user - implemented through capNhatNguoiDung method"""
-        return self.capNhatNguoiDung(id, data)
-
-    def xoa(self, id):
-        """Delete a user - implemented through xoaNguoiDung method"""
-        return self.xoaNguoiDung(id)
 
     def layTheoTenDangNhap(self, ten_dang_nhap):
         """Get user by username"""
@@ -138,19 +102,6 @@ class UserModel(BaseModel):
             JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
             WHERE u.ten_dang_nhap = %s
         """, (ten_dang_nhap,))
-        result = cursor.fetchone()
-        cursor.close()
-        return result
-
-    def layTheoEmail(self, email):
-        """Get user by email"""
-        cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT u.*, r.role_name 
-            FROM users u
-            JOIN user_roles r ON u.role_id = r.role_id
-            WHERE u.email = %s
-        """, (email,))
         result = cursor.fetchone()
         cursor.close()
         return result
@@ -325,11 +276,3 @@ class UserModel(BaseModel):
         result = cursor.fetchone()
         cursor.close()
         return result
-
-    def layIdNguoiDungHienTai(self):
-        """Get the ID of the currently logged-in user"""
-        return self.current_user_id
-    
-    def datIdNguoiDungHienTai(self, user_id):
-        """Set the current user ID after successful login"""
-        self.current_user_id = user_id
