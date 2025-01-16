@@ -157,75 +157,95 @@ class ProductDialog(CenterDialog):
         
         # If editing, populate fields with existing data
         if product:
-            self.name_entry.insert(0, product["name"])
-            if product["description"]:
-                self.desc_entry.insert("1.0", product["description"])
-            self.price_entry.insert(0, str(product["unit_price"]))
-            self.category_var.set(product["category_name"])
-            self.supplier_var.set(product["supplier_name"])
+            self.name_entry.insert(0, product["ten"])
+            if product["mo_ta"]:
+                self.desc_entry.insert("1.0", product["mo_ta"])
+            self.price_entry.insert(0, str(product["don_gia"]))
+            self.category_var.set(product["ten_danh_muc"])
+            self.supplier_var.set(product["ten_ncc"])
     
     def get_categories(self):
         """Get list of categories for dropdown"""
         from app.controllers.category_controller import CategoryController
         controller = CategoryController()
-        categories = controller.get_all_categories()
-        return [category["name"] for category in categories] if categories else []
+        categories = controller.layTatCaDanhMuc()
+        return [category["ten"] for category in categories] if categories else []
     
     def get_suppliers(self):
         """Get list of suppliers for dropdown"""
         from app.controllers.supplier_controller import SupplierController
         controller = SupplierController()
-        suppliers = controller.get_all_suppliers()
-        return [supplier["name"] for supplier in suppliers] if suppliers else []
+        suppliers = controller.layTatCaNhaCungCap()
+        return [supplier["ten"] for supplier in suppliers] if suppliers else []
     
     def save_product(self):
         """Validate and save product data"""
         try:
             # Get values from form
-            name = self.name_entry.get().strip()
-            description = self.desc_entry.get("1.0", "end-1c").strip()
-            price = self.price_entry.get().strip()
+            ten = self.name_entry.get().strip()
+            mo_ta = self.desc_entry.get("1.0", "end-1c").strip()
+            don_gia = self.price_entry.get().strip()
             category = self.category_var.get()
             supplier = self.supplier_var.get()
             
             # Validate required fields
-            if not name:
-                raise ValueError("Product name is required")
-            if not price:
-                raise ValueError("Price is required")
+            if not ten:
+                raise ValueError("Tên sản phẩm là bắt buộc")
+            if not don_gia:
+                raise ValueError("Đơn giá là bắt buộc")
             if not category:
-                raise ValueError("Category is required")
+                raise ValueError("Danh mục là bắt buộc")
             if not supplier:
-                raise ValueError("Supplier is required")
+                raise ValueError("Nhà cung cấp là bắt buộc")
             
             # Validate price format
             try:
-                price = float(price)
-                if price < 0:
+                don_gia = float(don_gia)
+                if don_gia < 0:
                     raise ValueError
             except ValueError:
-                raise ValueError("Price must be a positive number")
+                raise ValueError("Đơn giá phải là số dương")
             
-            # Prepare data for saving
+            # Get category and supplier IDs from names
+            category_data = self.get_category_by_name(category)
+            supplier_data = self.get_supplier_by_name(supplier)
+            
+            if not category_data or not supplier_data:
+                raise ValueError("Danh mục hoặc nhà cung cấp không hợp lệ")
+
+            # Create data structure matching database schema
             data = {
-                "name": name,
-                "description": description,
-                "unit_price": price,
-                "category_name": category,
-                "supplier_name": supplier
+                "ten": ten,
+                "mo_ta": mo_ta,
+                "don_gia": don_gia,
+                "ma_danh_muc": category_data["ma_danh_muc"],
+                "ma_ncc": supplier_data["ma_ncc"]
             }
             
-            # If editing, include product_id
+            # If editing, include product ID
             if self.product:
-                data["product_id"] = self.product["product_id"]
+                data["ma_san_pham"] = self.product["ma_san_pham"]
             
             # Call save callback
             if self.on_save:
                 self.on_save(data)
             
-            # Close dialog
             self.destroy()
             
         except Exception as e:
             from tkinter import messagebox
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Lỗi", str(e))
+
+    def get_category_by_name(self, category_name):
+        """Get category data by name"""
+        from app.controllers.category_controller import CategoryController
+        controller = CategoryController()
+        categories = controller.layTatCaDanhMuc()
+        return next((cat for cat in categories if cat["ten"] == category_name), None)
+
+    def get_supplier_by_name(self, supplier_name):
+        """Get supplier data by name"""
+        from app.controllers.supplier_controller import SupplierController
+        controller = SupplierController()
+        suppliers = controller.layTatCaNhaCungCap()
+        return next((sup for sup in suppliers if sup["ten"] == supplier_name), None)

@@ -459,7 +459,7 @@ class ProductsPage(ctk.CTkFrame):
         # Get categories from controller
         from app.controllers.category_controller import CategoryController
         category_controller = CategoryController()
-        categories = category_controller.layTatCaDanhMuc()
+        categories = category_controller.get_all_categories()
         category_names = [cat["name"] for cat in categories]
         
         category_combobox = ctk.CTkOptionMenu(
@@ -833,48 +833,47 @@ class ProductsPage(ctk.CTkFrame):
         try:
             # Validate price format and range
             try:
-                price = float(data['unit_price'])
-                if price < 0 or price > 999999.99:  # Adjust max value based on your database decimal(10,2) limits
+                price = float(data['don_gia'])
+                if price < 0 or price > 999999.99:
                     raise ValueError("Price must be between 0 and 999,999.99")
-                # Format to 2 decimal places
                 price = round(price, 2)
             except ValueError as e:
                 if "must be between" in str(e):
                     raise e
                 raise ValueError("Price must be a valid number")
 
-            # Map the dialog data to match the controller's expected format
+            # Map the dialog data to match the schema field names
             product_data = {
-                'name': data['name'],
-                'description': data['description'],
-                'unit_price': price,  # Use the validated and formatted price
-                'category_id': None,  # We'll get this from the category name
-                'supplier_id': None   # We'll get this from the supplier name
+                'ten': data['ten'],
+                'mo_ta': data['mo_ta'],
+                'don_gia': price,
+                'ma_danh_muc': data['ma_danh_muc'],
+                'ma_ncc': data['ma_ncc']
             }
 
-            # Get category_id from category_name
+            # Get ma_danh_muc from category_name
             from app.controllers.category_controller import CategoryController
             category_controller = CategoryController()
             categories = category_controller.layTatCaDanhMuc()
-            category = next((cat for cat in categories if cat["name"] == data['category_name']), None)
+            category = next((cat for cat in categories if cat["ten"] == data['ten_danh_muc']), None)
             if category:
-                product_data['category_id'] = category['category_id']
+                product_data['ma_danh_muc'] = category['ma_danh_muc']
             else:
                 raise ValueError("Invalid category selected")
 
-            # Get supplier_id from supplier_name
+            # Get ma_ncc from supplier_name
             from app.controllers.supplier_controller import SupplierController
             supplier_controller = SupplierController()
             suppliers = supplier_controller.layTatCaNhaCungCap()
-            supplier = next((sup for sup in suppliers if sup["name"] == data['supplier_name']), None)
+            supplier = next((sup for sup in suppliers if sup["ten"] == data['ten_ncc']), None)
             if supplier:
-                product_data['supplier_id'] = supplier['supplier_id']
+                product_data['ma_ncc'] = supplier['ma_ncc']
             else:
                 raise ValueError("Invalid supplier selected")
 
-            if "product_id" in data:
+            if "ma_san_pham" in data:
                 # Update existing product
-                success = self.controller.capNhatSanPham(data["product_id"], product_data)
+                success = self.controller.capNhatSanPham(data["ma_san_pham"], product_data)
             else:
                 # Add new product
                 success = self.controller.themSanPham(product_data)
@@ -899,15 +898,19 @@ class ProductsPage(ctk.CTkFrame):
             tooltip.wm_overrideredirect(True)
             tooltip.wm_geometry(f"+{event.x_root+10}+{event.y_root+10}")
             
-            label = tk.Label(tooltip, text=text, justify='left',
-                            background="#ffffe0", relief='solid', borderwidth=1)
-            label.pack()
+            label = ctk.CTkLabel(
+                tooltip,
+                text=text,
+                fg_color="#16151C",
+                text_color="white",
+                corner_radius=6
+            )
+            label.pack(padx=10, pady=5)
             
-            def hide_tooltip():
+            def hide_tooltip(event):
                 tooltip.destroy()
             
-            widget.tooltip = tooltip
-            widget.bind('<Leave>', lambda e: hide_tooltip())
-            tooltip.bind('<Leave>', lambda e: hide_tooltip())
-        
-        widget.bind('<Enter>', show_tooltip)
+            widget.bind("<Leave>", hide_tooltip)
+            tooltip.bind("<Leave>", hide_tooltip)
+            
+        widget.bind("<Enter>", show_tooltip)
