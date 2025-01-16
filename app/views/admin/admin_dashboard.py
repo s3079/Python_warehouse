@@ -49,7 +49,6 @@ class AdminDashboard(ctk.CTk):
 
         # Define icons for each item
         icon_files = {
-            'Dashboard': 'dashboard.png',
             'Products': 'products.png',
             'Category': 'category.png',
             'Inventory': 'inventory.png',
@@ -99,7 +98,7 @@ class AdminDashboard(ctk.CTk):
         menu_container.pack(fill="both", expand=True)
         
         # Sidebar items
-        sidebar_items = ['Dashboard', 'Products', 'Category', 'Inventory', 'Supplier', 'Orders', 'Users']
+        sidebar_items = ['Products', 'Category', 'Inventory', 'Supplier', 'Orders', 'Users']
         for item in sidebar_items:
             # Load and create both normal and active state icons
             icon_path = str(assets_path / icon_files[item])
@@ -176,7 +175,7 @@ class AdminDashboard(ctk.CTk):
         
         logout_button = ctk.CTkButton(
             logout_frame,
-            text="Log Out",
+            text="Đăng xuất",
             command=self.logout,
             fg_color="transparent",
             text_color="#FF4842",  # Red color for logout
@@ -205,7 +204,7 @@ class AdminDashboard(ctk.CTk):
         # Left side - Active page title
         self.page_title = ctk.CTkLabel(
             header,
-            text="Dashboard",  # Default page
+            text="Products",  # Default page
             font=("", 24, "bold"),
             text_color="#16151C"
         )
@@ -237,7 +236,7 @@ class AdminDashboard(ctk.CTk):
         # Role
         role_label = ctk.CTkLabel(
             user_details_frame,
-            text="Admin",  # You can make this dynamic based on user_data
+            text=user_data["fullName"],
             font=("", 12),
             text_color="#6F6E77"
         )
@@ -268,8 +267,7 @@ class AdminDashboard(ctk.CTk):
         # Bind resize event
         self.bind("<Configure>", self.on_resize)
 
-        # Activate Dashboard by default (after content_area is created)
-        self.show_page('Dashboard')
+        self.show_page('Products')
 
     def logout(self):
         """Log out the user and return to the login screen."""
@@ -310,7 +308,7 @@ class AdminDashboard(ctk.CTk):
             fg_color="#C9F1FF",
             text_color="#006EC4",
             image=self.active_icons[page_name],
-            font=("", 13, "bold")  # Make text bold when active
+            font=("", 13, "bold")
         )
         
         # Update page title
@@ -338,7 +336,7 @@ class AdminDashboard(ctk.CTk):
         
         page.pack(expand=True, fill="both")
 
-if __name__ == '__main__':
-    test_user_data = {"username": "Mathias"}
-    app = AdminDashboard(user_data=test_user_data)
-    app.mainloop()
+# if __name__ == '__main__':
+#     test_user_data = {"username": "Mathias"}
+#     app = AdminDashboard(user_data=test_user_data)
+#     app.mainloop()

@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from PIL import Image, ImageTk
+from PIL import Image
 from pathlib import Path
 from app.controllers.category_controller import CategoryController
 from app.views.admin.dialogs.category_dialog import CategoryDialog 

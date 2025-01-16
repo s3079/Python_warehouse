@@ -37,7 +37,6 @@ class ManagerDashboard(ctk.CTk):
         self.icons = {}
         self.active_icons = {}
         icon_files = {
-            'Dashboard': 'dashboard.png',
             'Products': 'products.png',
             'Category': 'category.png',
             'Inventory': 'inventory.png',
@@ -65,7 +64,7 @@ class ManagerDashboard(ctk.CTk):
         # Menu
         menu_container = ctk.CTkFrame(sidebar_content, fg_color="transparent")
         menu_container.pack(fill="both", expand=True)
-        sidebar_items = ['Dashboard', 'Products', 'Category', 'Inventory', 'Supplier', 'Orders']
+        sidebar_items = ['Products', 'Category', 'Inventory', 'Supplier', 'Orders']
         for item in sidebar_items:
             icon_path = str(assets_path / icon_files[item])
             icon_image = Image.open(icon_path)
@@ -109,7 +108,7 @@ class ManagerDashboard(ctk.CTk):
         header = ctk.CTkFrame(right_container, fg_color="transparent")
         header.grid(row=0, column=0, sticky="ew", padx=20, pady=(20, 0))
         header.grid_columnconfigure(1, weight=1)
-        self.page_title = ctk.CTkLabel(header, text="Dashboard", font=("", 24, "bold"), text_color="#16151C")
+        self.page_title = ctk.CTkLabel(header, text="Products", font=("", 24, "bold"), text_color="#16151C")
         self.page_title.grid(row=0, column=0, sticky="w")
         user_info_frame = ctk.CTkFrame(header, fg_color="transparent", border_color="#F0F0F0", border_width=2, corner_radius=8)
         user_info_frame.grid(row=0, column=2, sticky="e", padx=(20, 0))
@@ -135,7 +134,7 @@ class ManagerDashboard(ctk.CTk):
         self.bind("<Configure>", self.on_resize)
 
         # Activate Dashboard by default
-        self.show_page('Dashboard')
+        self.show_page('Products')
 
     def logout(self):
         from tkinter import messagebox
@@ -172,7 +171,7 @@ class ManagerDashboard(ctk.CTk):
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         page.pack(expand=True, fill="both")
 
-if __name__ == '__main__':
-    test_user_data = {"username": "Manager"}
-    app = ManagerDashboard(user_data=test_user_data)
-    app.mainloop() 
+# if __name__ == '__main__':
+#     test_user_data = {"username": "Manager"}
+#     app = ManagerDashboard(user_data=test_user_data)
+#     app.mainloop() 

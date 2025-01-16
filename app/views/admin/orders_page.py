@@ -44,6 +44,15 @@ class OrdersPage(ctk.CTkFrame):
             light_image=Image.open(str(assets_path / 'chevron-right.png')),
             size=(20, 20)
         )
+
+        self.trash_icon = ctk.CTkImage(
+            light_image=Image.open(str(assets_path / 'trash.png')),
+            size=(16, 16)
+        )
+        self.edit_icon = ctk.CTkImage(
+            light_image=Image.open(str(assets_path / 'edit.png')),
+            size=(16, 16)
+        )
         
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1)
@@ -232,7 +241,8 @@ class OrdersPage(ctk.CTkFrame):
                     # Edit button
                     edit_btn = ctk.CTkButton(
                         actions_frame,
-                        text="Edit",
+                        text="",
+                        image=self.edit_icon,
                         width=30,
                         height=30,
                         fg_color="#006EC4",
@@ -240,12 +250,15 @@ class OrdersPage(ctk.CTkFrame):
                         hover_color="#0059A1",
                         command=lambda o=order: self.edit_order(o)
                     )
+
+
                     edit_btn.pack(side="left", padx=(0, 5))
                     
                     # Delete button
                     delete_btn = ctk.CTkButton(
                         actions_frame,
-                        text="Delete",
+                        text="",
+                        image=self.trash_icon,
                         width=30,
                         height=30,
                         fg_color="#e03137",
