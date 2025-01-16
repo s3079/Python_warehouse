@@ -17,8 +17,6 @@ class OrderController:
         try:
             if not order_id:
                 raise ValueError("Order ID is required")
-            if not data.get('customer_name'):
-                raise ValueError("Customer name is required")
             return self._model.update(order_id, data)
         except Exception as e:
             self.handle_error(e, "updating order")
@@ -39,3 +37,11 @@ class OrderController:
         error_message = f"Error {action}: {str(error)}"
         print(error_message)  # Log the error
         return error_message 
+    
+    def get_order_details(self, order_id):
+        """Get detailed information for a specific order"""
+        try:
+            return self._model.get_order_details(order_id)
+        except Exception as e:
+            self.handle_error(e, "getting order details")
+            return None 

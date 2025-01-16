@@ -6,17 +6,15 @@ class InventoryModel(BaseModel):
         self._table_name = "inventory"
     
     def get_all(self):
-        """Get all inventory items with category and supplier names"""
+        """Get all inventory items with product names"""
         query = f"""
             SELECT 
                 i.inventory_id, 
-                i.product_name, 
-                i.quantity, 
-                i.category_id, 
-                c.name as category_name
+                p.name as product_name, 
+                i.quantity
             FROM {self._table_name} i
-            LEFT JOIN categories c ON i.category_id = c.category_id
-            ORDER BY i.product_name
+            LEFT JOIN products p ON i.product_id = p.product_id
+            ORDER BY p.name
         """
         try:
             return self._execute_query(query) or []
@@ -28,14 +26,13 @@ class InventoryModel(BaseModel):
         """Add a new inventory item"""
         query = f"""
             INSERT INTO {self._table_name} 
-            (product_name, quantity, category_id, supplier_id)
-            VALUES (%s, %s, %s, %s)
+            (product_id, quantity, last_restock_date)
+            VALUES (%s, %s, %s)
         """
         params = (
-            data.get('product_name'),
+            data.get('product_id'),
             data.get('quantity'),
-            data.get('category_id'),
-            data.get('supplier_id')
+            data.get('last_restock_date')
         )
         cursor = self._execute_query(query, params)
         if cursor:
@@ -43,17 +40,14 @@ class InventoryModel(BaseModel):
             return True, "Inventory item added successfully"
         return False, "Failed to add inventory item"
     
-    def update(self, inventory_id: int, product_name: str, quantity: int, 
-               category_id: int = None, supplier_id: int = None):
+    def update(self, inventory_id: int, product_id: int, quantity: int):
         """Update an existing inventory item"""
         query = f"""
             UPDATE {self._table_name}
-            SET product_name = %s, quantity = %s, 
-                category_id = %s, supplier_id = %s
+            SET product_id = %s, quantity = %s
             WHERE inventory_id = %s
         """
-        cursor = self._execute_query(query, (product_name, quantity, 
-                                             category_id, supplier_id, inventory_id))
+        cursor = self._execute_query(query, (product_id, quantity, inventory_id))
         if cursor:
             self.conn.commit()
             return True
@@ -69,14 +63,13 @@ class InventoryModel(BaseModel):
         return False
     
     def get_by_id(self, inventory_id: int):
-        """Get an inventory item by ID with category name"""
+        """Get an inventory item by ID with product name"""
         query = f"""
             SELECT 
-                i.inventory_id, i.product_name, i.quantity,
-                i.category_id,
-                c.name as category_name
+                i.inventory_id, i.quantity,
+                p.name as product_name
             FROM {self._table_name} i
-            LEFT JOIN categories c ON i.category_id = c.category_id
+            LEFT JOIN products p ON i.product_id = p.product_id
             WHERE i.inventory_id = %s
         """
         cursor = self._execute_query(query, (inventory_id,))
@@ -86,17 +79,17 @@ class InventoryModel(BaseModel):
         """Get paginated inventory items with optional search"""
         try:
             query = """
-                SELECT i.*, c.name as category_name
+                SELECT i.*, p.name as product_name
                 FROM inventory i
-                LEFT JOIN categories c ON i.category_id = c.category_id
+                LEFT JOIN products p ON i.product_id = p.product_id
             """
             count_query = "SELECT COUNT(*) FROM inventory i"
             
             params = []
             
             if search_query:
-                query += " WHERE i.product_name LIKE %s"
-                count_query += " WHERE i.product_name LIKE %s"
+                query += " WHERE p.name LIKE %s"
+                count_query += " WHERE p.name LIKE %s"
                 params.append(f"%{search_query}%")
             
             query += " LIMIT %s OFFSET %s"

@@ -142,26 +142,26 @@ class RegisterView(ctk.CTkFrame):
         self.username_entry.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
-        # Email field
-        self.email_label = ctk.CTkLabel(
+        # Full Name field (formerly Email field)
+        self.fullName_label = ctk.CTkLabel(
             register_form_frame,
-            text="Email",
+            text="Họ và tên",
             font=("Helvetica", 12),
             text_color="#006EC4",
             anchor="w"
         )
-        self.email_label.grid(row=form_row, column=0, sticky="w", pady=(10, 0))
+        self.fullName_label.grid(row=form_row, column=0, sticky="w", pady=(10, 0))
         form_row += 1
 
-        self.email_entry = ctk.CTkEntry(
+        self.fullName_entry = ctk.CTkEntry(
             register_form_frame,
             width=350,
             height=40,
-            placeholder_text="Nhập email",
+            placeholder_text="Nhập họ và tên",
             border_width=1,
             corner_radius=8
         )
-        self.email_entry.grid(row=form_row, column=0, sticky="w")
+        self.fullName_entry.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
         # Password field
@@ -240,11 +240,11 @@ class RegisterView(ctk.CTkFrame):
 
     def _on_register_click(self):
         username = self.username_entry.get()
-        email = self.email_entry.get()
+        fullName = self.fullName_entry.get()
         password = self.password_entry.get()
         confirm_password = self.confirm_password_entry.get()
 
-        if not all([username, email, password, confirm_password]):
+        if not all([username, fullName, password, confirm_password]):
             messagebox.showerror("Error", "Vui lòng điền đầy đủ thông tin")
             return
 
@@ -252,7 +252,7 @@ class RegisterView(ctk.CTkFrame):
             messagebox.showerror("Error", "Mật khẩu không khớp")
             return
 
-        success = self._controller.register(username,password, email)
+        success = self._controller.register(username, password, fullName)
         if success:
             messagebox.showinfo("Success", "Đăng ký thành công")
             self._on_login_click()

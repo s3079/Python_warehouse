@@ -126,25 +126,25 @@ class LoginView(ctk.CTkFrame):
         form_row += 1
 
         # Login Form
-        self.email_label = ctk.CTkLabel(
+        self.username_label = ctk.CTkLabel(
             login_form_frame,
-            text="Email",
+            text="Username",
             font=("Helvetica", 12),
             text_color="#006EC4",
             anchor="w"
         )
-        self.email_label.grid(row=form_row, column=0, sticky="w")
+        self.username_label.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
-        self.email_entry = ctk.CTkEntry(
+        self.username_entry = ctk.CTkEntry(
             login_form_frame,
             width=350,
             height=40,
-            placeholder_text="Nh\u1eadp email",
+            placeholder_text="Enter username",
             border_width=1,
             corner_radius=8
         )
-        self.email_entry.grid(row=form_row, column=0, sticky="w")
+        self.username_entry.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
         self.password_label = ctk.CTkLabel(
@@ -198,9 +198,9 @@ class LoginView(ctk.CTkFrame):
         self.register_button.grid(row=form_row, column=0, sticky="w", pady=(5, 0))
 
     def _on_login_click(self):
-        email = self.email_entry.get()
+        username = self.username_entry.get()
         password = self.password_entry.get()
-        success, user_data = self._controller.login(email, password)
+        success, user_data = self._controller.login(username, password)
 
         
         if success:

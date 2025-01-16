@@ -42,6 +42,21 @@ def init_database():
                 conn.commit()
             print("Cấu trúc cơ sở dữ liệu đã được tạo thành công.")
             
+            # Load sample data
+            sample_data_path = os.path.join(current_dir, 'sample_data.sql')
+            with open(sample_data_path, 'r') as sample_file:
+                sample_script = sample_file.read()
+                statements = sample_script.split(';')
+                
+                for statement in statements:
+                    if statement.strip():
+                        try:
+                            cursor.execute(statement)
+                        except Error as e:
+                            print(f"Error executing statement: {e}")
+                conn.commit()
+            print("Dữ liệu mẫu đã được chèn thành công.")
+            
             # Create admin user if it doesn't exist
             cursor.execute("SELECT user_id FROM users WHERE username = 'admin'")
             admin_exists = cursor.fetchone()
@@ -58,9 +73,9 @@ def init_database():
                     
                     # Create admin user
                     cursor.execute("""
-                        INSERT INTO users (username, password, email, role_id)
+                        INSERT INTO users (username, password, fullName, role_id)
                         VALUES (%s, %s, %s, %s)
-                    """, ('admin', hashed_password, 'admin@warehouse.com', admin_role[0]))
+                    """, ('admin', hashed_password, 'Admin User', admin_role[0]))
                     conn.commit()
                     print("Tài khoản quản trị viên đã được tạo thành công.")
                 else:

@@ -1,4 +1,6 @@
 import customtkinter as ctk
+from PIL import Image
+from pathlib import Path
 from app.controllers.order_controller import OrderController
 from app.views.admin.dialogs.order_dialog import OrderDialog
 from app.views.admin.dialogs.center_dialog import CenterDialog
@@ -11,6 +13,29 @@ class OrdersPage(ctk.CTkFrame):
         self.items_per_page = 10
         self.total_items = 0
         self.search_query = ""
+
+        # Load icons
+        assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
+        self.search_icon = ctk.CTkImage(
+            light_image=Image.open(str(assets_path / 'search.png')),
+            size=(20, 20)
+        )
+        self.filter_icon = ctk.CTkImage(
+            light_image=Image.open(str(assets_path / 'filter.png')),
+            size=(20, 20)
+        )
+        self.plus_icon = ctk.CTkImage(
+            light_image=Image.open(str(assets_path / 'plus.png')),
+            size=(20, 20)
+        )
+        self.chevron_left_image = ctk.CTkImage(
+            light_image=Image.open(str(assets_path / 'chevron-left.png')),
+            size=(20, 20)
+        )
+        self.chevron_right_image = ctk.CTkImage(
+            light_image=Image.open(str(assets_path / 'chevron-right.png')),
+            size=(20, 20)
+        )
         
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1)
@@ -72,10 +97,8 @@ class OrdersPage(ctk.CTkFrame):
         # Define column configurations
         self.columns = [
             {"name": "Order ID", "key": "order_id", "width": 100},
-            {"name": "Customer", "key": "customer_name", "width": 150},
             {"name": "Date", "key": "order_date", "width": 150},
             {"name": "Total", "key": "total_amount", "width": 100},
-            {"name": "Status", "key": "status", "width": 100},
             {"name": "Actions", "key": "actions", "width": 100}
         ]
         
@@ -137,6 +160,8 @@ class OrdersPage(ctk.CTkFrame):
         
         # Configure grid columns for content frame
         self.content_frame.grid_columnconfigure(tuple(range(len(self.columns))), weight=1)
+
+        print(orders)
         
         # Create rows for each order
         for i, order in enumerate(orders):
@@ -146,6 +171,9 @@ class OrdersPage(ctk.CTkFrame):
                 height=50
             )
             row_frame.pack(fill="x")
+            
+            # Bind click event to show order details
+            row_frame.bind("<Button-1>", lambda e, o=order: self.show_order_details(o))
             
             # Add order data
             for j, col in enumerate(self.columns):
@@ -380,27 +408,20 @@ class OrdersPage(ctk.CTkFrame):
         )
         delete_button.pack(side="left")
 
-    def save_order_changes(self, dialog, order_id, customer_name, order_date, total_amount, status):
+    def save_order_changes(self, dialog, order_id, order_date, total_amount):
         """Save order changes and close dialog"""
         try:
-            # Validate inputs
-            if not customer_name:
-                raise ValueError("Customer name is required")
             if not order_date:
                 raise ValueError("Order date is required")
-            if not status:
-                raise ValueError("Status is required")
             try:
                 total_amount = float(total_amount)
             except ValueError:
                 raise ValueError("Total amount must be a valid number")
             
-            # Update order
+            # Update order without customer_name
             success = self.controller.update_order(order_id, {
-                "customer_name": customer_name,
                 "order_date": order_date,
-                "total_amount": total_amount,
-                "status": status
+                "total_amount": total_amount
             })
             
             if success:
@@ -426,3 +447,13 @@ class OrdersPage(ctk.CTkFrame):
         except Exception as e:
             from tkinter import messagebox
             messagebox.showerror("Error", str(e))
+
+    def show_order_details(self, order):
+        """Show a dialog with order details"""
+        order_details = self.controller.get_order_details(order['order_id'])
+        if order_details:
+            dialog = OrderDialog(self, order=order_details)
+            dialog.show()
+        else:
+            from tkinter import messagebox
+            messagebox.showerror("Error", "Failed to load order details")

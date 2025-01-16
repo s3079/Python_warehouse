@@ -5,6 +5,7 @@ from app.views.admin.products_page import ProductsPage
 from app.views.admin.categories_page import CategoriesPage
 from app.views.admin.inventory_page import InventoryPage
 from app.views.admin.supplier_page import SupplierPage
+from app.views.admin.orders_page import OrdersPage
 
 class UserDashboard(ctk.CTk):
     def __init__(self, user_data):
@@ -41,6 +42,7 @@ class UserDashboard(ctk.CTk):
             'Category': 'category.png',
             'Inventory': 'inventory.png',
             'Supplier': 'supplier.png',
+            'Orders': 'order.png',
             'Logout': 'logout.png'
         }
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
@@ -164,6 +166,8 @@ class UserDashboard(ctk.CTk):
             page = InventoryPage(self.content_area, self)
         elif page_name == "Supplier":
             page = SupplierPage(self.content_area, self)
+        elif page_name == "Orders":
+            page = OrdersPage(self.content_area, self)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         page.pack(expand=True, fill="both")

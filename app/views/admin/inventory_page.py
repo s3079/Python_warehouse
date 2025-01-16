@@ -133,9 +133,7 @@ class InventoryPage(ctk.CTkFrame):
         # Define column configurations
         self.columns = [
             {"name": "Product Name", "key": "product_name", "width": 200},
-            {"name": "Quantity", "key": "quantity", "width": 100},
-            {"name": "Category", "key": "category_name", "width": 150},
-            {"name": "Supplier", "key": "supplier_name", "width": 150}
+            {"name": "Quantity", "key": "quantity", "width": 100}
         ]
         
         # Create table header
@@ -331,21 +329,8 @@ class InventoryPage(ctk.CTkFrame):
 
     def add_inventory_item(self, data):
         """Add inventory item logic"""
-        product_name = data['product_name']
-        quantity = data['quantity']
-        restock_date = data.get('last_restock_date')
-        
-        # Assuming you have a method to get product ID by name
-        product_id = self.controller.get_product_id_by_name(product_name)
-        
-        # Prepare data for adding inventory
-        inventory_data = {
-            'product_id': product_id,
-            'quantity': quantity,
-            'last_restock_date': restock_date
-        }
-        
-        success, message = self.controller.add_inventory(inventory_data)
+        # Directly use the data passed from the dialog, which includes product_id
+        success, message = self.controller.add_inventory(data)
         if success:
             self.load_inventory()  # Refresh the inventory list
         else:

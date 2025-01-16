@@ -9,7 +9,7 @@ class InventoryController:
         self._product_model = ProductModel()
     
     def get_all_inventory(self):
-        """Get all inventory items with their category and supplier names"""
+        """Get all inventory items with their product names"""
         try:
             inventory = self._model.get_all()
             if not inventory:
@@ -20,11 +20,7 @@ class InventoryController:
                 item_dict = {
                     "inventory_id": item["inventory_id"],
                     "product_name": item["product_name"],
-                    "quantity": item["quantity"],
-                    "category_id": item["category_id"],
-                    "supplier_id": item["supplier_id"],
-                    "category_name": item["category_name"] if item["category_name"] else "",
-                    "supplier_name": item["supplier_name"] if item["supplier_name"] else ""
+                    "quantity": item["quantity"]
                 }
                 formatted_inventory.append(item_dict)
             return formatted_inventory
@@ -35,8 +31,8 @@ class InventoryController:
     def add_inventory(self, data):
         """Add a new inventory item"""
         try:
-            if not data.get('product_name'):
-                raise ValueError("Product name is required")
+            if 'product_id' not in data:
+                raise ValueError("Product ID is required")
             return self._model.add(**data)
         except Exception as e:
             self.handle_error(e, "adding inventory item")
@@ -47,8 +43,8 @@ class InventoryController:
         try:
             if not inventory_id:
                 raise ValueError("Inventory ID is required")
-            if not data.get('product_name'):
-                raise ValueError("Product name is required")
+            if not data.get('product_id'):
+                raise ValueError("Product ID is required")
             return self._model.update(inventory_id=inventory_id, **data)
         except Exception as e:
             self.handle_error(e, "updating inventory item")

@@ -66,7 +66,7 @@ class UserModel(BaseModel):
         """Reject and delete a user"""
         return self.delete_user(user_id)
 
-    def create_user(self, username, password, email, is_admin=False):
+    def create_user(self, username, password, fullName, is_admin=False):
         """Create a new user"""
         try:
             cursor = self.conn.cursor(dictionary=True)
@@ -82,9 +82,9 @@ class UserModel(BaseModel):
 
             # Insert user with approval status
             cursor.execute("""
-                INSERT INTO users (username, password, email, role_id, is_approved)
+                INSERT INTO users (username, password, fullName, role_id, is_approved)
                 VALUES (%s, %s, %s, %s, %s)
-            """, (username, password, email, role['role_id'], is_admin))  # Admins are auto-approved
+            """, (username, password, fullName, role['role_id'], is_admin))  # Admins are auto-approved
             
             self.conn.commit()
             return cursor.lastrowid
@@ -116,7 +116,7 @@ class UserModel(BaseModel):
         return self.create_user(
             username=data['username'],
             password=data['password'],
-            email=data['email'],
+            fullName=data['fullName'],
             is_admin=data.get('is_admin', False)
         )
 
@@ -175,7 +175,7 @@ class UserModel(BaseModel):
             update_fields = []
             values = []
             for key, value in data.items():
-                if key in ['username', 'email', 'password']:
+                if key in ['username', 'fullName', 'password']:
                     update_fields.append(f"{key} = %s")
                     values.append(value)
 
@@ -275,7 +275,7 @@ class UserModel(BaseModel):
             """
             # Add search condition if search_query is provided
             if search_query:
-                query += " WHERE u.username LIKE %s OR u.email LIKE %s"
+                query += " WHERE u.username LIKE %s OR u.fullName LIKE %s"
                 search_term = f"%{search_query}%"
                 cursor.execute(query + " ORDER BY u.username LIMIT %s OFFSET %s", (search_term, search_term, limit, offset))
             else:
@@ -316,3 +316,16 @@ class UserModel(BaseModel):
             return False
         finally:
             cursor.close()
+
+    def get_by_fullName(self, fullName):
+        """Get user by full name"""
+        cursor = self.conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT u.*, r.role_name 
+            FROM users u
+            JOIN user_roles r ON u.role_id = r.role_id
+            WHERE u.fullName = %s
+        """, (fullName,))
+        result = cursor.fetchone()
+        cursor.close()
+        return result

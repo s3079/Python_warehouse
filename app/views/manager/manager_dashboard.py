@@ -5,6 +5,7 @@ from app.views.admin.products_page import ProductsPage
 from app.views.admin.categories_page import CategoriesPage
 from app.views.admin.inventory_page import InventoryPage
 from app.views.admin.supplier_page import SupplierPage
+from app.views.admin.orders_page import OrdersPage
 
 class ManagerDashboard(ctk.CTk):
     def __init__(self, user_data):
@@ -41,6 +42,7 @@ class ManagerDashboard(ctk.CTk):
             'Category': 'category.png',
             'Inventory': 'inventory.png',
             'Supplier': 'supplier.png',
+            'Orders': 'order.png',
             'Logout': 'logout.png'
         }
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
@@ -63,7 +65,7 @@ class ManagerDashboard(ctk.CTk):
         # Menu
         menu_container = ctk.CTkFrame(sidebar_content, fg_color="transparent")
         menu_container.pack(fill="both", expand=True)
-        sidebar_items = ['Dashboard', 'Products', 'Category', 'Inventory', 'Supplier']
+        sidebar_items = ['Dashboard', 'Products', 'Category', 'Inventory', 'Supplier', 'Orders']
         for item in sidebar_items:
             icon_path = str(assets_path / icon_files[item])
             icon_image = Image.open(icon_path)
@@ -164,6 +166,8 @@ class ManagerDashboard(ctk.CTk):
             page = InventoryPage(self.content_area, self)
         elif page_name == "Supplier":
             page = SupplierPage(self.content_area, self)
+        elif page_name == "Orders":
+            page = OrdersPage(self.content_area, self)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         page.pack(expand=True, fill="both")

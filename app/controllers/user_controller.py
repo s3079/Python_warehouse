@@ -61,7 +61,7 @@ class UserController:
         except Exception as e:
             return False, f"Login error: {str(e)}"
 
-    def register(self, username, password, email):
+    def register(self, username, password, fullName):
         """
         Register a new user
         Returns: (success, message)
@@ -71,15 +71,15 @@ class UserController:
             if self.model.get_by_username(username):
                 return False, "Username already exists"
 
-            # Check if email already exists
-            if self.model.get_by_email(email):
-                return False, "Email already exists"
+            # Check if full name already exists
+            if self.model.get_by_fullName(fullName):
+                return False, "Full name already exists"
 
             # Hash password
             hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             
             # Create user (default to non-admin)
-            self.model.create_user(username, hashed.decode('utf-8'), email, is_admin=False)
+            self.model.create_user(username, hashed.decode('utf-8'), fullName, is_admin=False)
             
             return True, "Registration successful! Please wait for admin approval."
 

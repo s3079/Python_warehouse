@@ -6,14 +6,12 @@ class OrderModel(BaseModel):
         self._table_name = "orders"
     
     def get_all(self):
-        """Get all orders with customer and status details"""
+        """Get all orders"""
         query = f"""
             SELECT 
                 o.order_id, 
-                o.customer_name, 
                 o.order_date, 
                 o.total_amount,
-                o.status,
                 o.created_at, 
                 o.updated_at
             FROM {self._table_name} o
@@ -37,22 +35,13 @@ class OrderModel(BaseModel):
             
             params = []
             
-            # Add search condition if search_query is provided
-            if search_query:
-                query += " WHERE o.customer_name LIKE %s OR o.status LIKE %s"
-                count_query += " WHERE o.customer_name LIKE %s OR o.status LIKE %s"
-                params.extend([f"%{search_query}%", f"%{search_query}%"])
-            
             # Add pagination
             query += " ORDER BY o.order_date DESC LIMIT %s OFFSET %s"
             params.extend([limit, offset])
             
             # Get total count
             cursor = self.conn.cursor()
-            if search_query:
-                cursor.execute(count_query, [f"%{search_query}%", f"%{search_query}%"])
-            else:
-                cursor.execute(count_query)
+            cursor.execute(count_query)
             total_count = cursor.fetchone()[0]
             
             # Get paginated results
@@ -73,14 +62,12 @@ class OrderModel(BaseModel):
         """Update an existing order"""
         query = f"""
             UPDATE {self._table_name}
-            SET customer_name = %s, order_date = %s, total_amount = %s, status = %s
+            SET order_date = %s, total_amount = %s
             WHERE order_id = %s
         """
         params = (
-            data.get('customer_name'),
             data.get('order_date'),
             data.get('total_amount'),
-            data.get('status'),
             order_id
         )
         cursor = self._execute_query(query, params)
@@ -96,4 +83,45 @@ class OrderModel(BaseModel):
         if cursor:
             self.conn.commit()
             return True
+        return False
+    
+    def add(self, order_date, total_amount):
+        """Add a new order"""
+        query = f"""
+            INSERT INTO {self._table_name} 
+            (order_date, total_amount)
+            VALUES (%s, %s)
+        """
+        params = (order_date, total_amount)
+        cursor = self._execute_query(query, params)
+        if cursor:
+            self.conn.commit()
+            return True
         return False 
+    
+    def get_order_details(self, order_id):
+        """Get detailed information for a specific order"""
+        query = f"""
+            SELECT 
+                o.order_id, 
+                o.order_date, 
+                o.total_amount,
+                u.username as buyer_name,
+                p.name as product_name
+            FROM {self._table_name} o
+            JOIN users u ON o.user_id = u.user_id
+            JOIN order_details od ON o.order_id = od.order_id
+            JOIN products p ON od.product_id = p.product_id
+            WHERE o.order_id = %s
+        """
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(query, (order_id,))
+            result = cursor.fetchone()
+            if result:
+                columns = [description[0] for description in cursor.description]
+                return dict(zip(columns, result))
+            return None
+        except Exception as e:
+            print(f"Error getting order details: {e}")
+            return None 
