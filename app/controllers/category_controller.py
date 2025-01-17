@@ -5,7 +5,6 @@ class CategoryController:
         self._model = CategoryModel()
     
     def layTatCaDanhMuc(self, name_sort="none", desc_sort="none", ten_filter=None):
-        """Get all categories with their product counts, sorting and name filtering"""
         try:
             categories = self._model.layTatCa(name_sort, desc_sort)
             if not categories:
@@ -13,7 +12,6 @@ class CategoryController:
                 
             formatted_categories = []
             for category in categories:
-                # Apply name filter if provided
                 if ten_filter and ten_filter.lower() not in category["ten"].lower():
                     continue
                     
@@ -28,12 +26,10 @@ class CategoryController:
                 formatted_categories.append(category_dict)
             return formatted_categories
         except Exception as e:
-            print(f"Lỗi khi lấy danh mục: {e}")
             self.handle_error(e, "lấy danh mục")
             return []
     
     def them(self, ten, mo_ta=""):
-        """Add a new category"""
         try:
             if not ten:
                 raise ValueError("Tên danh mục là bắt buộc")
@@ -43,7 +39,6 @@ class CategoryController:
             raise
     
     def capNhat(self, ma_danh_muc, ten, mo_ta=""):
-        """Update an existing category"""
         try:
             if not ma_danh_muc:
                 raise ValueError("ID danh mục là bắt buộc")
@@ -55,7 +50,6 @@ class CategoryController:
             raise
     
     def xoa(self, ma_danh_muc):
-        """Delete a category"""
         try:
             if not ma_danh_muc:
                 raise ValueError("ID danh mục là bắt buộc")
@@ -70,7 +64,6 @@ class CategoryController:
             raise
 
     def lay_danh_muc_theo_id(self, ma_danh_muc):
-        """Get a category by ID"""
         try:
             if not ma_danh_muc:
                 raise ValueError("ID danh mục là bắt buộc")
@@ -80,8 +73,7 @@ class CategoryController:
             raise
     
     def handle_error(self, error, action):
-        """Handle errors in the controller"""
         error_message = f"Lỗi {action}: {str(error)}"
-        print(error_message)  # Log the error
+        print(error_message)
         return error_message
 

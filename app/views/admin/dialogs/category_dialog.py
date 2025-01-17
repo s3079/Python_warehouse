@@ -4,28 +4,27 @@ class CategoryDialog(ctk.CTkToplevel):
     def __init__(self, parent, category=None, on_save=None):
         super().__init__(parent)
         
-        # Set up the dialog window
+  
         self.title("Thêm Danh Mục Mới" if not category else "Sửa Danh Mục")
         self.geometry("500x380")
         self.resizable(False, False)
         
-        # Store callback and category
         self.on_save = on_save
         self.category = category
         
-        # Make dialog modal
+
         self.transient(parent)
         self.grab_set()
         
-        # Configure grid layout
+  
         self.grid_columnconfigure(0, weight=1)
         
-        # Create main container with padding
+
         main_container = ctk.CTkFrame(self, fg_color="transparent")
         main_container.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
         main_container.grid_columnconfigure(0, weight=1)
         
-        # Add header
+
         header_text = "Thêm Danh Mục Mới" if not category else "Sửa Danh Mục"
         header = ctk.CTkLabel(
             main_container,
@@ -35,8 +34,6 @@ class CategoryDialog(ctk.CTkToplevel):
         )
         header.grid(row=0, column=0, sticky="w", pady=(0, 20))
         
-        # Add form fields
-        # Name field
         name_label = ctk.CTkLabel(
             main_container,
             text="Tên Danh Mục",
@@ -54,7 +51,7 @@ class CategoryDialog(ctk.CTkToplevel):
         )
         self.name_entry.grid(row=2, column=0, sticky="ew", pady=(0, 15))
         
-        # Description field
+
         description_label = ctk.CTkLabel(
             main_container,
             text="Mô Tả",
@@ -72,12 +69,11 @@ class CategoryDialog(ctk.CTkToplevel):
         )
         self.description_text.grid(row=4, column=0, sticky="ew", pady=(0, 20))
         
-        # Add buttons container
         buttons_frame = ctk.CTkFrame(main_container, fg_color="transparent")
         buttons_frame.grid(row=5, column=0, sticky="ew")
         buttons_frame.grid_columnconfigure(0, weight=1)
         
-        # Cancel button
+
         cancel_button = ctk.CTkButton(
             buttons_frame,
             text="Hủy",
@@ -90,7 +86,7 @@ class CategoryDialog(ctk.CTkToplevel):
         )
         cancel_button.grid(row=0, column=0, sticky="w", padx=(0, 10))
         
-        # Save button
+
         save_button = ctk.CTkButton(
             buttons_frame,
             text="Lưu Danh Mục",
@@ -103,36 +99,29 @@ class CategoryDialog(ctk.CTkToplevel):
         )
         save_button.grid(row=0, column=1, sticky="w")
         
-        # If editing, populate fields with existing data
         if category:
             self.name_entry.insert(0, category["ten"])
             if category["mo_ta"]:
                 self.description_text.insert("1.0", category["mo_ta"])
         
-        # Focus on name entry
         self.name_entry.focus_set()
     
     def save_category(self):
-        """Validate and save category data"""
         name = self.name_entry.get().strip()
         description = self.description_text.get("1.0", "end-1c").strip()
         
-        # Validate name
         if not name:
             self.show_error("Tên danh mục là bắt buộc")
             return
         
-        # Prepare category data
         category_data = {
             "ten": name,
             "mo_ta": description
         }
         
-        # If editing, include category_id
         if self.category:
             category_data["ma_danh_muc"] = self.category["ma_danh_muc"]
         
-        # Call save callback
         if self.on_save:
             try:
                 self.on_save(category_data)
@@ -141,7 +130,6 @@ class CategoryDialog(ctk.CTkToplevel):
                 self.show_error(str(e))
     
     def show_error(self, message):
-        """Show error message in a dialog"""
         error_dialog = ctk.CTkToplevel(self)
         error_dialog.title("Lỗi")
         error_dialog.geometry("300x150")
@@ -149,11 +137,9 @@ class CategoryDialog(ctk.CTkToplevel):
         error_dialog.transient(self)
         error_dialog.grab_set()
         
-        # Center the error dialog
         error_dialog.grid_columnconfigure(0, weight=1)
         error_dialog.grid_rowconfigure(0, weight=1)
         
-        # Add error message
         message_label = ctk.CTkLabel(
             error_dialog,
             text=message,
@@ -163,7 +149,6 @@ class CategoryDialog(ctk.CTkToplevel):
         )
         message_label.grid(row=0, column=0, padx=20, pady=(20, 10))
         
-        # Add OK button
         ok_button = ctk.CTkButton(
             error_dialog,
             text="OK",

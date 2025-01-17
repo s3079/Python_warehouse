@@ -148,7 +148,7 @@ class OrderModel(BaseModel):
             header_result = self._thucThiTruyVan(header_query, (ma_don_hang,))
             if not header_result:
                 return None
-            
+
             header = header_result[0]
             order_info = {
                 "ma_don_hang": header["ma_don_hang"],

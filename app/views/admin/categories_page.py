@@ -16,7 +16,7 @@ class CategoriesPage(ctk.CTkFrame):
         self.tong_so_muc = 0
         self.tu_khoa_tim = ""
         
-        # Load icons
+
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
         self.search_icon = ctk.CTkImage(
             light_image=Image.open(str(assets_path / 'search.png')),
@@ -47,16 +47,13 @@ class CategoriesPage(ctk.CTkFrame):
             size=(20, 20)
         )
 
-        # Configure grid layout
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
         
-        # Create top section with search and buttons
         top_section = ctk.CTkFrame(self, fg_color="transparent")
         top_section.grid(row=0, column=0, sticky="ew", padx=20, pady=(0, 20))
         top_section.grid_columnconfigure(1, weight=1)
         
-        # Create search frame
         search_frame = ctk.CTkFrame(
             top_section,
             fg_color="#F8F9FA",
@@ -66,7 +63,6 @@ class CategoriesPage(ctk.CTkFrame):
         )
         search_frame.grid(row=0, column=0, sticky="w")
         
-        # Add search icon and entry
         search_icon_label = ctk.CTkLabel(
             search_frame,
             text="",
@@ -85,11 +81,9 @@ class CategoriesPage(ctk.CTkFrame):
         self.search_entry.pack(side="left", padx=(0, 15), pady=10)
         self.search_entry.bind("<Return>", self.khi_tim_kiem)
         
-        # Create buttons container
         buttons_frame = ctk.CTkFrame(top_section, fg_color="transparent")
         buttons_frame.grid(row=0, column=1, sticky="e")
         
-        # Add filter button
         filter_button = ctk.CTkButton(
             buttons_frame,
             text="Lọc",
@@ -105,7 +99,6 @@ class CategoriesPage(ctk.CTkFrame):
         )
         filter_button.pack(side="left", padx=(0, 10))
         
-        # Add new category button
         new_category_button = ctk.CTkButton(
             buttons_frame,
             text="Thêm Danh Mục",
@@ -121,7 +114,6 @@ class CategoriesPage(ctk.CTkFrame):
         )
         new_category_button.pack(side="left")
         
-        # Create table container
         table_container = ctk.CTkFrame(
             self,
             fg_color="white",
@@ -133,14 +125,12 @@ class CategoriesPage(ctk.CTkFrame):
         table_container.grid_columnconfigure(0, weight=1)
         table_container.grid_rowconfigure(0, weight=1)
 
-        # Create scrollable frame for table
         self.table_frame = ctk.CTkScrollableFrame(
             table_container,
             fg_color="transparent"
         )
         self.table_frame.grid(row=0, column=0, sticky="nsew", padx=1, pady=1)
         
-        # Define column configurations
         self.columns = [
             {"name": "Tên danh mục", "key": "ten", "width": 200},
             {"name": "Mô tả", "key": "mo_ta", "width": 300},
@@ -148,7 +138,6 @@ class CategoriesPage(ctk.CTkFrame):
             {"name": "Thao tác", "key": "actions", "width": 80}
         ]
         
-        # Create table header
         header_frame = ctk.CTkFrame(
             self.table_frame,
             fg_color="#F8F9FA",
@@ -157,7 +146,6 @@ class CategoriesPage(ctk.CTkFrame):
         header_frame.pack(fill="x", expand=True)
         header_frame.pack_propagate(False)
         
-        # Add header labels
         for i, col in enumerate(self.columns):
             label = ctk.CTkLabel(
                 header_frame,
@@ -169,14 +157,12 @@ class CategoriesPage(ctk.CTkFrame):
             )
             label.grid(row=0, column=i, padx=(20 if i == 0 else 10, 10), pady=15, sticky="w")
             
-        # Create frame for table content
         self.content_frame = ctk.CTkFrame(
             self.table_frame,
             fg_color="transparent"
         )
         self.content_frame.pack(fill="both", expand=True)
         
-        # Load initial data
         self.tai_danh_muc()
     
     def khi_tim_kiem(self, event=None):
@@ -193,11 +179,9 @@ class CategoriesPage(ctk.CTkFrame):
                 desc_sort=self.desc_sort_value if hasattr(self, 'desc_sort_value') else "none",
                 ten_filter=self.tu_khoa_tim
             )
-            # Clear existing content
             for widget in self.content_frame.winfo_children():
                 widget.destroy()
             
-            # Calculate pagination
             offset = (self.trang_hien_tai - 1) * self.so_muc_moi_trang
             
             self.tong_so_muc = len(categories)
@@ -205,10 +189,8 @@ class CategoriesPage(ctk.CTkFrame):
             end_idx = start_idx + self.so_muc_moi_trang
             categories = categories[start_idx:end_idx]
 
-            # Configure grid columns for content frame
             self.content_frame.grid_columnconfigure(tuple(range(len(self.columns))), weight=1)
             
-            # Create rows for each category
             for i, category in enumerate(categories):
                 row_frame = ctk.CTkFrame(
                     self.content_frame,
@@ -217,17 +199,14 @@ class CategoriesPage(ctk.CTkFrame):
                 )
                 row_frame.pack(fill="x")
                 
-                # Add category data
                 for j, col in enumerate(self.columns):
                     if col["key"] == "actions":
-                        # Create actions frame
                         actions_frame = ctk.CTkFrame(
                             row_frame,
                             fg_color="transparent"
                         )
                         actions_frame.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
                         
-                        # Edit button
                         edit_btn = ctk.CTkButton(
                             actions_frame,
                             text="",
@@ -241,7 +220,6 @@ class CategoriesPage(ctk.CTkFrame):
                         )
                         edit_btn.pack(side="left", padx=(0, 5))
                         
-                        # Delete button
                         delete_btn = ctk.CTkButton(
                             actions_frame,
                             text="",
@@ -256,7 +234,6 @@ class CategoriesPage(ctk.CTkFrame):
                         delete_btn.pack(side="left")
                         
                     else:
-                        # Regular text columns
                         value = str(category.get(col["key"], "") or "")
                         label = ctk.CTkLabel(
                             row_frame,
@@ -266,22 +243,19 @@ class CategoriesPage(ctk.CTkFrame):
                         )
                         label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
                 
-                # Add separator
                 separator = ctk.CTkFrame(
                     self.content_frame,
                     fg_color="#E5E5E5",
                     height=1
                 )
                 separator.pack(fill="x")
-
-            # Add pagination controls at the bottom
+    
             self.tao_dieu_khien_phan_trang()
         except Exception as e:
             print(f"Error loading categories: {e}")
 
     def tao_dieu_khien_phan_trang(self):
         """Tạo điều khiển phân trang"""
-        # Create or clear pagination frame
         if hasattr(self, 'pagination_frame'):
             for widget in self.pagination_frame.winfo_children():
                 widget.destroy()
@@ -290,11 +264,9 @@ class CategoriesPage(ctk.CTkFrame):
             self.pagination_frame.grid(row=2, column=0, sticky="ew", padx=20, pady=(0, 20))
             self.pagination_frame.grid_propagate(False)
         
-        # Create container for pagination elements
         controls_frame = ctk.CTkFrame(self.pagination_frame, fg_color="transparent")
         controls_frame.pack(expand=True, fill="both")
         
-        # Left side - showing entries info
         left_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
         left_frame.pack(side="left", padx=20)
         
@@ -308,11 +280,9 @@ class CategoriesPage(ctk.CTkFrame):
         )
         showing_label.pack(side="left")
         
-        # Right side - pagination buttons
         right_frame = ctk.CTkFrame(controls_frame, fg_color="transparent")
         right_frame.pack(side="right", padx=20)
         
-        # Previous page button
         prev_button = ctk.CTkButton(
             right_frame,
             text="",
@@ -326,7 +296,6 @@ class CategoriesPage(ctk.CTkFrame):
         )
         prev_button.pack(side="left", padx=(0, 5))
         
-        # Page number buttons
         total_pages = math.ceil(self.tong_so_muc / self.so_muc_moi_trang)
         visible_pages = 5
         start_page = max(1, min(self.trang_hien_tai - visible_pages // 2,
@@ -347,7 +316,6 @@ class CategoriesPage(ctk.CTkFrame):
             )
             page_button.pack(side="left", padx=2)
         
-        # Next page button
         next_button = ctk.CTkButton(
             right_frame,
             text="",
@@ -362,30 +330,25 @@ class CategoriesPage(ctk.CTkFrame):
         next_button.pack(side="left", padx=(5, 0))
 
     def trang_truoc(self):
-        """Đi đến trang trước"""
         if self.trang_hien_tai > 1:
             self.trang_hien_tai -= 1
             self.tai_danh_muc()
 
     def trang_sau(self):
-        """Đi đến trang sau"""
         self.trang_hien_tai += 1
         self.tai_danh_muc()
 
     def den_trang(self, trang):
-        """Đi đến trang cụ thể"""
         self.trang_hien_tai = trang
         self.tai_danh_muc()
 
     def hien_thi_them_moi(self):
-        """Hiển thị hộp thoại thêm danh mục mới"""
         dialog = CategoryDialog(
             self,
             on_save=self.luu_danh_muc
         )
 
     def hien_thi_chinh_sua(self, danh_muc):
-        """Hiển thị hộp thoại chỉnh sửa danh mục"""
         dialog = CategoryDialog(
             self,
             category=danh_muc,
@@ -393,14 +356,11 @@ class CategoriesPage(ctk.CTkFrame):
         )
 
     def xoa_danh_muc(self, danh_muc):
-        """Hiển thị hộp thoại xác nhận và xóa danh mục"""
         dialog = CenterDialog(self, "Xoá Danh Mục")
         
-        # Create content frame
         content_frame = ctk.CTkFrame(dialog, fg_color="transparent")
         content_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # Warning icon or text
         warning_label = ctk.CTkLabel(
             content_frame,
             text="⚠️ Cảnh Báo",
@@ -409,7 +369,6 @@ class CategoriesPage(ctk.CTkFrame):
         )
         warning_label.pack(pady=(0, 10))
         
-        # Confirmation message
         message_label = ctk.CTkLabel(
             content_frame,
             text=f"Bạn có chắc chắn muốn xóa '{danh_muc['ten']}' không?\nKhông thể hoàn tác hành động này.",
@@ -418,17 +377,15 @@ class CategoriesPage(ctk.CTkFrame):
         )
         message_label.pack(pady=(0, 20))
         
-        # Buttons frame with proper spacing
         buttons_frame = ctk.CTkFrame(dialog, fg_color="transparent", height=60)
         buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
         buttons_frame.pack_propagate(False)
         
-        # Container for right-aligned buttons
         button_container = ctk.CTkFrame(buttons_frame, fg_color="transparent")
         button_container.pack(side="right")
         button_containerCancel = ctk.CTkFrame(buttons_frame, fg_color="transparent")
         button_containerCancel.pack(side="left")
-        # Cancel button
+
         cancel_button = ctk.CTkButton(
             button_containerCancel,
             text="Hủy",
@@ -442,7 +399,7 @@ class CategoriesPage(ctk.CTkFrame):
         )
         cancel_button.pack(side="left", padx=(0, 10))
         
-        # Delete button
+
         delete_button = ctk.CTkButton(
             button_container,
             text="Xóa",
@@ -457,7 +414,6 @@ class CategoriesPage(ctk.CTkFrame):
         delete_button.pack(side="left")
 
     def xac_nhan_xoa(self, dialog, danh_muc):
-        """Thực hiện xóa và đóng hộp thoại"""
         try:
             self.controller.xoa(danh_muc["ma_danh_muc"])
             dialog.destroy()
@@ -467,7 +423,6 @@ class CategoriesPage(ctk.CTkFrame):
             messagebox.showerror("Lỗi", f"Không thể xóa danh mục: {str(e)}")
 
     def luu_danh_muc(self, du_lieu_danh_muc):
-        """Lưu hoặc cập nhật danh mục"""
         try:
             if "ma_danh_muc" in du_lieu_danh_muc:
                 self.controller.capNhat(
@@ -486,18 +441,17 @@ class CategoriesPage(ctk.CTkFrame):
             messagebox.showerror("Lỗi", f"Không thể lưu danh mục: {str(e)}")
 
     def show_filter_dialog(self):
-        """Show filter options dialog"""
         dialog = CenterDialog(self, "Filter Categories", "400x300")
         
-        # Store filter states
+    
         self.name_sort = tk.StringVar(value="none")  # none, asc, desc
         self.desc_sort = tk.StringVar(value="none")  # none, asc, desc
         
-        # Create main content frame
+      
         content_frame = ctk.CTkFrame(dialog, fg_color="transparent")
         content_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # Name filter section
+    
         name_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
         name_frame.pack(fill="x", pady=(0, 15))
         
@@ -509,7 +463,7 @@ class CategoriesPage(ctk.CTkFrame):
         )
         name_label.pack(anchor="w", pady=(0, 10))
         
-        # Name radio buttons
+     
         name_options_frame = ctk.CTkFrame(name_frame, fg_color="transparent")
         name_options_frame.pack(fill="x")
         
@@ -543,7 +497,7 @@ class CategoriesPage(ctk.CTkFrame):
         )
         name_desc.pack(side="left")
         
-        # Description filter section
+       
         desc_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
         desc_frame.pack(fill="x", pady=(0, 20))
         
@@ -555,7 +509,7 @@ class CategoriesPage(ctk.CTkFrame):
         )
         desc_label.pack(anchor="w", pady=(0, 10))
         
-        # Description radio buttons
+       
         desc_options_frame = ctk.CTkFrame(desc_frame, fg_color="transparent")
         desc_options_frame.pack(fill="x")
         
@@ -589,12 +543,12 @@ class CategoriesPage(ctk.CTkFrame):
         )
         desc_desc.pack(side="left")
         
-        # Add buttons
+        
         buttons_frame = ctk.CTkFrame(dialog, fg_color="transparent", height=60)
         buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
         buttons_frame.pack_propagate(False)
         
-        # Cancel button
+     
         cancel_button = ctk.CTkButton(
             buttons_frame,
             text="Hủy",
@@ -608,7 +562,6 @@ class CategoriesPage(ctk.CTkFrame):
         )
         cancel_button.pack(side="left", padx=(0, 10))
         
-        # Apply button
         apply_button = ctk.CTkButton(
             buttons_frame,
             text="Áp Dụng",
@@ -623,9 +576,8 @@ class CategoriesPage(ctk.CTkFrame):
         apply_button.pack(side="left")
 
     def apply_filters(self, dialog):
-        """Apply the selected filters and refresh the table"""
         dialog.destroy()
-        self.trang_hien_tai = 1  # Reset to first page
+        self.trang_hien_tai = 1
         self.name_sort_value = self.name_sort.get()
         self.desc_sort_value = self.desc_sort.get()
         self.tai_danh_muc()
