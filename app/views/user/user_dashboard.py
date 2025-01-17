@@ -13,6 +13,7 @@ class UserDashboard(ctk.CTk):
         super().__init__()
         ctk.set_appearance_mode("light")
         self.user_data = user_data
+        self.has_edit_rights = False  # Users only have viewing rights
         self.title('User Dashboard')
         self.geometry('1200x700')
         self.configure(fg_color="white")
@@ -39,12 +40,12 @@ class UserDashboard(ctk.CTk):
         self.icons = {}
         self.active_icons = {}
         icon_files = {
-            'Products': 'products.png',
-            'Category': 'category.png',
-            'Inventory': 'inventory.png',
-            'Supplier': 'supplier.png',
-            'Orders': 'order.png',
-            'Logout': 'logout.png'
+            'Sản Phẩm': 'products.png',
+            'Danh Mục': 'category.png',
+            'Kho': 'inventory.png',
+            'Nhà Cung Cấp': 'supplier.png',
+            'Đơn Hàng': 'order.png',
+            'Đăng Xuất': 'logout.png'
         }
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
         
@@ -66,7 +67,7 @@ class UserDashboard(ctk.CTk):
         # Menu
         menu_container = ctk.CTkFrame(sidebar_content, fg_color="transparent")
         menu_container.pack(fill="both", expand=True)
-        sidebar_items = ['Products', 'Category', 'Inventory', 'Supplier']
+        sidebar_items = ['Sản Phẩm', 'Danh Mục', 'Kho', 'Nhà Cung Cấp', 'Đơn Hàng']
         for item in sidebar_items:
             icon_path = str(assets_path / icon_files[item])
             icon_image = Image.open(icon_path)
@@ -110,15 +111,25 @@ class UserDashboard(ctk.CTk):
         header = ctk.CTkFrame(right_container, fg_color="transparent")
         header.grid(row=0, column=0, sticky="ew", padx=20, pady=(20, 0))
         header.grid_columnconfigure(1, weight=1)
-        self.page_title = ctk.CTkLabel(header, text="Products", font=("", 24, "bold"), text_color="#16151C")
+        self.page_title = ctk.CTkLabel(header, text="Sản Phẩm", font=("", 24, "bold"), text_color="#16151C")
         self.page_title.grid(row=0, column=0, sticky="w")
         user_info_frame = ctk.CTkFrame(header, fg_color="transparent", border_color="#F0F0F0", border_width=2, corner_radius=8)
         user_info_frame.grid(row=0, column=2, sticky="e", padx=(20, 0))
         user_details_frame = ctk.CTkFrame(user_info_frame, fg_color="transparent")
         user_details_frame.pack(side="left", padx=10, pady=2)
-        username_label = ctk.CTkLabel(user_details_frame, text=user_data["username"], font=("", 13, "bold"), text_color="#16151C")
+        username_label = ctk.CTkLabel(
+            user_details_frame,
+            text=user_data["ten_dang_nhap"],
+            font=("", 13, "bold"),
+            text_color="#16151C"
+        )
         username_label.pack(anchor="w")
-        role_label = ctk.CTkLabel(user_details_frame, text="User", font=("", 12), text_color="#6F6E77")
+        role_label = ctk.CTkLabel(
+            user_details_frame,
+            text=user_data["ho_ten"],
+            font=("", 12),
+            text_color="#6F6E77"
+        )
         role_label.pack(anchor="w")
         chevron_path = str(assets_path / 'chevron-down.png')
         chevron_image = Image.open(chevron_path)
@@ -136,11 +147,11 @@ class UserDashboard(ctk.CTk):
         self.bind("<Configure>", self.on_resize)
 
         # Activate Dashboard by default
-        self.show_page('Products')
+        self.show_page('Sản Phẩm')
 
     def logout(self):
         from tkinter import messagebox
-        if messagebox.askyesno("Confirm Logout", "Are you sure you want to log out?"):
+        if messagebox.askyesno("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?"):
             self.destroy()
             from app.views.login_view import LoginView
             root = tk.Tk()
@@ -159,16 +170,16 @@ class UserDashboard(ctk.CTk):
         self.page_title.configure(text=page_name)
         for widget in self.content_area.winfo_children():
             widget.destroy()
-        if page_name == "Products":
-            page = ProductsPage(self.content_area, self)
-        elif page_name == "Category":
-            page = CategoriesPage(self.content_area, self)
-        elif page_name == "Inventory":
-            page = InventoryPage(self.content_area, self)
-        elif page_name == "Supplier":
-            page = SupplierPage(self.content_area, self)
-        elif page_name == "Orders":
-            page = OrdersPage(self.content_area, self, self.user_data)
+        if page_name == "Sản Phẩm":
+            page = ProductsPage(self.content_area, self, can_edit=False)
+        elif page_name == "Danh Mục":
+            page = CategoriesPage(self.content_area, self, can_edit=False)
+        elif page_name == "Kho":
+            page = InventoryPage(self.content_area, self, can_edit=False)
+        elif page_name == "Nhà Cung Cấp":
+            page = SupplierPage(self.content_area, self, can_edit=False)
+        elif page_name == "Đơn Hàng":
+            page = OrdersPage(self.content_area, self, self.user_data, can_edit=False)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         page.pack(expand=True, fill="both")
