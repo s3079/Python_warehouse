@@ -17,7 +17,7 @@ class EditOrderDialog(CenterDialog):
 
         print("order_details:", self.chi_tiet_don_hang)  # For debugging
         print("order_data:", order_data)  # For debugging
-
+        print("on_save:", self.lay_chi_tiet_don_hang(order_data['ma_don_hang']),order_data['ma_don_hang'])
         # Create main content frame
         content_frame = ctk.CTkFrame(self, fg_color="transparent")
         content_frame.pack(fill="both", expand=True, padx=20, pady=20)
@@ -42,7 +42,7 @@ class EditOrderDialog(CenterDialog):
 
         date_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
         date_frame.pack(fill="x", pady=(5, 15))
-
+        print("chi_tiet_don_hang:", self.chi_tiet_don_hang)
         # Format the order date to yyyy-mm-dd
         order_date = self.chi_tiet_don_hang.get('ngay_dat')
         if isinstance(order_date, datetime):

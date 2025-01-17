@@ -4,8 +4,8 @@ class CategoryController:
     def __init__(self):
         self._model = CategoryModel()
     
-    def layTatCaDanhMuc(self, name_sort="none", desc_sort="none"):
-        """Get all categories with their product counts and sorting"""
+    def layTatCaDanhMuc(self, name_sort="none", desc_sort="none", ten_filter=None):
+        """Get all categories with their product counts, sorting and name filtering"""
         try:
             categories = self._model.layTatCa(name_sort, desc_sort)
             if not categories:
@@ -13,6 +13,10 @@ class CategoryController:
                 
             formatted_categories = []
             for category in categories:
+                # Apply name filter if provided
+                if ten_filter and ten_filter.lower() not in category["ten"].lower():
+                    continue
+                    
                 category_dict = {
                     "ma_danh_muc": category["ma_danh_muc"],
                     "ten": category["ten"],

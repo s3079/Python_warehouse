@@ -190,7 +190,8 @@ class CategoriesPage(ctk.CTkFrame):
         try:
             categories = self.controller.layTatCaDanhMuc(
                 name_sort=self.name_sort_value if hasattr(self, 'name_sort_value') else "none",
-                desc_sort=self.desc_sort_value if hasattr(self, 'desc_sort_value') else "none"
+                desc_sort=self.desc_sort_value if hasattr(self, 'desc_sort_value') else "none",
+                ten_filter=self.tu_khoa_tim
             )
             # Clear existing content
             for widget in self.content_frame.winfo_children():

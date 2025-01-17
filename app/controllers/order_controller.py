@@ -4,10 +4,10 @@ class OrderController:
     def __init__(self):
         self._model = OrderModel()
     
-    def layDonHangPhanTrang(self, offset=0, limit=10, search_query=""):
+    def layDonHangPhanTrang(self, offset=0, limit=10):
         """Get paginated orders with optional search"""
         try:
-            return self._model.layDonHangPhanTrang(offset, limit, search_query)
+            return self._model.layDonHangPhanTrang(offset, limit)
         except Exception as e:
             self.handle_error(e, "lấy danh sách đơn hàng phân trang")
             return [], 0
@@ -52,6 +52,7 @@ class OrderController:
     def layChiTietDonHang(self, ma_don_hang):
         """Get detailed information for a specific order"""
         try:
+            print('ma_don_hang', ma_don_hang)
             return self._model.layChiTietDonHang(ma_don_hang)
         except Exception as e:
             self.handle_error(e, "lấy chi tiết đơn hàng")

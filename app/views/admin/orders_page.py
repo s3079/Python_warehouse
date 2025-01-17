@@ -19,7 +19,6 @@ class OrdersPage(ctk.CTkFrame):
         self.current_page = 1
         self.items_per_page = 10
         self.total_items = 0
-        self.search_query = ""
 
 
         # Load icons
@@ -63,34 +62,6 @@ class OrdersPage(ctk.CTkFrame):
         top_section.grid(row=0, column=0, sticky="ew", padx=20, pady=(0, 20))
         top_section.grid_columnconfigure(1, weight=1)
         
-        # Create search frame
-        search_frame = ctk.CTkFrame(
-            top_section,
-            fg_color="#F8F9FA",
-            corner_radius=8,
-            border_width=1,
-            border_color="#F0F0F0"
-        )
-        search_frame.grid(row=0, column=0, sticky="w")
-        
-        # Add search icon and entry
-        search_icon_label = ctk.CTkLabel(
-            search_frame,
-            text="",
-            image=self.search_icon
-        )
-        search_icon_label.pack(side="left", padx=(15, 5), pady=10)
-        
-        self.search_entry = ctk.CTkEntry(
-            search_frame,
-            placeholder_text="Tìm kiếm đơn hàng...",
-            border_width=0,
-            fg_color="transparent",
-            width=300,
-            height=35
-        )
-        self.search_entry.pack(side="left", padx=(0, 15), pady=10)
-        self.search_entry.bind("<Return>", self.on_search)
         
         # Create buttons container
         buttons_frame = ctk.CTkFrame(top_section, fg_color="transparent")
@@ -186,11 +157,7 @@ class OrdersPage(ctk.CTkFrame):
         # Load initial data
         self.load_orders()
     
-    def on_search(self, event=None):
-        """Handle search when Enter is pressed"""
-        self.search_query = self.search_entry.get().strip()
-        self.current_page = 1  # Reset to first page
-        self.load_orders()
+
 
     def load_orders(self):
         """Load orders into the table"""
@@ -205,7 +172,6 @@ class OrdersPage(ctk.CTkFrame):
         orders, total_count = self.controller.layDonHangPhanTrang(
             offset=offset,
             limit=self.items_per_page,
-            search_query=self.search_query
         )
         
         self.total_items = total_count

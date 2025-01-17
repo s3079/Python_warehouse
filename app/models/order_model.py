@@ -23,7 +23,7 @@ class OrderModel(BaseModel):
             print(f"Error in layTatCa: {str(e)}")
             return []
     
-    def layDonHangPhanTrang(self, offset=0, limit=10, search_query=""):
+    def layDonHangPhanTrang(self, offset=0, limit=10):
         """Get paginated orders with optional search"""
         try:
             # Base query
@@ -119,33 +119,63 @@ class OrderModel(BaseModel):
     
     def layChiTietDonHang(self, ma_don_hang):
         """Get detailed information for a specific order"""
-        query = f"""
-            SELECT 
-                dh.ma_don_hang, 
-                dh.ngay_dat, 
-                dh.tong_tien,
-                ctdh.so_luong,
-                ctdh.don_gia,
-                nd.ten_dang_nhap as ten_nguoi_mua,
-                sp.ten as ten_san_pham,
-                sp.ma_san_pham
-            FROM {self._table_name} dh
-            JOIN NGUOIDUNG nd ON dh.ma_nguoi_dung = nd.ma_nguoi_dung
-            JOIN CHITIETDONHANG ctdh ON dh.ma_don_hang = ctdh.ma_don_hang
-            JOIN SANPHAM sp ON ctdh.ma_san_pham = sp.ma_san_pham
-            WHERE dh.ma_don_hang = %s
-        """
         try:
-            cursor = self.conn.cursor()
-            cursor.execute(query, (ma_don_hang,))
-            result = cursor.fetchone()
-            if result:
-                columns = [description[0] for description in cursor.description]
-                return dict(zip(columns, result))
-            return None
+            # Get order header information
+            header_query = f"""
+                SELECT 
+                    dh.ma_don_hang,
+                    dh.ngay_dat,
+                    dh.tong_tien,
+                    nd.ten_dang_nhap as ten_nguoi_mua
+                FROM {self._table_name} dh
+                JOIN NGUOIDUNG nd ON dh.ma_nguoi_dung = nd.ma_nguoi_dung
+                WHERE dh.ma_don_hang = %s
+            """
+            
+            # Get order details
+            details_query = """
+                SELECT 
+                    ctdh.so_luong,
+                    ctdh.don_gia,
+                    sp.ten as ten_san_pham,
+                    sp.ma_san_pham
+                FROM CHITIETDONHANG ctdh
+                JOIN SANPHAM sp ON ctdh.ma_san_pham = sp.ma_san_pham
+                WHERE ctdh.ma_don_hang = %s
+            """
+            
+            # Execute header query
+            header_result = self._thucThiTruyVan(header_query, (ma_don_hang,))
+            if not header_result:
+                return None
+            
+            # Convert header result to dictionary
+            header = header_result[0]
+            order_info = {
+                "ma_don_hang": header["ma_don_hang"],
+                "ngay_dat": header["ngay_dat"],
+                "tong_tien": header["tong_tien"],
+                "ten_nguoi_mua": header["ten_nguoi_mua"],
+                "chi_tiet": []
+            }
+            
+            # Execute details query
+            details_result = self._thucThiTruyVan(details_query, (ma_don_hang,))
+            if details_result:
+                # Add all order details to the order_info
+                for detail in details_result:
+                    order_info["chi_tiet"].append({
+                        "ma_san_pham": detail["ma_san_pham"],
+                        "ten_san_pham": detail["ten_san_pham"],
+                        "so_luong": detail["so_luong"],
+                        "don_gia": detail["don_gia"]
+                    })
+            
+            return order_info
+            
         except Exception as e:
             print(f"Error getting order details: {e}")
-            return None 
+            return None
     
     def themChiTietDonHang(self, ma_don_hang, ma_san_pham, so_luong, don_gia):
         """Add a new order detail"""
