@@ -79,7 +79,7 @@ class ProductDialog(CenterDialog):
         self.category_dropdown = ctk.CTkOptionMenu(
             content_frame,
             variable=self.category_var,
-            values=self.get_categories(),
+            values=self.lay_danh_muc(),
             width=460,
             height=40,
             fg_color="white",
@@ -101,7 +101,7 @@ class ProductDialog(CenterDialog):
         self.supplier_dropdown = ctk.CTkOptionMenu(
             content_frame,
             variable=self.supplier_var,
-            values=self.get_suppliers(),
+            values=self.lay_nha_cung_cap(),
             width=460,
             height=40,
             fg_color="white",
@@ -139,7 +139,7 @@ class ProductDialog(CenterDialog):
             width=100,
             height=40,
             corner_radius=8,
-            command=self.save_product
+            command=self.luu_san_pham
         )
         save_button.pack(side="left")
         
@@ -157,19 +157,19 @@ class ProductDialog(CenterDialog):
             self.category_var.set(category_data["ten"])
             self.supplier_var.set(supplier_data["ten"])
     
-    def get_categories(self):
+    def lay_danh_muc(self):
         from app.controllers.category_controller import CategoryController
         controller = CategoryController()
         categories = controller.layTatCaDanhMuc()
         return [category["ten"] for category in categories] if categories else []
     
-    def get_suppliers(self):
+    def lay_nha_cung_cap(self):
         from app.controllers.supplier_controller import SupplierController
         controller = SupplierController()
         suppliers = controller.layTatCaNhaCungCap()
         return [supplier["ten"] for supplier in suppliers] if suppliers else []
     
-    def save_product(self):
+    def luu_san_pham(self):
         try:
             ten = self.name_entry.get().strip()
             mo_ta = self.desc_entry.get("1.0", "end-1c").strip()
@@ -198,8 +198,8 @@ class ProductDialog(CenterDialog):
                     raise e
                 raise ValueError("Đơn giá phải là số dương")
             
-            category_data = self.get_category_by_name(category)
-            supplier_data = self.get_supplier_by_name(supplier)
+            category_data = self.lay_danh_muc_theo_ten(category)
+            supplier_data = self.lay_nha_cung_cap_theo_ten(supplier)
             
             if not category_data or not supplier_data:
                 raise ValueError("Danh mục hoặc nhà cung cấp không hợp lệ")
@@ -224,13 +224,13 @@ class ProductDialog(CenterDialog):
             from tkinter import messagebox
             messagebox.showerror("Lỗi", str(e))
 
-    def get_category_by_name(self, category_name):
+    def lay_danh_muc_theo_ten(self, category_name):
         from app.controllers.category_controller import CategoryController
         controller = CategoryController()
         categories = controller.layTatCaDanhMuc()
         return next((cat for cat in categories if cat["ten"] == category_name), None)
 
-    def get_supplier_by_name(self, supplier_name):
+    def lay_nha_cung_cap_theo_ten(self, supplier_name):
         from app.controllers.supplier_controller import SupplierController
         controller = SupplierController()
         suppliers = controller.layTatCaNhaCungCap()

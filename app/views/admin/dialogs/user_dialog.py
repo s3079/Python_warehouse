@@ -6,20 +6,20 @@ class UserDialog(CenterDialog):
     def __init__(self, parent, user=None):
         self.controller = UserController()
         self.user = user
-        title = "Edit User" if user else "Add User"
+        title = "Sửa người dùng" if user else "Thêm người dùng"
         super().__init__(parent, title, "500x400")
         
-        self.setup_ui()
+        self.tao_giao_dien()
         if user:
-            self.load_user_data()
+            self.tai_du_lieu_nguoi_dung()
 
-    def setup_ui(self):
+    def tao_giao_dien(self):
         content_frame = ctk.CTkFrame(self)
         content_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
         ctk.CTkLabel(
             content_frame,
-            text="Username:",
+            text="Tên đăng nhập:",
             anchor="w"
         ).pack(fill="x", padx=10, pady=(10,5))
         
@@ -38,7 +38,7 @@ class UserDialog(CenterDialog):
         if not self.user:
             ctk.CTkLabel(
                 content_frame,
-                text="Password:",
+                text="Mật khẩu:",
                 anchor="w"
             ).pack(fill="x", padx=10, pady=(10,5))
             
@@ -47,11 +47,11 @@ class UserDialog(CenterDialog):
         
         ctk.CTkLabel(
             content_frame,
-            text="Role:",
+            text="Vai trò:",
             anchor="w"
         ).pack(fill="x", padx=10, pady=(10,5))
         
-        self.roles = self.controller.get_roles()
+        self.roles = self.controller.lay_danh_sach_vai_tro()
         role_names = [role["role_name"] for role in self.roles]
         
         self.role_var = ctk.StringVar()
@@ -65,14 +65,14 @@ class UserDialog(CenterDialog):
         if self.user:
             ctk.CTkLabel(
                 content_frame,
-                text="Status:",
+                text="Trạng thái:",
                 anchor="w"
             ).pack(fill="x", padx=10, pady=(10,5))
             
             self.status_var = ctk.BooleanVar()
             self.status_switch = ctk.CTkSwitch(
                 content_frame,
-                text="Approved",
+                text="Đã duyệt",
                 variable=self.status_var
             )
             self.status_switch.pack(fill="x", padx=10, pady=(0,10))
@@ -82,24 +82,24 @@ class UserDialog(CenterDialog):
         
         ctk.CTkButton(
             button_frame,
-            text="Cancel",
+            text="Hủy",
             command=self.destroy
         ).pack(side="left", padx=5)
         
         ctk.CTkButton(
             button_frame,
-            text="Save",
-            command=self.save_user
+            text="Lưu",
+            command=self.luu_nguoi_dung
         ).pack(side="left", padx=5)
 
-    def load_user_data(self):
+    def tai_du_lieu_nguoi_dung(self):
         self.username_entry.insert(0, self.user["username"])
         self.email_entry.insert(0, self.user["email"])
         self.role_var.set(self.user["role_name"])
         if hasattr(self, "status_var"):
             self.status_var.set(self.user["is_approved"])
 
-    def save_user(self):
+    def luu_nguoi_dung(self):
         data = {
             "username": self.username_entry.get(),
             "email": self.email_entry.get(),
@@ -109,10 +109,10 @@ class UserDialog(CenterDialog):
         
         if not self.user:
             data["password"] = self.password_entry.get()
-            result = self.controller.create_user(data)
+            result = self.controller.tao_nguoi_dung(data)
         else:
             data["is_approved"] = self.status_var.get()
-            result = self.controller.update_user(self.user["user_id"], data)
+            result = self.controller.cap_nhat_nguoi_dung(self.user["user_id"], data)
         
         if result:
             self.destroy()

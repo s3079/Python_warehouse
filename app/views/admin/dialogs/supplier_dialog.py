@@ -121,7 +121,7 @@ class SupplierDialog(ctk.CTkToplevel):
             hover_color="#0059A1",
             height=45,
             corner_radius=8,
-            command=self.save_supplier
+            command=self.luu_nha_cung_cap
         )
         save_button.grid(row=0, column=1, sticky="e")
         
@@ -133,14 +133,14 @@ class SupplierDialog(ctk.CTkToplevel):
         
         self.name_entry.focus_set()
     
-    def save_supplier(self):
+    def luu_nha_cung_cap(self):
         name = self.name_entry.get().strip()
         email = self.email_entry.get().strip()
         phone = self.phone_entry.get().strip()
         address = self.address_entry.get().strip()
 
         if not name:
-            self.show_error("Tên là bắt buộc")
+            self.hien_thi_loi("Tên là bắt buộc")
             return
         
         supplier_data = {
@@ -158,9 +158,9 @@ class SupplierDialog(ctk.CTkToplevel):
                 self.on_save(supplier_data)
                 self.destroy()
             except Exception as e:
-                self.show_error(str(e))
+                self.hien_thi_loi(str(e))
     
-    def show_error(self, message):
+    def hien_thi_loi(self, message):
         error_dialog = ctk.CTkToplevel(self)
         error_dialog.title("Lỗi")
         error_dialog.geometry("300x150")
