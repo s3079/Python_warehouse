@@ -115,8 +115,8 @@ class ProductModel(BaseModel):
         cursor = self._thucThiTruyVan(query, (ma_san_pham,))
         return cursor.fetchone() if cursor else None
     
-    def laySanPhamPhanTrang(self, offset=0, limit=10, search_query=""):
-        """Get paginated products with optional search"""
+    def laySanPhamPhanTrang(self, offset=0, limit=10, search_query="", filters=None):
+        """Get paginated products with optional search, filters and sorting"""
         try:
             query = """
                 SELECT p.*, c.ten as ten_danh_muc, s.ten as ten_ncc
@@ -126,23 +126,54 @@ class ProductModel(BaseModel):
             """
             count_query = "SELECT COUNT(*) FROM SANPHAM p"
             
+            where_conditions = []
             params = []
             
             if search_query:
-                query += " WHERE p.ten LIKE %s OR p.mo_ta LIKE %s"
-                count_query += " WHERE p.ten LIKE %s OR p.mo_ta LIKE %s"
+                where_conditions.append("(p.ten LIKE %s OR p.mo_ta LIKE %s)")
                 params.extend([f"%{search_query}%", f"%{search_query}%"])
+            
+            # Add filter conditions
+            if filters:
+                if filters.get('ma_danh_muc'):
+                    where_conditions.append("p.ma_danh_muc = %s")
+                    params.append(filters['ma_danh_muc'])
+                if filters.get('ma_ncc'):
+                    where_conditions.append("p.ma_ncc = %s")
+                    params.append(filters['ma_ncc'])
+                if filters.get('don_gia_min'):
+                    where_conditions.append("p.don_gia >= %s")
+                    params.append(filters['don_gia_min'])
+                if filters.get('don_gia_max'):
+                    where_conditions.append("p.don_gia <= %s")
+                    params.append(filters['don_gia_max'])
+            
+            if where_conditions:
+                where_clause = " WHERE " + " AND ".join(where_conditions)
+                query += where_clause
+                count_query += where_clause
+
+            # Add sorting
+            order_by_clauses = []
+            if filters and filters.get('name_sort') in ['ASC', 'DESC']:
+                order_by_clauses.append(f"p.ten {filters['name_sort']}")
+            if filters and filters.get('price_sort') in ['ASC', 'DESC']:
+                order_by_clauses.append(f"p.don_gia {filters['price_sort']}")
+            
+            if order_by_clauses:
+                query += " ORDER BY " + ", ".join(order_by_clauses)
+            else:
+                query += " ORDER BY p.ten"  # Default sorting
             
             query += " LIMIT %s OFFSET %s"
             params.extend([limit, offset])
             
+            # Execute count query
             cursor = self.conn.cursor()
-            if search_query:
-                cursor.execute(count_query, [f"%{search_query}%", f"%{search_query}%"])
-            else:
-                cursor.execute(count_query)
+            cursor.execute(count_query, params[:-2] if params else None)
             total_count = cursor.fetchone()[0]
             
+            # Execute main query
             cursor.execute(query, params)
             products = cursor.fetchall()
             
