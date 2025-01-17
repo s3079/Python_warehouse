@@ -22,14 +22,15 @@ class SupplierController:
             self.handle_error(e, "thêm nhà cung cấp")
             raise
 
-    def capNhatNhaCungCap(self, ma_ncc, data):
+    def capNhatNhaCungCap(self, data):
         """Update an existing supplier"""
+
         try:
-            if not ma_ncc:
+            if not data.get('ma_ncc'):
                 raise ValueError("Mã nhà cung cấp là bắt buộc")
             if not data.get('ten'):
                 raise ValueError("Tên nhà cung cấp là bắt buộc")
-            return self.model.capNhat(ma_ncc=ma_ncc, **data)
+            return self.model.capNhat(data)
         except Exception as e:
             self.handle_error(e, "cập nhật nhà cung cấp")
             raise

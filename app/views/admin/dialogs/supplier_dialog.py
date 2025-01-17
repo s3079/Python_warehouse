@@ -5,7 +5,7 @@ class SupplierDialog(ctk.CTkToplevel):
         super().__init__(parent)
         
         # Set up the dialog window
-        self.title("Add Supplier" if not supplier else "Edit Supplier")
+        self.title("Thêm Nhà Cung Cấp" if not supplier else "Sửa Nhà Cung Cấp")
         self.geometry("500x600")  
         self.resizable(False, False)
         
@@ -26,7 +26,7 @@ class SupplierDialog(ctk.CTkToplevel):
         main_container.grid_columnconfigure(0, weight=1)
         
         # Add header
-        header_text = "Add New Supplier" if not supplier else "Edit Supplier"
+        header_text = "Thêm Nhà Cung Cấp" if not supplier else "Sửa Nhà Cung Cấp"
         header = ctk.CTkLabel(
             main_container,
             text=header_text,
@@ -38,7 +38,7 @@ class SupplierDialog(ctk.CTkToplevel):
         # Name field
         name_label = ctk.CTkLabel(
             main_container,
-            text="Name",
+            text="Tên",
             font=("", 13, "bold"),
             text_color="#16151C"
         )
@@ -46,7 +46,7 @@ class SupplierDialog(ctk.CTkToplevel):
         
         self.name_entry = ctk.CTkEntry(
             main_container,
-            placeholder_text="Enter supplier name",
+            placeholder_text="Nhập tên nhà cung cấp",
             height=40,
             font=("", 13),
             corner_radius=8
@@ -64,7 +64,7 @@ class SupplierDialog(ctk.CTkToplevel):
         
         self.email_entry = ctk.CTkEntry(
             main_container,
-            placeholder_text="Enter email address",
+            placeholder_text="Nhập email",
             height=40,
             font=("", 13),
             corner_radius=8
@@ -74,7 +74,7 @@ class SupplierDialog(ctk.CTkToplevel):
         # Phone field
         phone_label = ctk.CTkLabel(
             main_container,
-            text="Phone",
+            text="Số Điện Thoại",
             font=("", 13, "bold"),
             text_color="#16151C"
         )
@@ -82,7 +82,7 @@ class SupplierDialog(ctk.CTkToplevel):
         
         self.phone_entry = ctk.CTkEntry(
             main_container,
-            placeholder_text="Enter phone number",
+            placeholder_text="Nhập số điện thoại",
             height=40,
             font=("", 13),
             corner_radius=8
@@ -92,7 +92,7 @@ class SupplierDialog(ctk.CTkToplevel):
         # Address field
         address_label = ctk.CTkLabel(
             main_container,
-            text="Address",
+            text="Địa chỉ",
             font=("", 13, "bold"),
             text_color="#16151C"
         )
@@ -100,7 +100,7 @@ class SupplierDialog(ctk.CTkToplevel):
         
         self.address_entry = ctk.CTkEntry(
             main_container,
-            placeholder_text="Enter address",
+            placeholder_text="Nhập địa chỉ",
             height=40,
             font=("", 13),
             corner_radius=8
@@ -115,7 +115,7 @@ class SupplierDialog(ctk.CTkToplevel):
         # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_frame,
-            text="Cancel",
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -128,7 +128,7 @@ class SupplierDialog(ctk.CTkToplevel):
         # Save button
         save_button = ctk.CTkButton(
             buttons_frame,
-            text="Save Supplier",
+            text="Lưu",
             fg_color="#006EC4",
             text_color="white",
             hover_color="#0059A1",
@@ -140,10 +140,10 @@ class SupplierDialog(ctk.CTkToplevel):
         
         # If editing, populate fields with existing data
         if supplier:
-            self.name_entry.insert(0, supplier.get("name", ""))
+            self.name_entry.insert(0, supplier.get("ten", ""))
             self.email_entry.insert(0, supplier.get("email", ""))
-            self.phone_entry.insert(0, supplier.get("phone", ""))
-            self.address_entry.insert(0, supplier.get("address", ""))
+            self.phone_entry.insert(0, supplier.get("dien_thoai", ""))
+            self.address_entry.insert(0, supplier.get("dia_chi", ""))
         
         # Focus on name entry
         self.name_entry.focus_set()
@@ -158,20 +158,20 @@ class SupplierDialog(ctk.CTkToplevel):
 
         # Validate name
         if not name:
-            self.show_error("Name is required")
+            self.show_error("Tên là bắt buộc")
             return
         
         # Prepare supplier data with correct field names
         supplier_data = {
-            "name": name,
-            "address": address,
-            "phone": phone,
+            "ten": name,
+            "dia_chi": address,
+            "dien_thoai": phone,
             "email": email,
         }
         
         # If editing, include supplier_id
         if self.supplier:
-            supplier_data["supplier_id"] = self.supplier.get("supplier_id")
+            supplier_data["ma_ncc"] = self.supplier.get("ma_ncc")
         
         # Call save callback
         if self.on_save:
@@ -184,7 +184,7 @@ class SupplierDialog(ctk.CTkToplevel):
     def show_error(self, message):
         """Show error message in a dialog"""
         error_dialog = ctk.CTkToplevel(self)
-        error_dialog.title("Error")
+        error_dialog.title("Lỗi")
         error_dialog.geometry("300x150")
         error_dialog.resizable(False, False)
         error_dialog.transient(self)

@@ -267,7 +267,7 @@ class AdminDashboard(ctk.CTk):
         # Bind resize event
         self.bind("<Configure>", self.on_resize)
 
-        self.show_page('Products')
+        self.show_page('Sản Phẩm')
 
     def logout(self):
         """Log out the user and return to the login screen."""

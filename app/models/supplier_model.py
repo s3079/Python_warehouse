@@ -33,7 +33,7 @@ class SupplierModel(BaseModel):
             return True, "Supplier added successfully"
         return False, "Failed to add supplier"
     
-    def capNhat(self, ma_ncc: int, **data):
+    def capNhat(self,data):
         """Update an existing supplier"""
         query = f"""
             UPDATE {self._table_name}
@@ -45,7 +45,7 @@ class SupplierModel(BaseModel):
             data.get('dia_chi'),
             data.get('dien_thoai'),
             data.get('email'),
-            ma_ncc
+            data.get('ma_ncc')
         )
         cursor = self._thucThiTruyVan(query, params)
         if cursor:

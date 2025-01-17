@@ -75,7 +75,7 @@ class SupplierPage(ctk.CTkFrame):
         
         self.search_entry = ctk.CTkEntry(
             search_frame,
-            placeholder_text="Search suppliers...",
+            placeholder_text="Tìm kiếm nhà cung cấp...",
             border_width=0,
             fg_color="transparent",
             width=300,
@@ -91,7 +91,7 @@ class SupplierPage(ctk.CTkFrame):
         # Add filter button
         filter_button = ctk.CTkButton(
             buttons_frame,
-            text="Filter",
+            text='Lọc',
             image=self.filter_icon,
             compound="left",
             fg_color="#F8F9FA",
@@ -107,7 +107,7 @@ class SupplierPage(ctk.CTkFrame):
         # Add new supplier button
         new_supplier_button = ctk.CTkButton(
             buttons_frame,
-            text="Add Supplier",
+            text='Thêm Nhà Cung Cấp',
             image=self.plus_icon,
             compound="left",
             fg_color="#006EC4",
@@ -300,7 +300,7 @@ class SupplierPage(ctk.CTkFrame):
         
         showing_label = ctk.CTkLabel(
             left_frame,
-            text=f"Showing {start_index}-{end_index} of {self.total_items} entries",
+            text=f"Hiển thị {start_index}-{end_index} của {self.total_items} nhà cung cấp",
             text_color="#6F6E77"
         )
         showing_label.pack(side="left")
@@ -399,7 +399,7 @@ class SupplierPage(ctk.CTkFrame):
         # Warning icon or text
         warning_label = ctk.CTkLabel(
             content_frame,
-            text="⚠️ Warning",
+            text="⚠️ Cảnh báo",
             font=("", 16, "bold"),
             text_color="#e03137"
         )
@@ -408,7 +408,7 @@ class SupplierPage(ctk.CTkFrame):
         # Confirmation message
         message_label = ctk.CTkLabel(
             content_frame,
-            text=f"Are you sure you want to delete '{supplier['name']}'?\nThis action cannot be undone.",
+            text=f"Bạn có chắc chắn muốn xóa '{supplier['ten']}'?\nHành động này không thể hoàn tác.",
             font=("", 13),
             text_color="#16151C"
         )
@@ -422,7 +422,7 @@ class SupplierPage(ctk.CTkFrame):
         # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_frame,
-            text="Cancel",
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -436,7 +436,7 @@ class SupplierPage(ctk.CTkFrame):
         # Delete button
         delete_button = ctk.CTkButton(
             buttons_frame,
-            text="Delete",
+            text="Xóa",
             fg_color="#e03137",
             text_color="white",
             hover_color="#b32429",
@@ -445,21 +445,21 @@ class SupplierPage(ctk.CTkFrame):
             corner_radius=8,
             command=lambda: self.confirm_delete(dialog, supplier)
         )
-        delete_button.pack(side="left")
+        delete_button.pack(side="right")
 
     def confirm_delete(self, dialog, supplier):
         """Execute delete operation and close dialog"""
         try:
-            self.controller.xoaNhaCungCap(supplier["supplier_id"])
+            self.controller.xoaNhaCungCap(supplier["ma_ncc"])
             dialog.destroy()
             self.load_suppliers()  # Refresh the list
         except Exception as e:
             from tkinter import messagebox
-            messagebox.showerror("Error", f"Failed to delete supplier: {str(e)}")
+            messagebox.showerror("Lỗi", f"Không thể xóa nhà cung cấp: {str(e)}")
 
     def show_filter_dialog(self):
         """Show filter options dialog"""
-        dialog = CenterDialog(self, "Filter Suppliers", "400x300")
+        dialog = CenterDialog(self, "Lọc Nhà Cung Cấp", "400x300")
         
         # Store filter states
         self.name_sort = tk.StringVar(value="none")  # none, asc, desc
@@ -475,7 +475,7 @@ class SupplierPage(ctk.CTkFrame):
         
         name_label = ctk.CTkLabel(
             name_frame,
-            text="Name",
+            text="Tên",
             font=("", 14, "bold"),
             text_color="#16151C"
         )
@@ -487,7 +487,7 @@ class SupplierPage(ctk.CTkFrame):
         
         name_all = ctk.CTkRadioButton(
             name_options_frame,
-            text="All",
+            text="Tất cả",
             variable=self.name_sort,
             value="none",
             font=("", 13),
@@ -521,7 +521,7 @@ class SupplierPage(ctk.CTkFrame):
         
         contact_label = ctk.CTkLabel(
             contact_frame,
-            text="Contact",
+            text="Số Điện Thoại",
             font=("", 14, "bold"),
             text_color="#16151C"
         )
@@ -533,7 +533,7 @@ class SupplierPage(ctk.CTkFrame):
         
         contact_all = ctk.CTkRadioButton(
             contact_options_frame,
-            text="All",
+            text="Tất cả",
             variable=self.contact_sort,
             value="none",
             font=("", 13),
@@ -569,7 +569,7 @@ class SupplierPage(ctk.CTkFrame):
         # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_frame,
-            text="Cancel",
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -583,7 +583,7 @@ class SupplierPage(ctk.CTkFrame):
         # Apply button
         apply_button = ctk.CTkButton(
             buttons_frame,
-            text="Apply",
+            text="Áp dụng",
             fg_color="#006EC4",
             text_color="white",
             hover_color="#0059A1",
@@ -604,20 +604,19 @@ class SupplierPage(ctk.CTkFrame):
         """Save or update a supplier"""
         try:
             # Validate that all required fields are present
-            required_fields = ["name", "email", "phone", "address"]
+            required_fields = ["ten", "email", "dien_thoai", "dia_chi"]
             for field in required_fields:
                 if field not in supplier_data:
                     raise ValueError(f"Missing required field: {field}")
+                print("supplier_data", supplier_data)
 
-            if "supplier_id" in supplier_data:
+            if "ma_ncc" in supplier_data:
                 # Update existing supplier
                 self.controller.capNhatNhaCungCap(
-                    supplier_data["supplier_id"],
-                    supplier_data
+                    supplier_data  # Unpack the supplier_data dictionary
                 )
             else:
                 # Add new supplier
-                print("supplier_data", supplier_data)
                 self.controller.themNhaCungCap(
                     supplier_data
                 )
