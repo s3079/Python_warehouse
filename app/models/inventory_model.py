@@ -3,7 +3,7 @@ from app.models.base_model import BaseModel
 class InventoryModel(BaseModel):
     def __init__(self):
         super().__init__()
-        self._table_name = "kho_hang"
+        self._table_name = "KHOHANG"
     
     def layTatCa(self):
         """Get all inventory items with product names"""
@@ -40,14 +40,21 @@ class InventoryModel(BaseModel):
             return True, "Thêm kho hàng thành công"
         return False, "Thêm kho hàng thất bại"
     
-    def capNhat(self, ma_kho: int, ma_san_pham: int, so_luong: int):
+    def capNhat(self, data):
         """Update an existing inventory item"""
         query = f"""
             UPDATE {self._table_name}
-            SET ma_san_pham = %s, so_luong = %s
+            SET ma_san_pham = %s, 
+                so_luong = %s,
+                ngay_nhap_cuoi = %s
             WHERE ma_kho = %s
         """
-        cursor = self._thucThiTruyVan(query, (ma_san_pham, so_luong, ma_kho))
+        cursor = self._thucThiTruyVan(query, (
+            data.get('ma_san_pham'),
+            data.get('so_luong'),
+            data.get('ngay_nhap_cuoi'),
+            data.get('ma_kho')
+        ))
         if cursor:
             self.conn.commit()
             return True
@@ -80,19 +87,19 @@ class InventoryModel(BaseModel):
         try:
             query = """
                 SELECT i.*, p.ten as ten_san_pham
-                FROM kho_hang i
-                LEFT JOIN san_pham p ON i.ma_san_pham = p.ma_san_pham
+                FROM KHOHANG i
+                LEFT JOIN SANPHAM p ON i.ma_san_pham = p.ma_san_pham
             """
-            count_query = "SELECT COUNT(*) FROM kho_hang i"
+            count_query = "SELECT COUNT(*) FROM KHOHANG i"
             
             params = []
             
             if search_query:
                 query += " WHERE p.ten LIKE %s"
-                count_query += " LEFT JOIN san_pham p ON i.ma_san_pham = p.ma_san_pham WHERE p.ten LIKE %s"
+                count_query += " LEFT JOIN SANPHAM p ON i.ma_san_pham = p.ma_san_pham WHERE p.ten LIKE %s"
                 params.append(f"%{search_query}%")
             
-            query += " LIMIT %s OFFSET %s"
+            query += " ORDER BY i.ngay_nhap_cuoi DESC LIMIT %s OFFSET %s"
             params.extend([limit, offset])
             
             cursor = self.conn.cursor()

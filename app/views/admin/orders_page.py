@@ -269,8 +269,8 @@ class OrdersPage(ctk.CTkFrame):
                     delete_btn.pack(side="left")
                     
                 elif col["key"] == "tong_tien":
-                    # Format total with currency
-                    value = f"${float(order[col['key']]):.2f}"
+                    # Format total with VND currency
+                    value = f"{float(order[col['key']]):,.0f} ₫"
                     label = ctk.CTkLabel(
                         row_frame,
                         text=value,
@@ -278,10 +278,20 @@ class OrdersPage(ctk.CTkFrame):
                         width=col["width"]
                     )
                     label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
-                    
+                elif col["key"] == "ngay_dat":
+                    # Format date as yyyy-mm-dd
+                    from datetime import datetime
+                    date_obj = datetime.strptime(str(order[col['key']]), '%Y-%m-%d %H:%M:%S')
+                    value = date_obj.strftime('%Y-%m-%d')
+                    label = ctk.CTkLabel(
+                        row_frame,
+                        text=value,
+                        anchor="w",
+                        width=col["width"]
+                    )
+                    label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
                 else:
-                    # Regular text columns
-                    value = str(order.get(col["key"], "") or "")
+                    value = str(order[col["key"]])
                     label = ctk.CTkLabel(
                         row_frame,
                         text=value,
@@ -483,8 +493,14 @@ class OrdersPage(ctk.CTkFrame):
             if not ngay_dat:
                 raise ValueError("Ngày đặt là bắt buộc")
             try:
-                tong_tien = float(tong_tien)
-            except ValueError:
+                tong_tien = float(tong_tien.replace(',', '').replace('₫', '').strip())
+                if tong_tien < 0:
+                    raise ValueError
+                if tong_tien > 999999999:
+                    raise ValueError("Tổng tiền không được vượt quá 999,999,999 ₫")
+            except ValueError as e:
+                if "không được vượt quá" in str(e):
+                    raise e
                 raise ValueError("Tổng tiền phải là số hợp lệ")
             
             success = self.controller.capNhatDonHang(ma_don_hang, {

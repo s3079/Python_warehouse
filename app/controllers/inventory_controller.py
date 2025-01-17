@@ -38,14 +38,26 @@ class InventoryController:
             self.handle_error(e, "thêm kho hàng")
             raise
     
-    def capNhatKhoHang(self, ma_kho, data):
+    def capNhatKhoHang(self,data):
         """Update an existing inventory item"""
         try:
-            if not ma_kho:
+            if not data.get('ma_kho'):
                 raise ValueError("Mã kho là bắt buộc")
             if not data.get('ma_san_pham'):
                 raise ValueError("Mã sản phẩm là bắt buộc")
-            return self._model.capNhat(ma_kho=ma_kho, **data)
+            if not data.get('so_luong'):
+                raise ValueError("Số lượng là bắt buộc")
+            if not data.get('ngay_nhap_cuoi'):
+                raise ValueError("Ngày nhập kho là bắt buộc")
+
+            data = {
+                "ma_kho": data.get('ma_kho'),
+                "ma_san_pham": data.get('ma_san_pham'),
+                "so_luong": data.get('so_luong'),
+                "ngay_nhap_cuoi": data.get('ngay_nhap_cuoi')
+            }
+            
+            return self._model.capNhat(data)
         except Exception as e:
             self.handle_error(e, "cập nhật kho hàng")
             raise

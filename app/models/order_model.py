@@ -3,7 +3,7 @@ from app.models.base_model import BaseModel
 class OrderModel(BaseModel):
     def __init__(self):
         super().__init__()
-        self._table_name = "don_hang"
+        self._table_name = "DONHANG"
     
     def layTatCa(self):
         """Get all orders"""
@@ -83,7 +83,7 @@ class OrderModel(BaseModel):
             cursor = self.conn.cursor()
             
             # First delete from chi_tiet_don_hang (child table)
-            details_query = "DELETE FROM chi_tiet_don_hang WHERE ma_don_hang = %s"
+            details_query = "DELETE FROM CHITIETDONHANG WHERE ma_don_hang = %s"
             cursor.execute(details_query, (ma_don_hang,))
             
             # Then delete from don_hang (parent table)
@@ -130,9 +130,9 @@ class OrderModel(BaseModel):
                 sp.ten as ten_san_pham,
                 sp.ma_san_pham
             FROM {self._table_name} dh
-            JOIN nguoi_dung nd ON dh.ma_nguoi_dung = nd.ma_nguoi_dung
-            JOIN chi_tiet_don_hang ctdh ON dh.ma_don_hang = ctdh.ma_don_hang
-            JOIN san_pham sp ON ctdh.ma_san_pham = sp.ma_san_pham
+            JOIN NGUOIDUNG nd ON dh.ma_nguoi_dung = nd.ma_nguoi_dung
+            JOIN CHITIETDONHANG ctdh ON dh.ma_don_hang = ctdh.ma_don_hang
+            JOIN SANPHAM sp ON ctdh.ma_san_pham = sp.ma_san_pham
             WHERE dh.ma_don_hang = %s
         """
         try:
@@ -150,7 +150,7 @@ class OrderModel(BaseModel):
     def themChiTietDonHang(self, ma_don_hang, ma_san_pham, so_luong, don_gia):
         """Add a new order detail"""
         query = f"""
-            INSERT INTO chi_tiet_don_hang 
+            INSERT INTO CHITIETDONHANG 
             (ma_don_hang, ma_san_pham, so_luong, don_gia)
             VALUES (%s, %s, %s, %s)
         """
@@ -179,7 +179,7 @@ class OrderModel(BaseModel):
             
             # Update order details
             details_query = """
-                UPDATE chi_tiet_don_hang
+                UPDATE CHITIETDONHANG
                 SET so_luong = %s,
                     ma_san_pham = %s,
                     don_gia = %s

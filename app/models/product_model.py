@@ -3,7 +3,7 @@ from app.models.base_model import BaseModel
 class ProductModel(BaseModel):
     def __init__(self):
         super().__init__()
-        self._table_name = "san_pham"
+        self._table_name = "SANPHAM"
     
     def layTatCa(self):
         """Get all products with category and supplier names"""
@@ -20,8 +20,8 @@ class ProductModel(BaseModel):
                 dm.ten as ten_danh_muc,
                 ncc.ten as ten_nha_cung_cap
             FROM {self._table_name} sp
-            LEFT JOIN danh_muc dm ON sp.ma_danh_muc = dm.ma_danh_muc
-            LEFT JOIN nha_cung_cap ncc ON sp.ma_ncc = ncc.ma_ncc
+            LEFT JOIN DANHMUC dm ON sp.ma_danh_muc = dm.ma_danh_muc
+            LEFT JOIN NHACUNGCAP ncc ON sp.ma_ncc = ncc.ma_ncc
             ORDER BY sp.ten
         """
         try:
@@ -63,8 +63,8 @@ class ProductModel(BaseModel):
                 c.ten as ten_danh_muc,
                 s.ten as ten_ncc
             FROM {self._table_name} p
-            LEFT JOIN danh_muc c ON p.ma_danh_muc = c.ma_danh_muc
-            LEFT JOIN nha_cung_cap s ON p.ma_ncc = s.ma_ncc
+            LEFT JOIN DANHMUC c ON p.ma_danh_muc = c.ma_danh_muc
+            LEFT JOIN NHACUNGCAP s ON p.ma_ncc = s.ma_ncc
             ORDER BY p.ten
         """
         cursor = self._thucThiTruyVan(query)
@@ -108,8 +108,8 @@ class ProductModel(BaseModel):
                 p.ma_danh_muc, p.ma_ncc, p.ngay_tao, p.ngay_cap_nhat,
                 c.ten as ten_danh_muc, s.ten as ten_ncc
             FROM {self._table_name} p
-            LEFT JOIN danh_muc c ON p.ma_danh_muc = c.ma_danh_muc
-            LEFT JOIN nha_cung_cap s ON p.ma_ncc = s.ma_ncc
+            LEFT JOIN DANHMUC c ON p.ma_danh_muc = c.ma_danh_muc
+            LEFT JOIN NHACUNGCAP s ON p.ma_ncc = s.ma_ncc
             WHERE p.ma_san_pham = %s
         """
         cursor = self._thucThiTruyVan(query, (ma_san_pham,))
@@ -120,11 +120,11 @@ class ProductModel(BaseModel):
         try:
             query = """
                 SELECT p.*, c.ten as ten_danh_muc, s.ten as ten_ncc
-                FROM san_pham p
-                LEFT JOIN danh_muc c ON p.ma_danh_muc = c.ma_danh_muc
-                LEFT JOIN nha_cung_cap s ON p.ma_ncc = s.ma_ncc
+                FROM SANPHAM p
+                LEFT JOIN DANHMUC c ON p.ma_danh_muc = c.ma_danh_muc
+                LEFT JOIN NHACUNGCAP s ON p.ma_ncc = s.ma_ncc
             """
-            count_query = "SELECT COUNT(*) FROM san_pham p"
+            count_query = "SELECT COUNT(*) FROM SANPHAM p"
             
             params = []
             

@@ -3,7 +3,7 @@ from app.models.base_model import BaseModel
 class UserModel(BaseModel):
     def __init__(self):
         super().__init__()
-        self._table_name = "nguoi_dung"
+        self._table_name = "NGUOIDUNG"
         self._damBaoTruongDuyet()
         self.current_user_id = None
 
@@ -14,12 +14,12 @@ class UserModel(BaseModel):
             cursor.execute("""
                 SELECT COUNT(*) 
                 FROM information_schema.COLUMNS 
-                WHERE TABLE_NAME = 'nguoi_dung' 
+                WHERE TABLE_NAME = {self._table_name} 
                 AND COLUMN_NAME = 'da_duyet'
             """)
             if cursor.fetchone()[0] == 0:
                 cursor.execute("""
-                    ALTER TABLE nguoi_dung 
+                    ALTER TABLE {self._table_name} 
                     ADD COLUMN da_duyet BOOLEAN DEFAULT FALSE
                 """)
                 self.conn.commit()
@@ -31,8 +31,8 @@ class UserModel(BaseModel):
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT nd.*, pq.ten_quyen 
-            FROM nguoi_dung nd
-            JOIN phan_quyen pq ON nd.ma_quyen = pq.ma_quyen
+            FROM NGUOIDUNG nd
+            JOIN PHANQUYEN pq ON nd.ma_quyen = pq.ma_quyen
             ORDER BY nd.ten_dang_nhap
         """)
         return cursor.fetchall()
@@ -42,8 +42,8 @@ class UserModel(BaseModel):
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT u.*, r.ten_quyen 
-            FROM nguoi_dung u
-            JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
+            FROM NGUOIDUNG u
+            JOIN PHANQUYEN r ON u.ma_quyen = r.ma_quyen
             WHERE u.da_duyet = FALSE
             ORDER BY u.ten_dang_nhap
         """)
@@ -54,7 +54,7 @@ class UserModel(BaseModel):
         try:
             cursor = self.conn.cursor()
             cursor.execute("""
-                UPDATE nguoi_dung 
+                UPDATE NGUOIDUNG 
                 SET da_duyet = TRUE, ma_quyen = 3
                 WHERE ma_nguoi_dung = %s
             """, (ma_nguoi_dung,))
@@ -75,7 +75,7 @@ class UserModel(BaseModel):
             # Get role ID
             ten_quyen = 'administrator' if la_admin else 'registered_user'
             cursor.execute(
-                "SELECT ma_quyen FROM phan_quyen WHERE ten_quyen = %s",
+                "SELECT ma_quyen FROM PHANQUYEN WHERE ten_quyen = %s",
                 (ten_quyen,)
             )
             role = cursor.fetchone()
@@ -83,7 +83,7 @@ class UserModel(BaseModel):
                 raise Exception(f"Role '{ten_quyen}' not found")
 
             cursor.execute("""
-                INSERT INTO nguoi_dung (ten_dang_nhap, mat_khau, ho_ten, ma_quyen, da_duyet)
+                INSERT INTO NGUOIDUNG (ten_dang_nhap, mat_khau, ho_ten, ma_quyen, da_duyet)
                 VALUES (%s, %s, %s, %s, %s)
             """, (ten_dang_nhap, mat_khau, ho_ten, role['ma_quyen'], la_admin))
             
@@ -98,8 +98,8 @@ class UserModel(BaseModel):
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT u.*, r.ten_quyen 
-            FROM nguoi_dung u
-            JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
+            FROM NGUOIDUNG u
+            JOIN PHANQUYEN r ON u.ma_quyen = r.ma_quyen
             WHERE u.ten_dang_nhap = %s
         """, (ten_dang_nhap,))
         result = cursor.fetchone()
@@ -111,8 +111,8 @@ class UserModel(BaseModel):
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT u.*, r.ten_quyen 
-            FROM nguoi_dung u
-            JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
+            FROM NGUOIDUNG u
+            JOIN PHANQUYEN r ON u.ma_quyen = r.ma_quyen
             WHERE u.ma_nguoi_dung = %s
         """, (ma_nguoi_dung,))
         result = cursor.fetchone()
@@ -136,7 +136,7 @@ class UserModel(BaseModel):
             values.append(ma_nguoi_dung)
 
             query = f"""
-                UPDATE nguoi_dung 
+                UPDATE NGUOIDUNG 
                 SET {', '.join(update_fields)}
                 WHERE ma_nguoi_dung = %s
             """
@@ -154,7 +154,7 @@ class UserModel(BaseModel):
         try:
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute("""
-                UPDATE nguoi_dung 
+                UPDATE NGUOIDUNG 
                 SET mat_khau = %s
                 WHERE ma_nguoi_dung = %s
             """, (mat_khau_moi, ma_nguoi_dung))
@@ -171,7 +171,7 @@ class UserModel(BaseModel):
         try:
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute("""
-                DELETE FROM nguoi_dung 
+                DELETE FROM NGUOIDUNG 
                 WHERE ma_nguoi_dung = %s
             """, (ma_nguoi_dung,))
             self.conn.commit()
@@ -202,8 +202,8 @@ class UserModel(BaseModel):
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute("""
                 SELECT u.*, r.ten_quyen 
-                FROM nguoi_dung u
-                JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
+                FROM NGUOIDUNG u
+                JOIN PHANQUYEN r ON u.ma_quyen = r.ma_quyen
                 WHERE u.da_duyet = TRUE
                 ORDER BY u.ten_dang_nhap
             """)
@@ -218,8 +218,8 @@ class UserModel(BaseModel):
         try:
             query = """
                 SELECT u.*, r.ten_quyen 
-                FROM nguoi_dung u
-                JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
+                FROM NGUOIDUNG u
+                JOIN PHANQUYEN r ON u.ma_quyen = r.ma_quyen
             """
             if search_query:
                 query += " WHERE u.ten_dang_nhap LIKE %s OR u.ho_ten LIKE %s"
@@ -232,7 +232,7 @@ class UserModel(BaseModel):
             
             users = cursor.fetchall()
 
-            cursor.execute("SELECT COUNT(*) FROM nguoi_dung")
+            cursor.execute("SELECT COUNT(*) FROM NGUOIDUNG")
             total_count = cursor.fetchone()['COUNT(*)']
 
             return users, total_count
@@ -253,7 +253,7 @@ class UserModel(BaseModel):
                 print(f"Quyền '{ten_quyen}' không tìm thấy.")
                 return False
 
-            cursor.execute("UPDATE nguoi_dung SET ma_quyen = %s WHERE ma_nguoi_dung = %s", 
+            cursor.execute("UPDATE NGUOIDUNG SET ma_quyen = %s WHERE ma_nguoi_dung = %s", 
                          (quyen['ma_quyen'], ma_nguoi_dung))
             self.conn.commit()
             return cursor.rowcount > 0
@@ -269,8 +269,8 @@ class UserModel(BaseModel):
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT u.*, r.ten_quyen 
-            FROM nguoi_dung u
-            JOIN phan_quyen r ON u.ma_quyen = r.ma_quyen
+            FROM NGUOIDUNG u
+            JOIN PHANQUYEN r ON u.ma_quyen = r.ma_quyen
             WHERE u.ho_ten = %s
         """, (ho_ten,))
         result = cursor.fetchone()

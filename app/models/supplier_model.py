@@ -3,7 +3,7 @@ from app.models.base_model import BaseModel
 class SupplierModel(BaseModel):
     def __init__(self):
         super().__init__()
-        self._table_name = "nha_cung_cap"
+        self._table_name = "NHACUNGCAP"
     
     def layTatCa(self):
         """Get all suppliers"""

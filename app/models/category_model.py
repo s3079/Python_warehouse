@@ -4,7 +4,7 @@ from app.models.base_model import BaseModel
 class CategoryModel(BaseModel):
     def __init__(self):
         super().__init__()
-        self._table_name = "danh_muc"
+        self._table_name = "DANHMUC"
         self._db = Database()
         self._db.connect()  # Ensure connection is established
     
@@ -32,7 +32,7 @@ class CategoryModel(BaseModel):
         """Count number of products in a category"""
         query = """
             SELECT COUNT(*) as so_luong
-            FROM san_pham 
+            FROM SANPHAM 
             WHERE ma_danh_muc = %s
         """
         result = self._thucThiTruyVan(query, (ma_danh_muc,))
