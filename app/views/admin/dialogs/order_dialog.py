@@ -9,7 +9,6 @@ class OrderDialog(ctk.CTkToplevel):
         self.create_widgets()
 
     def create_widgets(self):
-        """Create widgets to display order details"""
         order_id_label = ctk.CTkLabel(self, text=f"Order ID: {self.order['order_id']}")
         order_id_label.pack(pady=10)
 
@@ -29,6 +28,5 @@ class OrderDialog(ctk.CTkToplevel):
         close_button.pack(pady=20)
 
     def show(self):
-        """Show the dialog"""
         self.grab_set()
         self.wait_window(self) 

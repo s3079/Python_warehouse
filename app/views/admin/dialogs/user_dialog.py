@@ -14,11 +14,9 @@ class UserDialog(CenterDialog):
             self.load_user_data()
 
     def setup_ui(self):
-        # Main content frame
         content_frame = ctk.CTkFrame(self)
         content_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # Username
         ctk.CTkLabel(
             content_frame,
             text="Username:",
@@ -28,7 +26,6 @@ class UserDialog(CenterDialog):
         self.username_entry = ctk.CTkEntry(content_frame)
         self.username_entry.pack(fill="x", padx=10, pady=(0,10))
         
-        # Email
         ctk.CTkLabel(
             content_frame,
             text="Email:",
@@ -38,7 +35,6 @@ class UserDialog(CenterDialog):
         self.email_entry = ctk.CTkEntry(content_frame)
         self.email_entry.pack(fill="x", padx=10, pady=(0,10))
         
-        # Password (only for new users)
         if not self.user:
             ctk.CTkLabel(
                 content_frame,
@@ -49,7 +45,6 @@ class UserDialog(CenterDialog):
             self.password_entry = ctk.CTkEntry(content_frame, show="*")
             self.password_entry.pack(fill="x", padx=10, pady=(0,10))
         
-        # Role selection
         ctk.CTkLabel(
             content_frame,
             text="Role:",
@@ -67,7 +62,6 @@ class UserDialog(CenterDialog):
         )
         self.role_dropdown.pack(fill="x", padx=10, pady=(0,10))
         
-        # Approval status (only for editing)
         if self.user:
             ctk.CTkLabel(
                 content_frame,
@@ -83,7 +77,6 @@ class UserDialog(CenterDialog):
             )
             self.status_switch.pack(fill="x", padx=10, pady=(0,10))
         
-        # Buttons frame
         button_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
         button_frame.pack(fill="x", padx=10, pady=(20,10))
         
@@ -114,10 +107,10 @@ class UserDialog(CenterDialog):
                           if role["role_name"] == self.role_var.get())
         }
         
-        if not self.user:  # New user
+        if not self.user:
             data["password"] = self.password_entry.get()
             result = self.controller.create_user(data)
-        else:  # Edit user
+        else:
             data["is_approved"] = self.status_var.get()
             result = self.controller.update_user(self.user["user_id"], data)
         

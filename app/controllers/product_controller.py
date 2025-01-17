@@ -5,14 +5,11 @@ class ProductController:
         self._model = ProductModel()
     
     def layTatCaSanPham(self):
-        """Get all products with their category and supplier names"""
         try:
             san_pham = self._model.layTatCa()
-            print("san_pham", san_pham)
             if not san_pham:
                 return []
             
-            # Results are already in dictionary format from the model
             formatted_products = []
             for product in san_pham:
                 product_dict = {
@@ -34,7 +31,6 @@ class ProductController:
             return []
     
     def themSanPham(self, data):
-        """Add a new product"""
         try:
             if not data.get('ten'):
                 raise ValueError("Tên sản phẩm là bắt buộc")
@@ -44,7 +40,6 @@ class ProductController:
             raise
     
     def capNhatSanPham(self, ma_san_pham, data):
-        """Update an existing product"""
         try:
             if not ma_san_pham:
                 raise ValueError("Mã sản phẩm là bắt buộc")
@@ -56,7 +51,6 @@ class ProductController:
             raise
     
     def xoaSanPham(self, ma_san_pham):
-        """Delete a product"""
         try:
             if not ma_san_pham:
                 raise ValueError("Mã sản phẩm là bắt buộc")
@@ -66,13 +60,11 @@ class ProductController:
             raise
     
     def handle_error(self, error, action):
-        """Handle errors in the controller"""
         error_message = f"Lỗi {action}: {str(error)}"
-        print(error_message)  # Log the error
+        print(error_message)
         return error_message
     
     def laySanPhamPhanTrang(self, offset=0, limit=10, search_query="", name_sort="none", price_sort="none"):
-        """Get paginated products with optional search and sorting"""
         try:
             filters = {}
             if name_sort and name_sort != "none":

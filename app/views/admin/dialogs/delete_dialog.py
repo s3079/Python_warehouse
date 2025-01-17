@@ -7,11 +7,9 @@ class DeleteDialog(CenterDialog):
         
         self.on_confirm = on_confirm
         
-        # Create main content frame
         content_frame = ctk.CTkFrame(self, fg_color="transparent")
         content_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # Warning icon or text
         warning_label = ctk.CTkLabel(
             content_frame,
             text="⚠️ Cảnh báo",
@@ -20,7 +18,6 @@ class DeleteDialog(CenterDialog):
         )
         warning_label.pack(pady=(0, 10))
         
-        # Confirmation message
         message_label = ctk.CTkLabel(
             content_frame,
             text=f"Bạn có chắc chắn muốn xóa '{item_name}'?\nHành động này không thể hoàn tác.",
@@ -29,12 +26,10 @@ class DeleteDialog(CenterDialog):
         )
         message_label.pack(pady=(0, 20))
         
-        # Buttons frame
         buttons_frame = ctk.CTkFrame(self, fg_color="transparent", height=60)
         buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
         buttons_frame.pack_propagate(False)
         
-        # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_frame,
             text="Hủy",
@@ -48,7 +43,6 @@ class DeleteDialog(CenterDialog):
         )
         cancel_button.pack(side="left", padx=(0, 10))
         
-        # Delete button
         delete_button = ctk.CTkButton(
             buttons_frame,
             text="Xóa",
@@ -63,7 +57,6 @@ class DeleteDialog(CenterDialog):
         delete_button.pack(side="right")
 
     def confirm(self):
-        """Execute the confirmation callback"""
         if self.on_confirm:
             self.on_confirm()
         self.destroy() 

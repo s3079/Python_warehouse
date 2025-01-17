@@ -8,15 +8,12 @@ class FilterDialog(CenterDialog):
         
         self.on_apply = on_apply
         
-        # Store filter states
-        self.name_sort = tk.StringVar(value="none")  # none, asc, desc
-        self.price_sort = tk.StringVar(value="none")  # none, asc, desc
+        self.name_sort = tk.StringVar(value="none")
+        self.price_sort = tk.StringVar(value="none")
         
-        # Create main content frame
         content_frame = ctk.CTkFrame(self, fg_color="transparent")
         content_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # Name filter section
         name_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
         name_frame.pack(fill="x", pady=(0, 15))
         
@@ -28,7 +25,6 @@ class FilterDialog(CenterDialog):
         )
         name_label.pack(anchor="w", pady=(0, 10))
         
-        # Name radio buttons
         name_options_frame = ctk.CTkFrame(name_frame, fg_color="transparent")
         name_options_frame.pack(fill="x")
         
@@ -62,7 +58,6 @@ class FilterDialog(CenterDialog):
         )
         name_desc.pack(side="left")
         
-        # Price filter section
         price_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
         price_frame.pack(fill="x", pady=(0, 20))
         
@@ -74,7 +69,6 @@ class FilterDialog(CenterDialog):
         )
         price_label.pack(anchor="w", pady=(0, 10))
         
-        # Price radio buttons
         price_options_frame = ctk.CTkFrame(price_frame, fg_color="transparent")
         price_options_frame.pack(fill="x")
         
@@ -108,12 +102,10 @@ class FilterDialog(CenterDialog):
         )
         price_desc.pack(side="left")
         
-        # Add buttons
         buttons_frame = ctk.CTkFrame(self, fg_color="transparent", height=60)
         buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
         buttons_frame.pack_propagate(False)
         
-        # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_frame,
             text="Hủy",
@@ -127,7 +119,6 @@ class FilterDialog(CenterDialog):
         )
         cancel_button.pack(side="left", padx=(0, 10))
         
-        # Apply button
         apply_button = ctk.CTkButton(
             buttons_frame,
             text="Áp dụng",
@@ -142,7 +133,6 @@ class FilterDialog(CenterDialog):
         apply_button.pack(side="left")
 
     def apply_filters(self):
-        """Get filter values and call the callback"""
         if self.on_apply:
             filters = {
                 "name_sort": self.name_sort.get(),

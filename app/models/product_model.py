@@ -6,7 +6,6 @@ class ProductModel(BaseModel):
         self._table_name = "SANPHAM"
     
     def layTatCa(self):
-        """Get all products with category and supplier names"""
         query = f"""
             SELECT 
                 sp.ma_san_pham,
@@ -31,7 +30,6 @@ class ProductModel(BaseModel):
             return []
     
     def them(self, **data):
-        """Add a new product"""
         query = f"""
             INSERT INTO {self._table_name} 
             (ten, mo_ta, don_gia, ma_danh_muc, ma_ncc)
@@ -51,7 +49,6 @@ class ProductModel(BaseModel):
         return False, "Thêm sản phẩm thất bại"
     
     def layTatCaVoiTen(self):
-        """Get all products with category and supplier names"""
         query = f"""
             SELECT 
                 p.ma_san_pham,
@@ -72,7 +69,6 @@ class ProductModel(BaseModel):
     
     def capNhat(self, ma_san_pham: int, ten: str, mo_ta: str, 
                don_gia: float, ma_danh_muc: int = None, ma_ncc: int = None):
-        """Update an existing product"""
         query = f"""
             UPDATE {self._table_name}
             SET ten = %s, mo_ta = %s, don_gia = %s, 
@@ -87,7 +83,6 @@ class ProductModel(BaseModel):
         return False
     
     def xoa(self, ma_san_pham: int):
-        """Delete a product"""
         query = f"DELETE FROM {self._table_name} WHERE ma_san_pham = %s"
         try:
             cursor = self._thucThiTruyVan(query, (ma_san_pham,))
@@ -101,7 +96,6 @@ class ProductModel(BaseModel):
         return False, "Xóa sản phẩm thất bại"
     
     def layTheoId(self, ma_san_pham: int):
-        """Get a product by ID with category and supplier names"""
         query = f"""
             SELECT 
                 p.ma_san_pham, p.ten, p.mo_ta, p.don_gia,
@@ -116,7 +110,6 @@ class ProductModel(BaseModel):
         return cursor.fetchone() if cursor else None
     
     def laySanPhamPhanTrang(self, offset=0, limit=10, search_query="", filters=None):
-        """Get paginated products with optional search, filters and sorting"""
         try:
             query = """
                 SELECT p.*, c.ten as ten_danh_muc, s.ten as ten_ncc
@@ -133,7 +126,6 @@ class ProductModel(BaseModel):
                 where_conditions.append("(p.ten LIKE %s OR p.mo_ta LIKE %s)")
                 params.extend([f"%{search_query}%", f"%{search_query}%"])
             
-            # Add filter conditions
             if filters:
                 if filters.get('ma_danh_muc'):
                     where_conditions.append("p.ma_danh_muc = %s")
@@ -153,7 +145,6 @@ class ProductModel(BaseModel):
                 query += where_clause
                 count_query += where_clause
 
-            # Add sorting
             order_by_clauses = []
             if filters and filters.get('name_sort') in ['ASC', 'DESC']:
                 order_by_clauses.append(f"p.ten {filters['name_sort']}")
@@ -163,17 +154,15 @@ class ProductModel(BaseModel):
             if order_by_clauses:
                 query += " ORDER BY " + ", ".join(order_by_clauses)
             else:
-                query += " ORDER BY p.ten"  # Default sorting
+                query += " ORDER BY p.ten"
             
             query += " LIMIT %s OFFSET %s"
             params.extend([limit, offset])
             
-            # Execute count query
             cursor = self.conn.cursor()
             cursor.execute(count_query, params[:-2] if params else None)
             total_count = cursor.fetchone()[0]
             
-            # Execute main query
             cursor.execute(query, params)
             products = cursor.fetchall()
             
@@ -187,7 +176,6 @@ class ProductModel(BaseModel):
             return [], 0
     
     def layTatCaSanPham(self):
-        """Get all products"""
         query = f"SELECT ma_san_pham, ten FROM {self._table_name} ORDER BY ten"
         try:
             return self._thucThiTruyVan(query) or []
@@ -196,7 +184,6 @@ class ProductModel(BaseModel):
             return []
     
     def layTheoTen(self, ten_san_pham):
-        """Get a product by name"""
         query = f"SELECT ma_san_pham, ten FROM {self._table_name} WHERE ten = %s"
         try:
             cursor = self._thucThiTruyVan(query, (ten_san_pham,))
