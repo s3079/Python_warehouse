@@ -187,7 +187,7 @@ class UserModel(BaseModel):
         try:
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute("""
-                SELECT * FROM phan_quyen
+                SELECT * FROM PHANQUYEN
                 WHERE ten_quyen IN ('nguoi_dung', 'quan_ly')
                 ORDER BY ten_quyen
             """)
@@ -247,7 +247,7 @@ class UserModel(BaseModel):
         try:
             cursor = self.conn.cursor(dictionary=True)
             
-            cursor.execute("SELECT ma_quyen FROM phan_quyen WHERE ten_quyen = %s", (ten_quyen,))
+            cursor.execute("SELECT ma_quyen FROM PHANQUYEN WHERE ten_quyen = %s", (ten_quyen,))
             quyen = cursor.fetchone()
             if not quyen:
                 print(f"Quyền '{ten_quyen}' không tìm thấy.")
