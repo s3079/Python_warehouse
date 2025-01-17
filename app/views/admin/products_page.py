@@ -77,7 +77,7 @@ class ProductsPage(ctk.CTkFrame):
         
         self.search_entry = ctk.CTkEntry(
             search_frame,
-            placeholder_text="Search products...",
+            placeholder_text="Tìm kiếm sản phẩm...",
             border_width=0,
             fg_color="transparent",
             width=300,
@@ -93,7 +93,7 @@ class ProductsPage(ctk.CTkFrame):
         # Add filter button
         filter_button = ctk.CTkButton(
             buttons_frame,
-            text="Filter",
+            text='Lọc',
             image=self.filter_icon,
             compound="left",
             fg_color="#F8F9FA",
@@ -109,7 +109,7 @@ class ProductsPage(ctk.CTkFrame):
         # Add new product button
         new_product_button = ctk.CTkButton(
             buttons_frame,
-            text="Add Product",
+            text='Thêm Sản Phẩm',
             image=self.plus_icon,
             compound="left",
             fg_color="#006EC4",
@@ -325,7 +325,7 @@ class ProductsPage(ctk.CTkFrame):
         
         showing_label = ctk.CTkLabel(
             left_frame,
-            text=f"Showing {start_index}-{end_index} of {self.total_items} entries",
+            text=f"Hiển thị {start_index}-{end_index} của {self.total_items} sản phẩm",
             text_color="#6F6E77"
         )
         showing_label.pack(side="left")

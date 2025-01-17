@@ -3,7 +3,7 @@ from app.views.admin.dialogs.center_dialog import CenterDialog
 
 class ProductDialog(CenterDialog):
     def __init__(self, parent, product=None, on_save=None):
-        title = "Edit Product" if product else "Add Product"
+        title = "Sửa Sản Phẩm" if product else "Thêm Sản Phẩm"
         super().__init__(parent, title, "500x700")
         
         self.product = product
@@ -26,7 +26,7 @@ class ProductDialog(CenterDialog):
         # Name field
         name_label = ctk.CTkLabel(
             content_frame,
-            text="Name*",
+            text="Tên*",
             font=("", 13),
             text_color="#16151C"
         )
@@ -34,7 +34,7 @@ class ProductDialog(CenterDialog):
         
         self.name_entry = ctk.CTkEntry(
             content_frame,
-            placeholder_text="Enter product name",
+            placeholder_text="Nhập tên sản phẩm",
             height=40,
             width=460
         )
@@ -43,7 +43,7 @@ class ProductDialog(CenterDialog):
         # Description field
         desc_label = ctk.CTkLabel(
             content_frame,
-            text="Description",
+            text="Mô tả",
             font=("", 13),
             text_color="#16151C"
         )
@@ -59,7 +59,7 @@ class ProductDialog(CenterDialog):
         # Price field
         price_label = ctk.CTkLabel(
             content_frame,
-            text="Price (VND)*",
+            text="Đơn giá (VND)*",
             font=("", 13),
             text_color="#16151C"
         )
@@ -67,7 +67,7 @@ class ProductDialog(CenterDialog):
         
         self.price_entry = ctk.CTkEntry(
             content_frame,
-            placeholder_text="Enter price in VND",
+            placeholder_text="Nhập đơn giá",
             height=40,
             width=460
         )
@@ -76,7 +76,7 @@ class ProductDialog(CenterDialog):
         # Category dropdown
         category_label = ctk.CTkLabel(
             content_frame,
-            text="Category*",
+            text="Danh mục*",
             font=("", 13),
             text_color="#16151C"
         )
@@ -99,7 +99,7 @@ class ProductDialog(CenterDialog):
         # Supplier dropdown
         supplier_label = ctk.CTkLabel(
             content_frame,
-            text="Supplier*",
+            text="Nhà cung cấp*",
             font=("", 13),
             text_color="#16151C"
         )
@@ -130,7 +130,7 @@ class ProductDialog(CenterDialog):
         # Cancel button
         cancel_button = ctk.CTkButton(
             buttons_container,
-            text="Cancel",
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -144,7 +144,7 @@ class ProductDialog(CenterDialog):
         # Save button
         save_button = ctk.CTkButton(
             buttons_container,
-            text="Save",
+            text='Lưu',
             fg_color="#006EC4",
             text_color="white",
             hover_color="#0059A1",

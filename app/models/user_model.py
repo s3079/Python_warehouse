@@ -14,12 +14,12 @@ class UserModel(BaseModel):
             cursor.execute("""
                 SELECT COUNT(*) 
                 FROM information_schema.COLUMNS 
-                WHERE TABLE_NAME = {self._table_name} 
+                WHERE TABLE_NAME = 'NGUOIDUNG'
                 AND COLUMN_NAME = 'da_duyet'
             """)
             if cursor.fetchone()[0] == 0:
                 cursor.execute("""
-                    ALTER TABLE {self._table_name} 
+                    ALTER TABLE NGUOIDUNG 
                     ADD COLUMN da_duyet BOOLEAN DEFAULT FALSE
                 """)
                 self.conn.commit()

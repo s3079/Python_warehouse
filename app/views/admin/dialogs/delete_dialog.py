@@ -60,7 +60,7 @@ class DeleteDialog(CenterDialog):
             corner_radius=8,
             command=self.confirm
         )
-        delete_button.pack(side="left")
+        delete_button.pack(side="right")
 
     def confirm(self):
         """Execute the confirmation callback"""

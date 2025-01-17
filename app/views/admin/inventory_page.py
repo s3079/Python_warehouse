@@ -86,21 +86,6 @@ class InventoryPage(ctk.CTkFrame):
         buttons_frame = ctk.CTkFrame(top_section, fg_color="transparent")
         buttons_frame.grid(row=0, column=1, sticky="e")
         
-      
-        filter_button = ctk.CTkButton(
-            buttons_frame,
-            text="Lọc",
-            image=self.filter_icon,
-            compound="left",
-            fg_color="#F8F9FA",
-            text_color="#16151C",
-            hover_color="#E8E9EA",
-            width=100,
-            height=45,
-            corner_radius=8,
-            command=self.show_filter_dialog
-        )
-        filter_button.pack(side="left", padx=(0, 10))
         
     
         new_inventory_button = ctk.CTkButton(
