@@ -5,9 +5,10 @@ from app.controllers.inventory_controller import InventoryController
 from app.views.admin.dialogs.inventory_dialog import InventoryDialog
 
 class InventoryPage(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, can_edit=True):
         super().__init__(parent, fg_color="transparent")
         self.controller = InventoryController()
+        self.can_edit = can_edit
         
         self.current_page = 1
         self.items_per_page = 10
@@ -291,6 +292,10 @@ class InventoryPage(ctk.CTkFrame):
         self.load_inventory()
 
     def show_add_dialog(self):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         InventoryDialog(self, on_save=self.add_inventory_item)
 
     def add_inventory_item(self, data):
@@ -360,6 +365,10 @@ class InventoryPage(ctk.CTkFrame):
             label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
 
     def edit_inventory(self, inventory):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         def handle_save(data):
             try:
                 print("data--", data)
@@ -377,6 +386,10 @@ class InventoryPage(ctk.CTkFrame):
         InventoryDialog(self, inventory, on_save=handle_save)
 
     def delete_inventory(self, inventory):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         from app.views.admin.dialogs.delete_dialog import DeleteDialog
         
         def handle_delete():

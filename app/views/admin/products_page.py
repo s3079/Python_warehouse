@@ -9,9 +9,10 @@ from app.views.admin.dialogs.delete_dialog import DeleteDialog
 from app.views.admin.dialogs.filter_dialog import FilterDialog
 
 class ProductsPage(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, can_edit=True):
         super().__init__(parent, fg_color="transparent")
         self.controller = ProductController()
+        self.can_edit = can_edit
         self.current_page = 1
         self.items_per_page = 10
         self.total_items = 0
@@ -401,6 +402,10 @@ class ProductsPage(ctk.CTkFrame):
         self.load_products()
 
     def show_add_dialog(self):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         """Show dialog to add a new product"""
         dialog = ProductDialog(
             self,
@@ -408,6 +413,10 @@ class ProductsPage(ctk.CTkFrame):
         )
 
     def show_edit_dialog(self, product):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         print("product", product)
         """Show dialog to edit a product"""
         # Create product data dictionary with the required format
@@ -427,6 +436,10 @@ class ProductsPage(ctk.CTkFrame):
         )
 
     def delete_product(self, product):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         """Show confirmation dialog and delete product"""
         def handle_delete():
             try:

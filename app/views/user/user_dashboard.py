@@ -71,17 +71,43 @@ class UserDashboard(ctk.CTk):
         for item in sidebar_items:
             icon_path = str(assets_path / icon_files[item])
             icon_image = Image.open(icon_path)
-            active_image = icon_image.copy().convert('RGBA')
+            
+            active_image = icon_image.copy()
+            active_image = active_image.convert('RGBA')
             data = active_image.getdata()
-            new_data = [(17, 24, 39, item_data[3]) if item_data[3] != 0 else item_data for item_data in data]
+            new_data = []
+            for item_data in data:
+                if item_data[3] != 0:
+                    new_data.append((17, 24, 39, item_data[3]))
+                else:
+                    new_data.append(item_data)
             active_image.putdata(new_data)
-            normal_icon = ctk.CTkImage(light_image=icon_image, size=(24, 24))
-            active_icon = ctk.CTkImage(light_image=active_image, size=(24, 24))
+
+            normal_icon = ctk.CTkImage(
+                light_image=icon_image,
+                size=(24, 24)
+            )
+            active_icon = ctk.CTkImage(
+                light_image=active_image,
+                size=(24, 24)
+            )
+            
             self.icons[item] = normal_icon
             self.active_icons[item] = active_icon
-            button = ctk.CTkButton(menu_container, text=item, command=lambda i=item: self.show_page(i),
-                                   fg_color="transparent", text_color="#16151C", image=normal_icon,
-                                   compound="left", anchor="w", height=40, corner_radius=8, font=("", 13))
+            
+            button = ctk.CTkButton(
+                menu_container, 
+                text=item,
+                command=lambda i=item: self.show_page(i),
+                fg_color="transparent",
+                text_color="#16151C",
+                image=normal_icon,
+                compound="left",
+                anchor="w",
+                height=40,
+                corner_radius=8,
+                font=("", 13)
+            )
             button.pack(fill='x', pady=5)
             self.buttons.append(button)
 
@@ -95,10 +121,21 @@ class UserDashboard(ctk.CTk):
         new_data = [(255, 72, 66, item[3]) if item[3] != 0 else item for item in data]
         red_icon.putdata(new_data)
         logout_icon = ctk.CTkImage(light_image=red_icon, size=(24, 24))
-        logout_button = ctk.CTkButton(logout_frame, text="Log Out", command=self.logout,
-                                      fg_color="transparent", text_color="#FF4842", image=logout_icon,
-                                      compound="left", anchor="w", height=40, corner_radius=8, font=("", 13),
-                                      hover=True, hover_color="#FFE8E7")
+        logout_button = ctk.CTkButton(
+            logout_frame,
+            text="Đăng xuất",
+            command=self.logout,
+            fg_color="transparent",
+            text_color="#FF4842",
+            image=logout_icon,
+            compound="left",
+            anchor="w",
+            height=40,
+            corner_radius=8,
+            font=("", 13),
+            hover=True,
+            hover_color="#FFE8E7"
+        )
         logout_button.pack(fill="x")
 
         # Right container
@@ -164,9 +201,20 @@ class UserDashboard(ctk.CTk):
     def show_page(self, page_name):
         for button in self.buttons:
             button_text = button.cget("text")
-            button.configure(fg_color="transparent", text_color="#16151C", image=self.icons[button_text], font=("", 13))
+            button.configure(
+                fg_color="transparent",
+                text_color="#16151C",
+                image=self.icons[button_text],
+                font=("", 13)
+            )
+            
         active_button = next(btn for btn in self.buttons if btn.cget("text") == page_name)
-        active_button.configure(fg_color="#C9F1FF", text_color="#006EC4", image=self.active_icons[page_name], font=("", 13, "bold"))
+        active_button.configure(
+            fg_color="#C9F1FF",
+            text_color="#006EC4",
+            image=self.active_icons[page_name],
+            font=("", 13, "bold")
+        )
         self.page_title.configure(text=page_name)
         for widget in self.content_area.winfo_children():
             widget.destroy()

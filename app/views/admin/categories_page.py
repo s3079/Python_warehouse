@@ -8,9 +8,10 @@ import math
 import tkinter as tk
 
 class CategoriesPage(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, can_edit=True):
         super().__init__(parent, fg_color="transparent")
         self.controller = CategoryController()
+        self.can_edit = can_edit
         self.trang_hien_tai = 1
         self.so_muc_moi_trang = 10
         self.tong_so_muc = 0
@@ -343,12 +344,20 @@ class CategoriesPage(ctk.CTkFrame):
         self.tai_danh_muc()
 
     def hien_thi_them_moi(self):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         dialog = CategoryDialog(
             self,
             on_save=self.luu_danh_muc
         )
 
     def hien_thi_chinh_sua(self, danh_muc):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         dialog = CategoryDialog(
             self,
             category=danh_muc,
@@ -356,6 +365,10 @@ class CategoriesPage(ctk.CTkFrame):
         )
 
     def xoa_danh_muc(self, danh_muc):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         dialog = CenterDialog(self, "Xoá Danh Mục")
         
         content_frame = ctk.CTkFrame(dialog, fg_color="transparent")
@@ -441,6 +454,10 @@ class CategoriesPage(ctk.CTkFrame):
             messagebox.showerror("Lỗi", f"Không thể lưu danh mục: {str(e)}")
 
     def show_filter_dialog(self):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         dialog = CenterDialog(self, "Filter Categories", "400x300")
         
     
@@ -576,6 +593,10 @@ class CategoriesPage(ctk.CTkFrame):
         apply_button.pack(side="left")
 
     def apply_filters(self, dialog):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         dialog.destroy()
         self.trang_hien_tai = 1
         self.name_sort_value = self.name_sort.get()

@@ -7,9 +7,10 @@ from app.views.admin.dialogs.supplier_dialog import SupplierDialog
 from app.views.admin.dialogs.center_dialog import CenterDialog
 
 class SupplierPage(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, can_edit=True):
         super().__init__(parent, fg_color="transparent")
         self.controller = SupplierController()
+        self.can_edit = can_edit
         self.current_page = 1
         self.items_per_page = 10
         self.total_items = 0
@@ -382,6 +383,10 @@ class SupplierPage(ctk.CTkFrame):
         self.load_suppliers()
 
     def show_add_dialog(self):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         """Show dialog to add a new supplier"""
         dialog = SupplierDialog(
             self,
@@ -389,6 +394,10 @@ class SupplierPage(ctk.CTkFrame):
         )
 
     def show_edit_dialog(self, supplier):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         """Show dialog to edit a supplier"""
         dialog = SupplierDialog(
             self,
@@ -397,6 +406,10 @@ class SupplierPage(ctk.CTkFrame):
         )
 
     def delete_supplier(self, supplier):
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         """Show confirmation dialog and delete supplier"""
         dialog = CenterDialog(self, "Delete Supplier")
         

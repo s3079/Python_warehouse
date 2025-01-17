@@ -8,9 +8,10 @@ from app.views.admin.dialogs.add_order_dialog import AddOrderDialog
 from app.views.admin.dialogs.edit_order_dialog import EditOrderDialog
 
 class OrdersPage(ctk.CTkFrame):
-    def __init__(self, parent, controller, user_data):
+    def __init__(self, parent, controller, user_data, can_edit=True):
         super().__init__(parent, fg_color="transparent")
         self.controller = OrderController()
+        self.can_edit = can_edit
         self.user_data = user_data
         
         # Get user_id from parent (AdminDashboard)
@@ -376,10 +377,18 @@ class OrdersPage(ctk.CTkFrame):
 
     def edit_order(self, order_data):
         """Show dialog to edit an order"""
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         dialog = EditOrderDialog(self, order_data, on_save=self.update_order)
 
     def update_order(self, data):
         """Update an existing order"""
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         print("data:", data)
         try:
             success = self.controller.capNhatDonHang(data)
@@ -396,6 +405,10 @@ class OrdersPage(ctk.CTkFrame):
 
     def delete_order(self, order):
         """Show confirmation dialog and delete order"""
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         dialog = CenterDialog(self, "Delete Order")
         
         # Create content frame
@@ -455,6 +468,10 @@ class OrdersPage(ctk.CTkFrame):
 
     def save_order_changes(self, dialog, ma_don_hang, ngay_dat, tong_tien):
         """Save order changes and close dialog"""
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         try:
             if not ngay_dat:
                 raise ValueError("Ngày đặt là bắt buộc")
@@ -487,6 +504,10 @@ class OrdersPage(ctk.CTkFrame):
 
     def confirm_delete(self, dialog, order):
         """Execute delete operation and close dialog"""
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         try:
             if self.controller.xoaDonHang(order["ma_don_hang"]):
                 dialog.destroy()
@@ -510,10 +531,18 @@ class OrdersPage(ctk.CTkFrame):
 
     def show_add_order_dialog(self):
         """Show dialog to add a new order"""
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         dialog = AddOrderDialog(self, ma_nguoi_dung=self.ma_nguoi_dung, on_save=self.add_order)
 
     def add_order(self, order_data):
         """Add a new order and refresh the list"""
+        if not self.can_edit:
+            from tkinter import messagebox
+            messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
+            return
         try:
             success = self.controller.themDonHang(order_data)
             if success:
