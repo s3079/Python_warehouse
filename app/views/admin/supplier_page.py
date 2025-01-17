@@ -14,6 +14,8 @@ class SupplierPage(ctk.CTkFrame):
         self.items_per_page = 10
         self.total_items = 0
         self.search_query = ""
+        self.name_sort_value = "none"
+        self.contact_sort_value = "none"
         
         # Load icons
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
@@ -186,95 +188,101 @@ class SupplierPage(ctk.CTkFrame):
         self.load_suppliers()
 
     def load_suppliers(self):
-        """Load suppliers into the table"""
-        # Clear existing content
-        for widget in self.content_frame.winfo_children():
-            widget.destroy()
+        """Load suppliers with current filters and pagination"""
+        try:
+            # Clear existing content
+            for widget in self.content_frame.winfo_children():
+                widget.destroy()
             
-        # Calculate pagination
-        offset = (self.current_page - 1) * self.items_per_page
-        
-        # Get suppliers from controller with pagination
-        suppliers, total_count = self.controller.layNhaCungCapPhanTrang(
-            offset=offset,
-            limit=self.items_per_page,
-            search_query=self.search_query
-        )
-        
-        self.total_items = total_count
-        total_pages = -(-total_count // self.items_per_page)  # Ceiling division
-        
-        # Configure grid columns for content frame
-        self.content_frame.grid_columnconfigure(tuple(range(len(self.columns))), weight=1)
-        
-        # Create rows for each supplier
-        for i, supplier in enumerate(suppliers):
-            row_frame = ctk.CTkFrame(
-                self.content_frame,
-                fg_color="white" if i % 2 == 0 else "#F8F9FA",
-                height=50
+            # Calculate pagination
+            offset = (self.current_page - 1) * self.items_per_page
+            
+            # Get suppliers from controller with pagination and sorting
+            suppliers, total_count = self.controller.layNhaCungCapPhanTrang(
+                offset=offset,
+                limit=self.items_per_page,
+                search_query=self.search_query,
+                name_sort=getattr(self, 'name_sort_value', 'none'),
+                contact_sort=getattr(self, 'contact_sort_value', 'none')
             )
-            row_frame.pack(fill="x")
             
-            # Add supplier data
-            for j, col in enumerate(self.columns):
-                if col["key"] == "actions":
-                    # Create actions frame
-                    actions_frame = ctk.CTkFrame(
-                        row_frame,
-                        fg_color="transparent"
-                    )
-                    actions_frame.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
-                    
-                    # Edit button
-                    edit_btn = ctk.CTkButton(
-                        actions_frame,
-                        text="",
-                        image=self.edit_icon,
-                        width=30,
-                        height=30,
-                        fg_color="#006EC4",
-                        text_color="white",
-                        hover_color="#0059A1",
-                        command=lambda s=supplier: self.show_edit_dialog(s)
-                    )
-                    edit_btn.pack(side="left", padx=(0, 5))
-                    
-                    # Delete button
-                    delete_btn = ctk.CTkButton(
-                        actions_frame,
-                        text="",
-                        image=self.trash_icon,
-                        width=30,
-                        height=30,
-                        fg_color="#e03137",
-                        text_color="white",
-                        hover_color="#b32429",
-                        command=lambda s=supplier: self.delete_supplier(s)
-                    )
-                    delete_btn.pack(side="left")
-                    
-                else:
-                    # Regular text columns
-                    value = str(supplier.get(col["key"], "") or "")
-                    label = ctk.CTkLabel(
-                        row_frame,
-                        text=value,
-                        anchor="w",
-                        width=col["width"]
-                    )
-                    label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
+            self.total_items = total_count
+            total_pages = -(-total_count // self.items_per_page)  # Ceiling division
             
-            # Add separator
-            separator = ctk.CTkFrame(
-                self.content_frame,
-                fg_color="#E5E5E5",
-                height=1
-            )
-            separator.pack(fill="x")
+            # Configure grid columns for content frame
+            self.content_frame.grid_columnconfigure(tuple(range(len(self.columns))), weight=1)
+            
+            # Create rows for each supplier
+            for i, supplier in enumerate(suppliers):
+                row_frame = ctk.CTkFrame(
+                    self.content_frame,
+                    fg_color="white" if i % 2 == 0 else "#F8F9FA",
+                    height=50
+                )
+                row_frame.pack(fill="x")
+                
+                # Add supplier data
+                for j, col in enumerate(self.columns):
+                    if col["key"] == "actions":
+                        # Create actions frame
+                        actions_frame = ctk.CTkFrame(
+                            row_frame,
+                            fg_color="transparent"
+                        )
+                        actions_frame.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
+                        
+                        # Edit button
+                        edit_btn = ctk.CTkButton(
+                            actions_frame,
+                            text="",
+                            image=self.edit_icon,
+                            width=30,
+                            height=30,
+                            fg_color="#006EC4",
+                            text_color="white",
+                            hover_color="#0059A1",
+                            command=lambda s=supplier: self.show_edit_dialog(s)
+                        )
+                        edit_btn.pack(side="left", padx=(0, 5))
+                        
+                        # Delete button
+                        delete_btn = ctk.CTkButton(
+                            actions_frame,
+                            text="",
+                            image=self.trash_icon,
+                            width=30,
+                            height=30,
+                            fg_color="#e03137",
+                            text_color="white",
+                            hover_color="#b32429",
+                            command=lambda s=supplier: self.delete_supplier(s)
+                        )
+                        delete_btn.pack(side="left")
+                        
+                    else:
+                        # Regular text columns
+                        value = str(supplier.get(col["key"], "") or "")
+                        label = ctk.CTkLabel(
+                            row_frame,
+                            text=value,
+                            anchor="w",
+                            width=col["width"]
+                        )
+                        label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
+                
+                # Add separator
+                separator = ctk.CTkFrame(
+                    self.content_frame,
+                    fg_color="#E5E5E5",
+                    height=1
+                )
+                separator.pack(fill="x")
 
-        # Add pagination controls at the bottom
-        self.create_pagination_controls(total_pages)
+            # Add pagination controls at the bottom
+            self.create_pagination_controls(total_pages)
+        except Exception as e:
+            from tkinter import messagebox
+            messagebox.showerror("Lỗi", f"Không thể tải dữ liệu: {str(e)}")
 
     def create_pagination_controls(self, total_pages):
         """Create pagination controls"""
@@ -598,6 +606,8 @@ class SupplierPage(ctk.CTkFrame):
         """Apply the selected filters and refresh the table"""
         dialog.destroy()
         self.current_page = 1  # Reset to first page
+        self.name_sort_value = self.name_sort.get()
+        self.contact_sort_value = self.contact_sort.get()
         self.load_suppliers()
 
     def save_supplier(self, supplier_data):

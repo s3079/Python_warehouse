@@ -51,10 +51,16 @@ class SupplierController:
         print(error_message)
         return error_message
 
-    def layNhaCungCapPhanTrang(self, offset=0, limit=10, search_query=""):
-        """Get paginated suppliers with optional search"""
+    def layNhaCungCapPhanTrang(self, offset=0, limit=10, search_query="", name_sort="none", contact_sort="none"):
+        """Get paginated suppliers with optional search and sorting"""
         try:
-            return self.model.layNhaCungCapPhanTrang(offset, limit, search_query)
+            return self.model.layNhaCungCapPhanTrang(
+                offset=offset,
+                limit=limit,
+                search_query=search_query,
+                name_sort=name_sort,
+                contact_sort=contact_sort
+            )
         except Exception as e:
             self.handle_error(e, "lấy danh sách nhà cung cấp phân trang")
             return [], 0

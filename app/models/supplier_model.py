@@ -68,34 +68,51 @@ class SupplierModel(BaseModel):
         result = self._thucThiTruyVan(query, (ma_ncc,))
         return result[0] if result else None
     
-    def layNhaCungCapPhanTrang(self, offset=0, limit=10, search_query=""):
-        """Get paginated suppliers with optional search"""
+    def layNhaCungCapPhanTrang(self, offset=0, limit=10, search_query="", name_sort="none", contact_sort="none"):
+        """Get paginated suppliers with optional search and sorting"""
         try:
-            query = f"SELECT * FROM {self._table_name}"
-            count_query = f"SELECT COUNT(*) FROM {self._table_name}"
-            
+            query = f"""
+                SELECT 
+                    ma_ncc, ten, email, dien_thoai, dia_chi, 
+                    ngay_tao, ngay_cap_nhat
+                FROM {self._table_name}
+                WHERE 1=1
+            """
             params = []
             
+            # Add search conditions if search_query exists
             if search_query:
-                query += " WHERE ten LIKE %s OR email LIKE %s"
-                count_query += " WHERE ten LIKE %s OR email LIKE %s"
-                params.extend([f"%{search_query}%", f"%{search_query}%", f"%{search_query}%"])
+                query += " AND (ten LIKE %s OR email LIKE %s OR dien_thoai LIKE %s)"
+                params.extend([f"%{search_query}%"] * 3)
             
-            query += " ORDER BY ten LIMIT %s OFFSET %s"
+            # Add ORDER BY clause based on sorting preferences
+            order_clauses = []
+            if name_sort in ["asc", "desc"]:
+                order_clauses.append(f"ten {name_sort}")
+            if contact_sort in ["asc", "desc"]:
+                order_clauses.append(f"dien_thoai {contact_sort}")
+            
+            if order_clauses:
+                query += " ORDER BY " + ", ".join(order_clauses)
+            else:
+                query += " ORDER BY ten"  # Default sorting
+            
+            # Add pagination
+            query += " LIMIT %s OFFSET %s"
             params.extend([limit, offset])
             
-            cursor = self.conn.cursor()
+            # Execute query and get results
+            suppliers = self._thucThiTruyVan(query, params) or []
+            
+            # Get total count
+            count_query = f"SELECT COUNT(*) as total FROM {self._table_name}"
             if search_query:
-                cursor.execute(count_query, params[:3])
+                count_query += " WHERE ten LIKE %s OR email LIKE %s OR dien_thoai LIKE %s"
+                count_result = self._thucThiTruyVan(count_query, [f"%{search_query}%"] * 3)
             else:
-                cursor.execute(count_query)
-            total_count = cursor.fetchone()[0]
+                count_result = self._thucThiTruyVan(count_query)
             
-            cursor.execute(query, params)
-            suppliers = cursor.fetchall()
-            
-            columns = [description[0] for description in cursor.description]
-            suppliers = [dict(zip(columns, supplier)) for supplier in suppliers]
+            total_count = count_result[0]['total'] if count_result else 0
             
             return suppliers, total_count
             
