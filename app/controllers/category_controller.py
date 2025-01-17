@@ -4,10 +4,10 @@ class CategoryController:
     def __init__(self):
         self._model = CategoryModel()
     
-    def layTatCaDanhMuc(self):
-        """Get all categories with their product counts""" 
+    def layTatCaDanhMuc(self, name_sort="none", desc_sort="none"):
+        """Get all categories with their product counts and sorting"""
         try:
-            categories = self._model.layTatCa()
+            categories = self._model.layTatCa(name_sort, desc_sort)
             if not categories:
                 return []
                 

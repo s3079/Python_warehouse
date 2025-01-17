@@ -186,101 +186,97 @@ class CategoriesPage(ctk.CTkFrame):
         self.tai_danh_muc()
 
     def tai_danh_muc(self):
-        """Tải danh mục vào bảng"""
-        # Clear existing content
-        for widget in self.content_frame.winfo_children():
-            widget.destroy()
-            
-        # Calculate pagination
-        offset = (self.trang_hien_tai - 1) * self.so_muc_moi_trang
-        
-        # Get categories from controller with pagination
-        all_categories = self.controller.layTatCaDanhMuc()
-        
-        # Filter categories if search query exists
-        if self.tu_khoa_tim:
-            all_categories = [
-                cat for cat in all_categories 
-                if self.tu_khoa_tim.lower() in cat["name"].lower() or 
-                   (cat["description"] and self.tu_khoa_tim.lower() in cat["description"].lower())
-            ]
-        
-        self.tong_so_muc = len(all_categories)
-        start_idx = offset
-        end_idx = start_idx + self.so_muc_moi_trang
-        categories = all_categories[start_idx:end_idx]
-
-        # Configure grid columns for content frame
-        self.content_frame.grid_columnconfigure(tuple(range(len(self.columns))), weight=1)
-        
-        # Create rows for each category
-        for i, category in enumerate(categories):
-            row_frame = ctk.CTkFrame(
-                self.content_frame,
-                fg_color="white" if i % 2 == 0 else "#F8F9FA",
-                height=50
+        """Load categories with current filters"""
+        try:
+            categories = self.controller.layTatCaDanhMuc(
+                name_sort=self.name_sort_value if hasattr(self, 'name_sort_value') else "none",
+                desc_sort=self.desc_sort_value if hasattr(self, 'desc_sort_value') else "none"
             )
-            row_frame.pack(fill="x")
+            # Clear existing content
+            for widget in self.content_frame.winfo_children():
+                widget.destroy()
             
-            # Add category data
-            for j, col in enumerate(self.columns):
-                if col["key"] == "actions":
-                    # Create actions frame
-                    actions_frame = ctk.CTkFrame(
-                        row_frame,
-                        fg_color="transparent"
-                    )
-                    actions_frame.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
-                    
-                    # Edit button
-                    edit_btn = ctk.CTkButton(
-                        actions_frame,
-                        text="",
-                        image=self.edit_icon,
-                        width=30,
-                        height=30,
-                        fg_color="#006EC4",
-                        text_color="white",
-                        hover_color="#0059A1",
-                        command=lambda c=category: self.hien_thi_chinh_sua(c)
-                    )
-                    edit_btn.pack(side="left", padx=(0, 5))
-                    
-                    # Delete button
-                    delete_btn = ctk.CTkButton(
-                        actions_frame,
-                        text="",
-                        image=self.trash_icon,
-                        width=30,
-                        height=30,
-                        fg_color="#e03137",
-                        text_color="white",
-                        hover_color="#b32429",
-                        command=lambda c=category: self.xoa_danh_muc(c)
-                    )
-                    delete_btn.pack(side="left")
-                    
-                else:
-                    # Regular text columns
-                    value = str(category.get(col["key"], "") or "")
-                    label = ctk.CTkLabel(
-                        row_frame,
-                        text=value,
-                        anchor="w",
-                        width=col["width"]
-                    )
-                    label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
+            # Calculate pagination
+            offset = (self.trang_hien_tai - 1) * self.so_muc_moi_trang
             
-            # Add separator
-            separator = ctk.CTkFrame(
-                self.content_frame,
-                fg_color="#E5E5E5",
-                height=1
-            )
-            separator.pack(fill="x")
+            self.tong_so_muc = len(categories)
+            start_idx = offset
+            end_idx = start_idx + self.so_muc_moi_trang
+            categories = categories[start_idx:end_idx]
 
-        # Add pagination controls at the bottom
-        self.tao_dieu_khien_phan_trang()
+            # Configure grid columns for content frame
+            self.content_frame.grid_columnconfigure(tuple(range(len(self.columns))), weight=1)
+            
+            # Create rows for each category
+            for i, category in enumerate(categories):
+                row_frame = ctk.CTkFrame(
+                    self.content_frame,
+                    fg_color="white" if i % 2 == 0 else "#F8F9FA",
+                    height=50
+                )
+                row_frame.pack(fill="x")
+                
+                # Add category data
+                for j, col in enumerate(self.columns):
+                    if col["key"] == "actions":
+                        # Create actions frame
+                        actions_frame = ctk.CTkFrame(
+                            row_frame,
+                            fg_color="transparent"
+                        )
+                        actions_frame.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
+                        
+                        # Edit button
+                        edit_btn = ctk.CTkButton(
+                            actions_frame,
+                            text="",
+                            image=self.edit_icon,
+                            width=30,
+                            height=30,
+                            fg_color="#006EC4",
+                            text_color="white",
+                            hover_color="#0059A1",
+                            command=lambda c=category: self.hien_thi_chinh_sua(c)
+                        )
+                        edit_btn.pack(side="left", padx=(0, 5))
+                        
+                        # Delete button
+                        delete_btn = ctk.CTkButton(
+                            actions_frame,
+                            text="",
+                            image=self.trash_icon,
+                            width=30,
+                            height=30,
+                            fg_color="#e03137",
+                            text_color="white",
+                            hover_color="#b32429",
+                            command=lambda c=category: self.xoa_danh_muc(c)
+                        )
+                        delete_btn.pack(side="left")
+                        
+                    else:
+                        # Regular text columns
+                        value = str(category.get(col["key"], "") or "")
+                        label = ctk.CTkLabel(
+                            row_frame,
+                            text=value,
+                            anchor="w",
+                            width=col["width"]
+                        )
+                        label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
+                
+                # Add separator
+                separator = ctk.CTkFrame(
+                    self.content_frame,
+                    fg_color="#E5E5E5",
+                    height=1
+                )
+                separator.pack(fill="x")
+
+            # Add pagination controls at the bottom
+            self.tao_dieu_khien_phan_trang()
+        except Exception as e:
+            print(f"Error loading categories: {e}")
 
     def tao_dieu_khien_phan_trang(self):
         """Tạo điều khiển phân trang"""
@@ -629,4 +625,6 @@ class CategoriesPage(ctk.CTkFrame):
         """Apply the selected filters and refresh the table"""
         dialog.destroy()
         self.trang_hien_tai = 1  # Reset to first page
+        self.name_sort_value = self.name_sort.get()
+        self.desc_sort_value = self.desc_sort.get()
         self.tai_danh_muc()

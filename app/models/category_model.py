@@ -18,14 +18,25 @@ class CategoryModel(BaseModel):
     #         print(f"Database error: {e}")
     #         return None
     
-    def layTatCa(self):
-        """Get all categories"""
+    def layTatCa(self, name_sort="none", desc_sort="none"):
+        """Get all categories with sorting options"""
         query = f"""
             SELECT 
                 ma_danh_muc, ten, mo_ta, ngay_tao, ngay_cap_nhat
             FROM {self._table_name}
-            ORDER BY ten
+            WHERE 1=1
         """
+        
+        # Add ORDER BY clause based on sorting preferences
+        order_clauses = []
+        if name_sort in ["asc", "desc"]:
+            order_clauses.append(f"ten {name_sort}")
+        if desc_sort in ["asc", "desc"]:
+            order_clauses.append(f"mo_ta {desc_sort}")
+        
+        if order_clauses:
+            query += " ORDER BY " + ", ".join(order_clauses)
+        
         return self._thucThiTruyVan(query) or []
         
     def demSanPham(self, ma_danh_muc):
