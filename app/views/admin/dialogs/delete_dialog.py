@@ -52,11 +52,11 @@ class DeleteDialog(CenterDialog):
             width=100,
             height=40,
             corner_radius=8,
-            command=self.confirm
+            command=self.xac_nhan
         )
         delete_button.pack(side="right")
 
-    def confirm(self):
+    def xac_nhan(self):
         if self.on_confirm:
             self.on_confirm()
         self.destroy() 

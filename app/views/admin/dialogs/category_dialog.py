@@ -4,7 +4,6 @@ class CategoryDialog(ctk.CTkToplevel):
     def __init__(self, parent, category=None, on_save=None):
         super().__init__(parent)
         
-  
         self.title("Thêm Danh Mục Mới" if not category else "Sửa Danh Mục")
         self.geometry("500x380")
         self.resizable(False, False)
@@ -12,19 +11,15 @@ class CategoryDialog(ctk.CTkToplevel):
         self.on_save = on_save
         self.category = category
         
-
         self.transient(parent)
         self.grab_set()
         
-  
         self.grid_columnconfigure(0, weight=1)
         
-
         main_container = ctk.CTkFrame(self, fg_color="transparent")
         main_container.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
         main_container.grid_columnconfigure(0, weight=1)
         
-
         header_text = "Thêm Danh Mục Mới" if not category else "Sửa Danh Mục"
         header = ctk.CTkLabel(
             main_container,
@@ -51,7 +46,6 @@ class CategoryDialog(ctk.CTkToplevel):
         )
         self.name_entry.grid(row=2, column=0, sticky="ew", pady=(0, 15))
         
-
         description_label = ctk.CTkLabel(
             main_container,
             text="Mô Tả",
@@ -73,7 +67,6 @@ class CategoryDialog(ctk.CTkToplevel):
         buttons_frame.grid(row=5, column=0, sticky="ew")
         buttons_frame.grid_columnconfigure(0, weight=1)
         
-
         cancel_button = ctk.CTkButton(
             buttons_frame,
             text="Hủy",
@@ -86,7 +79,6 @@ class CategoryDialog(ctk.CTkToplevel):
         )
         cancel_button.grid(row=0, column=0, sticky="w", padx=(0, 10))
         
-
         save_button = ctk.CTkButton(
             buttons_frame,
             text="Lưu Danh Mục",
@@ -95,7 +87,7 @@ class CategoryDialog(ctk.CTkToplevel):
             hover_color="#0059A1",
             height=45,
             corner_radius=8,
-            command=self.save_category
+            command=self.luu_danh_muc
         )
         save_button.grid(row=0, column=1, sticky="w")
         
@@ -106,12 +98,12 @@ class CategoryDialog(ctk.CTkToplevel):
         
         self.name_entry.focus_set()
     
-    def save_category(self):
+    def luu_danh_muc(self):
         name = self.name_entry.get().strip()
         description = self.description_text.get("1.0", "end-1c").strip()
         
         if not name:
-            self.show_error("Tên danh mục là bắt buộc")
+            self.hien_thi_loi("Tên danh mục là bắt buộc")
             return
         
         category_data = {
@@ -127,9 +119,9 @@ class CategoryDialog(ctk.CTkToplevel):
                 self.on_save(category_data)
                 self.destroy()
             except Exception as e:
-                self.show_error(str(e))
+                self.hien_thi_loi(str(e))
     
-    def show_error(self, message):
+    def hien_thi_loi(self, message):
         error_dialog = ctk.CTkToplevel(self)
         error_dialog.title("Lỗi")
         error_dialog.geometry("300x150")

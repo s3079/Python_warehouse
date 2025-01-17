@@ -128,11 +128,11 @@ class FilterDialog(CenterDialog):
             width=100,
             height=40,
             corner_radius=8,
-            command=self.apply_filters
+            command=self.ap_dung_bo_loc
         )
         apply_button.pack(side="left")
 
-    def apply_filters(self):
+    def ap_dung_bo_loc(self):
         if self.on_apply:
             filters = {
                 "name_sort": self.name_sort.get(),

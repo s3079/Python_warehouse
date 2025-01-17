@@ -90,7 +90,7 @@ class InventoryDialog(CenterDialog):
             text="📅",
             width=40,
             height=40,
-            command=self.show_calendar
+            command=self.hien_thi_lich
         )
         self.calendar_button.pack(side="left")
         
@@ -135,7 +135,7 @@ class InventoryDialog(CenterDialog):
         san_pham = controller.layTatCaSanPham()
         return {sp["ten"]: sp["ma_san_pham"] for sp in san_pham} if san_pham else {}
     
-    def show_calendar(self):
+    def hien_thi_lich(self):
         top = ctk.CTkToplevel(self)
         top.title("Chọn ngày")
         top.geometry("300x300")
@@ -169,14 +169,14 @@ class InventoryDialog(CenterDialog):
         )
         cal.pack(expand=True, fill="both", padx=10, pady=10)
         
-        def grab_date():
+        def chon_ngay():
             self.date_var.set(cal.get_date())
             top.destroy()
         
         select_button = ctk.CTkButton(
             top,
             text="Chọn",
-            command=grab_date
+            command=chon_ngay
         )
         select_button.pack(pady=10)
         

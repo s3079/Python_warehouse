@@ -10,10 +10,10 @@ class CenterDialog(ctk.CTkToplevel):
         self.grab_set()
         self.focus_set()
         
-        self.center_dialog()
+        self.can_giua_cua_so()
     
-    def center_dialog(self):
-        def _center():
+    def can_giua_cua_so(self):
+        def _can_giua():
             self.update_idletasks()
             
             dialog_width = self.winfo_width()
@@ -29,4 +29,4 @@ class CenterDialog(ctk.CTkToplevel):
             
             self.geometry(f"{dialog_width}x{dialog_height}+{x}+{y}")
         
-        self.after(10, _center) 
+        self.after(10, _can_giua) 

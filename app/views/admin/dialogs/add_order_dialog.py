@@ -49,7 +49,7 @@ class AddOrderDialog(CenterDialog):
             text="📅",
             width=40,
             height=40,
-            command=self.show_calendar
+            command=self.hien_thi_lich
         )
         self.calendar_button.pack(side="left")
 
@@ -99,7 +99,7 @@ class AddOrderDialog(CenterDialog):
             text_color="#16151C",
             button_color="#F0F0F0",
             button_hover_color="#E8E9EA",
-            command=self.update_unit_price
+            command=self.cap_nhat_don_gia
         )
         self.product_dropdown.pack(pady=(5, 15))
 
@@ -120,7 +120,7 @@ class AddOrderDialog(CenterDialog):
             width=460
         )
         self.quantity_entry.pack(pady=(5, 15))
-        self.quantity_var.trace("w", self.update_total_amount)
+        self.quantity_var.trace("w", self.cap_nhat_tong_tien)
 
         unit_price_label = ctk.CTkLabel(
             content_frame,
@@ -168,7 +168,7 @@ class AddOrderDialog(CenterDialog):
             width=100,
             height=40,
             corner_radius=8,
-            command=self.save_order
+            command=self.luu_don_hang
         )
         save_button.pack(side="left")
 
@@ -177,13 +177,13 @@ class AddOrderDialog(CenterDialog):
         controller = ProductController()
         return controller.layTatCaSanPham()
 
-    def update_unit_price(self, selected_product):
+    def cap_nhat_don_gia(self, selected_product):
         if selected_product != "No products available":
             unit_price = self.product_prices.get(selected_product, 0.0)
             self.unit_price_var.set(f"{unit_price:.2f}")
-            self.update_total_amount()
+            self.cap_nhat_tong_tien()
 
-    def update_total_amount(self, *args):
+    def cap_nhat_tong_tien(self, *args):
         try:
             quantity = int(self.quantity_var.get())
             unit_price = float(self.unit_price_var.get())
@@ -192,7 +192,7 @@ class AddOrderDialog(CenterDialog):
         except (ValueError, TypeError):
             self.total_var.set("0.00")
 
-    def save_order(self):
+    def luu_don_hang(self):
         try:
             ngay_dat = self.date_var.get().strip()
             tong_tien = self.total_var.get().strip()
@@ -251,7 +251,7 @@ class AddOrderDialog(CenterDialog):
             from tkinter import messagebox
             messagebox.showerror("Lỗi", str(e))
 
-    def show_calendar(self):
+    def hien_thi_lich(self):
         top = ctk.CTkToplevel(self)
         top.title("Chọn ngày")
         top.geometry("300x300")
@@ -285,14 +285,14 @@ class AddOrderDialog(CenterDialog):
         )
         cal.pack(expand=True, fill="both", padx=10, pady=10)
         
-        def grab_date():
+        def chon_ngay():
             self.date_var.set(cal.get_date())
             top.destroy()
         
         select_button = ctk.CTkButton(
             top,
-            text="Select",
-            command=grab_date
+            text="Chọn",
+            command=chon_ngay
         )
         select_button.pack(pady=10)
         

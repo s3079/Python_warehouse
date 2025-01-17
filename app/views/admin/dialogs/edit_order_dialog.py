@@ -61,7 +61,7 @@ class EditOrderDialog(CenterDialog):
             text="📅",
             width=40,
             height=40,
-            command=self.show_calendar
+            command=self.hien_thi_lich
         )
         self.calendar_button.pack(side="left")
 
@@ -93,7 +93,7 @@ class EditOrderDialog(CenterDialog):
             text_color="#16151C",
             button_color="#F0F0F0",
             button_hover_color="#E8E9EA",
-            command=self.update_unit_price
+            command=self.cap_nhat_don_gia
         )
         self.product_dropdown.pack(pady=(5, 15))
 
@@ -114,7 +114,7 @@ class EditOrderDialog(CenterDialog):
             width=460
         )
         self.quantity_entry.pack(pady=(5, 15))
-        self.quantity_var.trace("w", self.update_total_amount)
+        self.quantity_var.trace("w", self.cap_nhat_tong_tien)
 
         unit_price_label = ctk.CTkLabel(
             content_frame,
@@ -160,7 +160,7 @@ class EditOrderDialog(CenterDialog):
 
         cancel_button = ctk.CTkButton(
             buttons_container,
-            text="Cancel",
+            text="Hủy",
             fg_color="#F8F9FA",
             text_color="#16151C",
             hover_color="#E8E9EA",
@@ -180,7 +180,7 @@ class EditOrderDialog(CenterDialog):
             width=100,
             height=40,
             corner_radius=8,
-            command=self.save_order
+            command=self.luu_don_hang
         )
         save_button.pack(side="left")
 
@@ -194,19 +194,19 @@ class EditOrderDialog(CenterDialog):
         controller = OrderController()
         return controller.layChiTietDonHang(ma_don_hang)
 
-    def get_product_name_by_id(self, product_id):
+    def lay_ten_san_pham_theo_id(self, product_id):
         for name, pid in self.product_names.items():
             if pid == product_id:
                 return name
         return "No products available"
 
-    def update_unit_price(self, selected_product):
+    def cap_nhat_don_gia(self, selected_product):
         if selected_product != "No products available":
             unit_price = self.product_prices.get(selected_product, 0.0)
             self.unit_price_var.set(f"{unit_price:.2f}")
-            self.update_total_amount()
+            self.cap_nhat_tong_tien()
 
-    def update_total_amount(self, *args):
+    def cap_nhat_tong_tien(self, *args):
         try:
             quantity = int(self.quantity_var.get())
             unit_price = float(self.unit_price_var.get())
@@ -215,9 +215,9 @@ class EditOrderDialog(CenterDialog):
         except (ValueError, TypeError):
             self.total_var.set("0.00")
 
-    def show_calendar(self):
+    def hien_thi_lich(self):
         top = ctk.CTkToplevel(self)
-        top.title("Select Date")
+        top.title("Chọn ngày")
         top.geometry("300x300")
         
         try:
@@ -257,7 +257,7 @@ class EditOrderDialog(CenterDialog):
         )
         cal.pack(expand=True, fill="both", padx=10, pady=10)
         
-        def grab_date():
+        def chon_ngay():
             selected_date = cal.get_date()
             try:
                 parsed_date = datetime.strptime(selected_date, '%Y-%m-%d')
@@ -269,8 +269,8 @@ class EditOrderDialog(CenterDialog):
         
         select_button = ctk.CTkButton(
             top,
-            text="Select",
-            command=grab_date
+            text="Chọn",
+            command=chon_ngay
         )
         select_button.pack(pady=10)
         
@@ -278,7 +278,7 @@ class EditOrderDialog(CenterDialog):
         top.grab_set()
         self.wait_window(top)
 
-    def save_order(self):
+    def luu_don_hang(self):
         try:
             ngay_dat = self.date_var.get().strip()
             tong_tien = self.total_var.get().strip()
