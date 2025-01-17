@@ -5,7 +5,16 @@ class OrderController:
         self._model = OrderModel()
     
     def layDonHangPhanTrang(self, offset=0, limit=10):
-        """Get paginated orders with optional search"""
+        """
+        + Input:
+            - offset: Số bản ghi bỏ qua (mặc định: 0)
+            - limit: Số lượng bản ghi tối đa trả về (mặc định: 10)
+        + Output: Tuple chứa:
+            - Danh sách các từ điển thông tin đơn hàng thỏa mãn điều kiện
+            - Tổng số đơn hàng thỏa mãn điều kiện
+        + Raises:
+            - Exception khi lấy dữ liệu thất bại
+        """
         try:
             return self._model.layDonHangPhanTrang(offset, limit)
         except Exception as e:
@@ -13,7 +22,21 @@ class OrderController:
             return [], 0
     
     def capNhatDonHang(self, data):
-        """Update an existing order"""
+        """
+        + Input:
+            - data (từ điển): Dữ liệu đơn hàng cập nhật bao gồm:
+                + ma_don_hang: Mã đơn hàng (bắt buộc)
+                + ngay_dat: Ngày đặt hàng (bắt buộc)
+                + so_luong: Số lượng (bắt buộc)
+                + tong_tien: Tổng tiền (bắt buộc)
+                + ma_san_pham: Mã sản phẩm (bắt buộc)
+                + ma_nguoi_dung: Mã người dùng
+                + don_gia: Đơn giá
+        + Output: True nếu cập nhật thành công, False nếu thất bại
+        + Raises:
+            - ValueError khi thiếu thông tin bắt buộc
+            - Exception khi cập nhật đơn hàng thất bại
+        """
         try:
             # Validate data
             required_fields = ['ma_don_hang', 'ngay_dat', 'so_luong', 'tong_tien', 'ma_san_pham']
@@ -34,7 +57,14 @@ class OrderController:
             return False
     
     def xoaDonHang(self, ma_don_hang):
-        """Delete an order"""
+        """
+        + Input:
+            - ma_don_hang: Mã đơn hàng cần xóa
+        + Output: True nếu xóa thành công, False nếu thất bại
+        + Raises:
+            - ValueError khi thiếu mã đơn hàng
+            - Exception khi xóa đơn hàng thất bại
+        """
         try:
             if not ma_don_hang:
                 raise ValueError("Mã đơn hàng là bắt buộc")
@@ -44,13 +74,24 @@ class OrderController:
             raise
     
     def handle_error(self, error, action):
-        """Handle errors in the controller"""
+        """
+        + Input:
+            - error: Đối tượng lỗi
+            - action: Chuỗi mô tả hành động đang thực hiện
+        + Output: Chuỗi thông báo lỗi đã được định dạng
+        """
         error_message = f"Lỗi {action}: {str(error)}"
         print(error_message)  # Log the error
         return error_message 
     
     def layChiTietDonHang(self, ma_don_hang):
-        """Get detailed information for a specific order"""
+        """
+        + Input:
+            - ma_don_hang: Mã đơn hàng cần lấy chi tiết
+        + Output: Từ điển chứa thông tin chi tiết đơn hàng hoặc None nếu không tìm thấy
+        + Raises:
+            - Exception khi lấy chi tiết đơn hàng thất bại
+        """
         try:
             print('ma_don_hang', ma_don_hang)
             return self._model.layChiTietDonHang(ma_don_hang)
@@ -59,7 +100,20 @@ class OrderController:
             return None 
     
     def themDonHang(self, data):
-        """Add a new order and its details"""
+        """
+        + Input:
+            - data (từ điển): Dữ liệu đơn hàng mới bao gồm:
+                + ngay_dat: Ngày đặt hàng
+                + tong_tien: Tổng tiền
+                + ma_san_pham: Mã sản phẩm
+                + so_luong: Số lượng
+                + don_gia: Đơn giá
+                + ma_nguoi_dung: Mã người dùng
+        + Output: True nếu thêm thành công, False nếu thất bại
+        + Raises:
+            - ValueError khi thêm đơn hàng thất bại
+            - Exception khi thêm đơn hàng hoặc chi tiết đơn hàng thất bại
+        """
         try:
             ngay_dat = data.get("ngay_dat")
             tong_tien = data.get("tong_tien")
@@ -82,7 +136,13 @@ class OrderController:
             raise
 
     def layMaSanPhamTheoTen(self, ten_san_pham):
-        """Get product ID by product name"""
+        """
+        + Input:
+            - ten_san_pham: Tên sản phẩm cần tìm
+        + Output: Mã sản phẩm tương ứng hoặc None nếu không tìm thấy
+        + Raises:
+            - Exception khi lấy mã sản phẩm thất bại
+        """
         try:
             return self._model.layMaSanPhamTheoTen(ten_san_pham)
         except Exception as e:

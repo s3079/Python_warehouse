@@ -2,13 +2,23 @@ from app.models.base_model import BaseModel
 
 class UserModel(BaseModel):
     def __init__(self):
+        """
+        + Input: Không có
+        + Output: Khởi tạo đối tượng UserModel với tên bảng "NGUOIDUNG"
+        """
         super().__init__()
         self._table_name = "NGUOIDUNG"
         self._damBaoTruongDuyet()
         self.current_user_id = None
 
     def _damBaoTruongDuyet(self):
-        """Ensure the approval_status column exists"""
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects: Đảm bảo cột da_duyet tồn tại trong bảng NGUOIDUNG
+        + Raises:
+            - Exception khi kiểm tra hoặc thêm cột thất bại
+        """
         try:
             cursor = self.conn.cursor()
             cursor.execute("""
@@ -27,7 +37,18 @@ class UserModel(BaseModel):
             print(f"Error ensuring approval column: {str(e)}")
 
     def layTatCa(self):
-        """Get all users with their roles and approval status"""
+        """
+        + Input: Không có
+        + Output: Danh sách từ điển chứa thông tin người dùng:
+            - ma_nguoi_dung: Mã người dùng
+            - ten_dang_nhap: Tên đăng nhập
+            - ho_ten: Họ tên
+            - ma_quyen: Mã quyền
+            - ten_quyen: Tên quyền
+            - da_duyet: Trạng thái duyệt
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT nd.*, pq.ten_quyen 
@@ -38,7 +59,12 @@ class UserModel(BaseModel):
         return cursor.fetchall()
 
     def layNguoiDungChoDuyet(self):
-        """Get users pending approval"""
+        """
+        + Input: Không có
+        + Output: Danh sách từ điển chứa thông tin người dùng chờ duyệt
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT u.*, r.ten_quyen 
@@ -50,7 +76,13 @@ class UserModel(BaseModel):
         return cursor.fetchall()
 
     def duyetNguoiDung(self, ma_nguoi_dung):
-        """Approve a user and set role to normal user"""
+        """
+        + Input:
+            - ma_nguoi_dung: Mã người dùng cần duyệt
+        + Output: Boolean - True nếu duyệt thành công, False nếu thất bại
+        + Raises:
+            - Exception khi duyệt người dùng thất bại
+        """
         try:
             cursor = self.conn.cursor()
             cursor.execute("""
@@ -65,14 +97,30 @@ class UserModel(BaseModel):
             return False
 
     def tuChoiNguoiDung(self, ma_nguoi_dung):
-        """Reject and delete a user"""
+        """
+        + Input:
+            - ma_nguoi_dung: Mã người dùng cần từ chối
+        + Output: Boolean - True nếu từ chối thành công, False nếu thất bại
+        + Raises:
+            - Exception khi từ chối người dùng thất bại
+        """
         return self.xoaNguoiDung(ma_nguoi_dung)
 
     def taoNguoiDung(self, ten_dang_nhap, mat_khau, ho_ten, la_admin=False):
-        """Create a new user"""
+        """
+        + Input:
+            - ten_dang_nhap: Tên đăng nhập mới
+            - mat_khau: Mật khẩu
+            - ho_ten: Họ tên người dùng
+            - la_admin: True nếu là admin, False nếu là người dùng thường (mặc định: False)
+        + Output: 
+            - Mã người dùng mới nếu tạo thành công
+            - None nếu tạo thất bại
+        + Raises:
+            - Exception khi tạo người dùng thất bại
+        """
         try:
             cursor = self.conn.cursor(dictionary=True)
-            # Get role ID
             ten_quyen = 'administrator' if la_admin else 'registered_user'
             cursor.execute(
                 "SELECT ma_quyen FROM PHANQUYEN WHERE ten_quyen = %s",
@@ -94,7 +142,15 @@ class UserModel(BaseModel):
             return None
 
     def layTheoTenDangNhap(self, ten_dang_nhap):
-        """Get user by username"""
+        """
+        + Input:
+            - ten_dang_nhap: Tên đăng nhập cần tìm
+        + Output: 
+            - Từ điển chứa thông tin người dùng nếu tìm thấy
+            - None nếu không tìm thấy
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT u.*, r.ten_quyen 
@@ -107,7 +163,15 @@ class UserModel(BaseModel):
         return result
 
     def layTheoId(self, ma_nguoi_dung):
-        """Get user by ID"""
+        """
+        + Input:
+            - ma_nguoi_dung: Mã người dùng cần tìm
+        + Output: 
+            - Từ điển chứa thông tin người dùng nếu tìm thấy
+            - None nếu không tìm thấy
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT u.*, r.ten_quyen 
@@ -120,7 +184,17 @@ class UserModel(BaseModel):
         return result
 
     def capNhatNguoiDung(self, ma_nguoi_dung, data):
-        """Update user information"""
+        """
+        + Input:
+            - ma_nguoi_dung: Mã người dùng cần cập nhật
+            - data: Từ điển chứa thông tin cập nhật:
+                + ten_dang_nhap: Tên đăng nhập mới
+                + ho_ten: Họ tên mới
+                + mat_khau: Mật khẩu mới
+        + Output: Boolean - True nếu cập nhật thành công, False nếu thất bại
+        + Raises:
+            - Exception khi cập nhật người dùng thất bại
+        """
         try:
             cursor = self.conn.cursor(dictionary=True)
             update_fields = []
@@ -149,25 +223,14 @@ class UserModel(BaseModel):
         finally:
             cursor.close()
 
-    def capNhatMatKhau(self, ma_nguoi_dung, mat_khau_moi):
-        """Update user password"""
-        try:
-            cursor = self.conn.cursor(dictionary=True)
-            cursor.execute("""
-                UPDATE NGUOIDUNG 
-                SET mat_khau = %s
-                WHERE ma_nguoi_dung = %s
-            """, (mat_khau_moi, ma_nguoi_dung))
-            self.conn.commit()
-            return cursor.rowcount > 0
-        except Exception as e:
-            self.conn.rollback()
-            raise e
-        finally:
-            cursor.close()
-
     def xoaNguoiDung(self, ma_nguoi_dung):
-        """Delete a user"""
+        """
+        + Input:
+            - ma_nguoi_dung: Mã người dùng cần xóa
+        + Output: Boolean - True nếu xóa thành công, False nếu thất bại
+        + Raises:
+            - Exception khi xóa người dùng thất bại
+        """
         try:
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute("""
@@ -183,7 +246,12 @@ class UserModel(BaseModel):
             cursor.close()
 
     def layVaiTro(self):
-        """Get all user roles except administrator"""
+        """
+        + Input: Không có
+        + Output: Danh sách các vai trò trong hệ thống (trừ vai trò administrator)
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         try:
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute("""
@@ -197,7 +265,12 @@ class UserModel(BaseModel):
             return []
 
     def layNguoiDungDaDuyet(self):
-        """Get approved users"""
+        """
+        + Input: Không có
+        + Output: Danh sách người dùng đã được duyệt
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         try:
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute("""
@@ -213,7 +286,17 @@ class UserModel(BaseModel):
             return []
 
     def layNguoiDungPhanTrang(self, offset=0, limit=10, search_query=""):
-        """Get users with pagination and optional search query"""
+        """
+        + Input:
+            - offset: Số bản ghi bỏ qua (mặc định: 0)
+            - limit: Số lượng bản ghi tối đa trả về (mặc định: 10)
+            - search_query: Từ khóa tìm kiếm (mặc định: "")
+        + Output: Tuple chứa:
+            - Danh sách từ điển thông tin người dùng thỏa mãn điều kiện
+            - Tổng số người dùng thỏa mãn điều kiện tìm kiếm
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         cursor = self.conn.cursor(dictionary=True)
         try:
             query = """
@@ -243,7 +326,14 @@ class UserModel(BaseModel):
             cursor.close()
 
     def datVaiTroNguoiDung(self, ma_nguoi_dung, ten_quyen):
-        """Update the role of a user identified by ma_nguoi_dung."""
+        """
+        + Input:
+            - ma_nguoi_dung: Mã người dùng cần đặt vai trò
+            - ten_quyen: Tên quyền mới
+        + Output: Boolean - True nếu đặt vai trò thành công, False nếu thất bại
+        + Raises:
+            - Exception khi cập nhật vai trò thất bại
+        """
         try:
             cursor = self.conn.cursor(dictionary=True)
             
@@ -265,7 +355,15 @@ class UserModel(BaseModel):
             cursor.close()
 
     def layTheoHoTen(self, ho_ten):
-        """Get user by full name"""
+        """
+        + Input:
+            - ho_ten: Họ tên người dùng cần tìm
+        + Output: 
+            - Từ điển chứa thông tin người dùng nếu tìm thấy
+            - None nếu không tìm thấy
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT u.*, r.ten_quyen 

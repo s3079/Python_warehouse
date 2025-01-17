@@ -115,7 +115,7 @@ class AdminDashboard(ctk.CTk):
             button = ctk.CTkButton(
                 menu_container, 
                 text=item,
-                command=lambda i=item: self.show_page(i),
+                command=lambda i=item: self.hien_thi_trang(i),
                 fg_color="transparent",
                 text_color="#16151C",
                 image=normal_icon,
@@ -153,7 +153,7 @@ class AdminDashboard(ctk.CTk):
         logout_button = ctk.CTkButton(
             logout_frame,
             text="Đăng xuất",
-            command=self.logout,
+            command=self.dang_xuat,
             fg_color="transparent",
             text_color="#FF4842",
             image=logout_icon,
@@ -231,11 +231,11 @@ class AdminDashboard(ctk.CTk):
         self.content_area.grid_columnconfigure(0, weight=1)
         self.content_area.grid_rowconfigure(0, weight=1)
 
-        self.bind("<Configure>", self.on_resize)
+        self.bind("<Configure>", self.khi_thay_doi_kich_thuoc)
 
-        self.show_page('Sản Phẩm')
+        self.hien_thi_trang('Sản Phẩm')
 
-    def logout(self):
+    def dang_xuat(self):
         from tkinter import messagebox
 
         if messagebox.askyesno("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?"):
@@ -245,15 +245,15 @@ class AdminDashboard(ctk.CTk):
             login_screen = LoginView(root)
             root.mainloop()
 
-    def on_resize(self, event):
+    def khi_thay_doi_kich_thuoc(self, event):
         self.update_idletasks()
 
-    def apply_opacity(self, hex_color, opacity):
+    def ap_dung_do_mo(self, hex_color, opacity):
         hex_color = hex_color.lstrip('#')
         rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
         return f'#{int(rgb[0])}{int(rgb[1])}{int(rgb[2])}{int(opacity * 255):02x}'
 
-    def show_page(self, page_name):
+    def hien_thi_trang(self, page_name):
         for button in self.buttons:
             button_text = button.cget("text")
             button.configure(
@@ -277,17 +277,17 @@ class AdminDashboard(ctk.CTk):
             widget.destroy()
             
         if page_name == "Sản Phẩm":
-            page = ProductsPage(self.content_area, self)
+            page = ProductsPage(self.content_area, self, can_edit=True)
         elif page_name == "Danh Mục":  
-            page = CategoriesPage(self.content_area, self)
+            page = CategoriesPage(self.content_area, self, can_edit=True)
         elif page_name == "Kho":
-            page = InventoryPage(self.content_area, self)
+            page = InventoryPage(self.content_area, self, can_edit=True)
         elif page_name == "Nhà Cung Cấp":
-            page = SupplierPage(self.content_area, self)
+            page = SupplierPage(self.content_area, self, can_edit=True)
         elif page_name == "Tài Khoản":
-            page = UsersPage(self.content_area, self)
+            page = UsersPage(self.content_area, self, can_edit=True)
         elif page_name == "Đơn Hàng":
-            page = OrdersPage(self.content_area, self, self.user_data)
+            page = OrdersPage(self.content_area, self, self.user_data, can_edit=True)
         else:
             page = ctk.CTkLabel(self.content_area, text=f'{page_name} Page (Content coming soon...)')
         

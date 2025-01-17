@@ -2,10 +2,30 @@ from app.models.base_model import BaseModel
 
 class ProductModel(BaseModel):
     def __init__(self):
+        """
+        + Input: Không có
+        + Output: Khởi tạo đối tượng ProductModel với tên bảng "SANPHAM"
+        """
         super().__init__()
         self._table_name = "SANPHAM"
     
     def layTatCa(self):
+        """
+        + Input: Không có
+        + Output: Danh sách từ điển chứa thông tin sản phẩm:
+            - ma_san_pham: Mã sản phẩm
+            - ten: Tên sản phẩm
+            - mo_ta: Mô tả sản phẩm
+            - don_gia: Đơn giá
+            - ma_danh_muc: Mã danh mục
+            - ma_ncc: Mã nhà cung cấp
+            - ngay_tao: Ngày tạo
+            - ngay_cap_nhat: Ngày cập nhật
+            - ten_danh_muc: Tên danh mục
+            - ten_nha_cung_cap: Tên nhà cung cấp
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         query = f"""
             SELECT 
                 sp.ma_san_pham,
@@ -30,6 +50,20 @@ class ProductModel(BaseModel):
             return []
     
     def them(self, **data):
+        """
+        + Input:
+            - data: Từ điển chứa thông tin sản phẩm mới:
+                + ten: Tên sản phẩm
+                + mo_ta: Mô tả sản phẩm
+                + don_gia: Đơn giá
+                + ma_danh_muc: Mã danh mục
+                + ma_ncc: Mã nhà cung cấp
+        + Output: Tuple chứa:
+            - Boolean: True nếu thêm thành công, False nếu thất bại
+            - String: Thông báo kết quả
+        + Raises:
+            - Exception khi thêm sản phẩm thất bại
+        """
         query = f"""
             INSERT INTO {self._table_name} 
             (ten, mo_ta, don_gia, ma_danh_muc, ma_ncc)
@@ -69,6 +103,18 @@ class ProductModel(BaseModel):
     
     def capNhat(self, ma_san_pham: int, ten: str, mo_ta: str, 
                don_gia: float, ma_danh_muc: int = None, ma_ncc: int = None):
+        """
+        + Input:
+            - ma_san_pham: Mã sản phẩm cần cập nhật
+            - ten: Tên sản phẩm mới
+            - mo_ta: Mô tả sản phẩm mới
+            - don_gia: Đơn giá mới
+            - ma_danh_muc: Mã danh mục mới (tùy chọn)
+            - ma_ncc: Mã nhà cung cấp mới (tùy chọn)
+        + Output: Boolean - True nếu cập nhật thành công, False nếu thất bại
+        + Raises:
+            - Exception khi cập nhật sản phẩm thất bại
+        """
         query = f"""
             UPDATE {self._table_name}
             SET ten = %s, mo_ta = %s, don_gia = %s, 
@@ -83,6 +129,15 @@ class ProductModel(BaseModel):
         return False
     
     def xoa(self, ma_san_pham: int):
+        """
+        + Input:
+            - ma_san_pham: Mã sản phẩm cần xóa
+        + Output: Tuple chứa:
+            - Boolean: True nếu xóa thành công, False nếu thất bại
+            - String: Thông báo kết quả
+        + Raises:
+            - Exception khi xóa sản phẩm thất bại
+        """
         query = f"DELETE FROM {self._table_name} WHERE ma_san_pham = %s"
         try:
             cursor = self._thucThiTruyVan(query, (ma_san_pham,))
@@ -96,6 +151,15 @@ class ProductModel(BaseModel):
         return False, "Xóa sản phẩm thất bại"
     
     def layTheoId(self, ma_san_pham: int):
+        """
+        + Input:
+            - ma_san_pham: Mã sản phẩm cần tìm
+        + Output: 
+            - Từ điển chứa thông tin sản phẩm nếu tìm thấy
+            - None nếu không tìm thấy
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         query = f"""
             SELECT 
                 p.ma_san_pham, p.ten, p.mo_ta, p.don_gia,
@@ -110,6 +174,24 @@ class ProductModel(BaseModel):
         return cursor.fetchone() if cursor else None
     
     def laySanPhamPhanTrang(self, offset=0, limit=10, search_query="", filters=None):
+        """
+        + Input:
+            - offset: Số bản ghi bỏ qua (mặc định: 0)
+            - limit: Số lượng bản ghi tối đa trả về (mặc định: 10)
+            - search_query: Từ khóa tìm kiếm (mặc định: "")
+            - filters: Từ điển chứa các điều kiện lọc (mặc định: None):
+                + ma_danh_muc: Mã danh mục cần lọc
+                + ma_ncc: Mã nhà cung cấp cần lọc
+                + don_gia_min: Giá tối thiểu
+                + don_gia_max: Giá tối đa
+                + name_sort: Hướng sắp xếp theo tên ('ASC', 'DESC')
+                + price_sort: Hướng sắp xếp theo giá ('ASC', 'DESC')
+        + Output: Tuple chứa:
+            - Danh sách từ điển thông tin sản phẩm thỏa mãn điều kiện
+            - Tổng số sản phẩm thỏa mãn điều kiện tìm kiếm
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         try:
             query = """
                 SELECT p.*, c.ten as ten_danh_muc, s.ten as ten_ncc
@@ -176,6 +258,14 @@ class ProductModel(BaseModel):
             return [], 0
     
     def layTatCaSanPham(self):
+        """
+        + Input: Không có
+        + Output: Danh sách từ điển chứa thông tin cơ bản của sản phẩm:
+            - ma_san_pham: Mã sản phẩm
+            - ten: Tên sản phẩm
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         query = f"SELECT ma_san_pham, ten FROM {self._table_name} ORDER BY ten"
         try:
             return self._thucThiTruyVan(query) or []
@@ -184,6 +274,15 @@ class ProductModel(BaseModel):
             return []
     
     def layTheoTen(self, ten_san_pham):
+        """
+        + Input:
+            - ten_san_pham: Tên sản phẩm cần tìm
+        + Output: 
+            - Từ điển chứa thông tin sản phẩm nếu tìm thấy
+            - None nếu không tìm thấy
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         query = f"SELECT ma_san_pham, ten FROM {self._table_name} WHERE ten = %s"
         try:
             cursor = self._thucThiTruyVan(query, (ten_san_pham,))

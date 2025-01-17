@@ -5,11 +5,25 @@ class ProductController:
         self._model = ProductModel()
     
     def layTatCaSanPham(self):
+        """
+        + Input: Không có
+        + Output: Danh sách các từ điển chứa thông tin sản phẩm:
+            - ma_san_pham: Mã sản phẩm
+            - ten: Tên sản phẩm
+            - mo_ta: Mô tả sản phẩm
+            - don_gia: Đơn giá
+            - ma_danh_muc: Mã danh mục
+            - ma_ncc: Mã nhà cung cấp
+            - ngay_tao: Ngày tạo
+            - ngay_cap_nhat: Ngày cập nhật
+            - ten_danh_muc: Tên danh mục
+            - ten_ncc: Tên nhà cung cấp
+        """
         try:
             san_pham = self._model.layTatCa()
             if not san_pham:
                 return []
-            
+
             formatted_products = []
             for product in san_pham:
                 product_dict = {
@@ -31,6 +45,19 @@ class ProductController:
             return []
     
     def themSanPham(self, data):
+        """
+        + Input:
+            - data (từ điển): Dữ liệu sản phẩm bao gồm:
+                + ten: Tên sản phẩm (bắt buộc)
+                + mo_ta: Mô tả sản phẩm
+                + don_gia: Đơn giá
+                + ma_danh_muc: Mã danh mục
+                + ma_ncc: Mã nhà cung cấp
+        + Output: Từ điển chứa thông tin sản phẩm vừa tạo
+        + Raises:
+            - ValueError khi thiếu tên sản phẩm
+            - Exception khi thêm sản phẩm thất bại
+        """
         try:
             if not data.get('ten'):
                 raise ValueError("Tên sản phẩm là bắt buộc")
@@ -40,6 +67,20 @@ class ProductController:
             raise
     
     def capNhatSanPham(self, ma_san_pham, data):
+        """
+        + Input:
+            - ma_san_pham: Mã sản phẩm cần cập nhật
+            - data (từ điển): Dữ liệu sản phẩm cập nhật bao gồm:
+                + ten: Tên sản phẩm (bắt buộc)
+                + mo_ta: Mô tả sản phẩm
+                + don_gia: Đơn giá
+                + ma_danh_muc: Mã danh mục
+                + ma_ncc: Mã nhà cung cấp
+        + Output: Từ điển chứa thông tin sản phẩm sau khi cập nhật
+        + Raises:
+            - ValueError khi thiếu mã sản phẩm hoặc tên sản phẩm
+            - Exception khi cập nhật thất bại
+        """
         try:
             if not ma_san_pham:
                 raise ValueError("Mã sản phẩm là bắt buộc")
@@ -51,6 +92,14 @@ class ProductController:
             raise
     
     def xoaSanPham(self, ma_san_pham):
+        """
+        + Input:
+            - ma_san_pham: Mã sản phẩm cần xóa
+        + Output: Giá trị boolean thể hiện việc xóa thành công hay không
+        + Raises:
+            - ValueError khi thiếu mã sản phẩm
+            - Exception khi xóa thất bại
+        """
         try:
             if not ma_san_pham:
                 raise ValueError("Mã sản phẩm là bắt buộc")
@@ -60,11 +109,30 @@ class ProductController:
             raise
     
     def handle_error(self, error, action):
+        """
+        + Input:
+            - error: Đối tượng lỗi
+            - action: Chuỗi mô tả hành động đang thực hiện
+        + Output: Chuỗi thông báo lỗi đã được định dạng
+        """
         error_message = f"Lỗi {action}: {str(error)}"
-        print(error_message)
+        print(error_message)  # Log the error
         return error_message
     
     def laySanPhamPhanTrang(self, offset=0, limit=10, search_query="", name_sort="none", price_sort="none"):
+        """
+        + Input:
+            - offset: Số bản ghi bỏ qua (mặc định: 0)
+            - limit: Số lượng bản ghi tối đa trả về (mặc định: 10)
+            - search_query: Từ khóa tìm kiếm sản phẩm (mặc định: "")
+            - name_sort: Hướng sắp xếp theo tên ('asc', 'desc', 'none') (mặc định: "none")
+            - price_sort: Hướng sắp xếp theo giá ('asc', 'desc', 'none') (mặc định: "none")
+        + Output: Tuple chứa:
+            - Danh sách các từ điển thông tin sản phẩm thỏa mãn điều kiện
+            - Tổng số sản phẩm thỏa mãn điều kiện tìm kiếm
+        + Raises:
+            - Exception khi lấy dữ liệu thất bại
+        """
         try:
             filters = {}
             if name_sort and name_sort != "none":

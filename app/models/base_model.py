@@ -5,10 +5,20 @@ from app.config.config import Config
 class BaseModel(ABC):
     
     def __init__(self):
+        """
+        + Input: Không có
+        + Output: Khởi tạo đối tượng BaseModel với kết nối database
+        """
         self.config = Config.get_db_config()
         self._ketNoi()
 
     def _ketNoi(self):
+        """
+        + Input: Không có
+        + Output: Đối tượng kết nối database mới
+        + Raises:
+            - Exception khi không thể tạo kết nối database
+        """
         try:
             self.conn = mysql.connector.connect(
                 host=self.config['host'],
@@ -23,6 +33,11 @@ class BaseModel(ABC):
             self.conn = None
     
     def __del__(self):
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects: Đóng kết nối database hiện tại nếu có
+        """
         try:
             if hasattr(self, 'conn') and self.conn and self.conn.is_connected():
                 self.conn.close()
@@ -30,6 +45,16 @@ class BaseModel(ABC):
             pass  # Ignore errors during cleanup
     
     def _thucThiTruyVan(self, query, params=None):
+        """
+        + Input:
+            - query: Câu truy vấn SQL cần thực thi
+            - params: Tham số cho câu truy vấn (mặc định: None)
+        + Output: 
+            - SELECT: Danh sách kết quả truy vấn
+            - INSERT/UPDATE/DELETE: Số dòng bị ảnh hưởng
+        + Raises:
+            - Exception khi thực thi truy vấn thất bại
+        """
         cursor = None
         try:
             if not self.conn or not self.conn.is_connected():

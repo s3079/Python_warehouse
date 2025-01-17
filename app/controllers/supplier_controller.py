@@ -5,7 +5,17 @@ class SupplierController:
         self.model = SupplierModel()
 
     def layTatCaNhaCungCap(self):
-        """Get all suppliers"""
+        """
+        + Input: Không có
+        + Output: Danh sách các từ điển chứa thông tin nhà cung cấp:
+            - ma_ncc: Mã nhà cung cấp
+            - ten: Tên nhà cung cấp
+            - dia_chi: Địa chỉ
+            - email: Email
+            - so_dien_thoai: Số điện thoại
+            - ngay_tao: Ngày tạo
+            - ngay_cap_nhat: Ngày cập nhật
+        """
         try:
             return self.model.layTatCa()
         except Exception as e:
@@ -13,7 +23,18 @@ class SupplierController:
             return []
 
     def themNhaCungCap(self, data):
-        """Add a new supplier"""
+        """
+        + Input:
+            - data (từ điển): Dữ liệu nhà cung cấp bao gồm:
+                + ten: Tên nhà cung cấp (bắt buộc)
+                + dia_chi: Địa chỉ
+                + email: Email
+                + so_dien_thoai: Số điện thoại
+        + Output: Thông tin nhà cung cấp vừa được tạo
+        + Raises:
+            - ValueError khi thiếu tên nhà cung cấp
+            - Exception khi thêm nhà cung cấp thất bại
+        """
         try:
             if not data.get('ten'):
                 raise ValueError("Tên nhà cung cấp là bắt buộc")
@@ -23,8 +44,19 @@ class SupplierController:
             raise
 
     def capNhatNhaCungCap(self, data):
-        """Update an existing supplier"""
-
+        """
+        + Input:
+            - data (từ điển): Dữ liệu cập nhật nhà cung cấp:
+                + ma_ncc: Mã nhà cung cấp (bắt buộc)
+                + ten: Tên nhà cung cấp (bắt buộc)
+                + dia_chi: Địa chỉ
+                + email: Email
+                + so_dien_thoai: Số điện thoại
+        + Output: Thông tin nhà cung cấp sau khi cập nhật
+        + Raises:
+            - ValueError khi thiếu mã hoặc tên nhà cung cấp
+            - Exception khi cập nhật nhà cung cấp thất bại
+        """
         try:
             if not data.get('ma_ncc'):
                 raise ValueError("Mã nhà cung cấp là bắt buộc")
@@ -36,7 +68,14 @@ class SupplierController:
             raise
 
     def xoaNhaCungCap(self, ma_ncc):
-        """Delete a supplier"""
+        """
+        + Input:
+            - ma_ncc: Mã nhà cung cấp cần xóa
+        + Output: True nếu xóa thành công, False nếu thất bại
+        + Raises:
+            - ValueError khi thiếu mã nhà cung cấp
+            - Exception khi xóa nhà cung cấp thất bại
+        """
         try:
             if not ma_ncc:
                 raise ValueError("Mã nhà cung cấp là bắt buộc")
@@ -46,13 +85,30 @@ class SupplierController:
             raise
 
     def handle_error(self, error, action):
-        """Handle errors in the controller"""
+        """
+        + Input:
+            - error: Đối tượng lỗi
+            - action: Chuỗi mô tả hành động đang thực hiện
+        + Output: Chuỗi thông báo lỗi đã được định dạng
+        """
         error_message = f"Lỗi {action}: {str(error)}"
         print(error_message)
         return error_message
 
     def layNhaCungCapPhanTrang(self, offset=0, limit=10, search_query="", name_sort="none", contact_sort="none"):
-        """Get paginated suppliers with optional search and sorting"""
+        """
+        + Input:
+            - offset: Số bản ghi bỏ qua (mặc định: 0)
+            - limit: Số lượng bản ghi tối đa trả về (mặc định: 10)
+            - search_query: Từ khóa tìm kiếm nhà cung cấp (mặc định: "")
+            - name_sort: Hướng sắp xếp theo tên ('asc', 'desc', 'none') (mặc định: "none")
+            - contact_sort: Hướng sắp xếp theo liên hệ ('asc', 'desc', 'none') (mặc định: "none")
+        + Output: Tuple chứa:
+            - Danh sách các từ điển thông tin nhà cung cấp thỏa mãn điều kiện
+            - Tổng số nhà cung cấp thỏa mãn điều kiện tìm kiếm
+        + Raises:
+            - Exception khi lấy dữ liệu thất bại
+        """
         try:
             return self.model.layNhaCungCapPhanTrang(
                 offset=offset,
@@ -66,7 +122,14 @@ class SupplierController:
             return [], 0
 
     def lay_nha_cung_cap_theo_id(self, ma_ncc):
-        """Get a supplier by ID"""
+        """
+        + Input:
+            - ma_ncc: Mã nhà cung cấp cần tìm
+        + Output: Thông tin của nhà cung cấp hoặc None nếu không tìm thấy
+        + Raises:
+            - ValueError khi thiếu mã nhà cung cấp
+            - Exception khi lấy thông tin nhà cung cấp thất bại
+        """
         try:
             if not ma_ncc:
                 raise ValueError("ID nhà cung cấp là bắt buộc")

@@ -2,11 +2,23 @@ from app.models.base_model import BaseModel
 
 class InventoryModel(BaseModel):
     def __init__(self):
+        """
+        + Input: Không có
+        + Output: Khởi tạo đối tượng InventoryModel với tên bảng "KHOHANG"
+        """
         super().__init__()
         self._table_name = "KHOHANG"
     
     def layTatCa(self):
-        """Get all inventory items with product names"""
+        """
+        + Input: Không có
+        + Output: Danh sách từ điển chứa thông tin kho hàng:
+            - ma_kho: Mã kho hàng
+            - ten_san_pham: Tên sản phẩm
+            - so_luong: Số lượng tồn kho
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         query = f"""
             SELECT 
                 i.ma_kho,
@@ -23,7 +35,18 @@ class InventoryModel(BaseModel):
             return []
     
     def them(self, **data):
-        """Add a new inventory item"""
+        """
+        + Input:
+            - data: Từ điển chứa thông tin kho hàng mới:
+                + ma_san_pham: Mã sản phẩm
+                + so_luong: Số lượng
+                + ngay_nhap_cuoi: Ngày nhập kho cuối cùng
+        + Output: Tuple chứa:
+            - Boolean: True nếu thêm thành công, False nếu thất bại
+            - String: Thông báo kết quả
+        + Raises:
+            - Exception khi thêm kho hàng thất bại
+        """
         query = f"""
             INSERT INTO {self._table_name} 
             (ma_san_pham, so_luong, ngay_nhap_cuoi)
@@ -41,7 +64,17 @@ class InventoryModel(BaseModel):
         return False, "Thêm kho hàng thất bại"
     
     def capNhat(self, data):
-        """Update an existing inventory item"""
+        """
+        + Input:
+            - data: Từ điển chứa thông tin cập nhật:
+                + ma_kho: Mã kho hàng cần cập nhật
+                + ma_san_pham: Mã sản phẩm mới
+                + so_luong: Số lượng mới
+                + ngay_nhap_cuoi: Ngày nhập kho cuối cùng mới
+        + Output: Boolean - True nếu cập nhật thành công, False nếu thất bại
+        + Raises:
+            - Exception khi cập nhật kho hàng thất bại
+        """
         query = f"""
             UPDATE {self._table_name}
             SET ma_san_pham = %s, 
@@ -61,7 +94,13 @@ class InventoryModel(BaseModel):
         return False
     
     def xoa(self, ma_kho: int):
-        """Delete an inventory item"""
+        """
+        + Input:
+            - ma_kho: Mã kho hàng cần xóa
+        + Output: Boolean - True nếu xóa thành công, False nếu thất bại
+        + Raises:
+            - Exception khi xóa kho hàng thất bại
+        """
         query = f"DELETE FROM {self._table_name} WHERE ma_kho = %s"
         cursor = self._thucThiTruyVan(query, (ma_kho,))
         if cursor:
@@ -70,7 +109,18 @@ class InventoryModel(BaseModel):
         return False
     
     def layTheoId(self, ma_kho: int):
-        """Get an inventory item by ID with product name"""
+        """
+        + Input:
+            - ma_kho: Mã kho hàng cần tìm
+        + Output: 
+            - Từ điển chứa thông tin kho hàng nếu tìm thấy:
+                + ma_kho: Mã kho hàng
+                + so_luong: Số lượng tồn kho
+                + ten_san_pham: Tên sản phẩm
+            - None nếu không tìm thấy
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         query = f"""
             SELECT 
                 i.ma_kho, i.so_luong,
@@ -83,7 +133,17 @@ class InventoryModel(BaseModel):
         return cursor.fetchone() if cursor else None
     
     def layKhoHangPhanTrang(self, offset=0, limit=10, search_query=""):
-        """Get paginated inventory items with optional search"""
+        """
+        + Input:
+            - offset: Số bản ghi bỏ qua (mặc định: 0)
+            - limit: Số lượng bản ghi tối đa trả về (mặc định: 10)
+            - search_query: Từ khóa tìm kiếm theo tên sản phẩm (mặc định: "")
+        + Output: Tuple chứa:
+            - Danh sách từ điển thông tin kho hàng thỏa mãn điều kiện
+            - Tổng số kho hàng thỏa mãn điều kiện tìm kiếm
+        + Raises:
+            - Exception khi truy vấn thất bại
+        """
         try:
             query = """
                 SELECT i.*, p.ten as ten_san_pham
