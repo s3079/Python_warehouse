@@ -71,10 +71,16 @@ class ProductController:
         print(error_message)  # Log the error
         return error_message
     
-    def laySanPhamPhanTrang(self, offset=0, limit=10, search_query=""):
-        """Get paginated products with optional search"""
+    def laySanPhamPhanTrang(self, offset=0, limit=10, search_query="", name_sort="none", price_sort="none"):
+        """Get paginated products with optional search and sorting"""
         try:
-            return self._model.laySanPhamPhanTrang(offset, limit, search_query)
+            filters = {}
+            if name_sort and name_sort != "none":
+                filters['name_sort'] = name_sort.upper()
+            if price_sort and price_sort != "none":
+                filters['price_sort'] = price_sort.upper()
+            
+            return self._model.laySanPhamPhanTrang(offset, limit, search_query, filters)
         except Exception as e:
             self.handle_error(e, "lấy danh sách sản phẩm phân trang")
             return [], 0
