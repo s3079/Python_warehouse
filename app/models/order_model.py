@@ -149,27 +149,24 @@ class OrderModel(BaseModel):
             if not header_result:
                 return None
             
-            # Convert header result to dictionary
             header = header_result[0]
             order_info = {
                 "ma_don_hang": header["ma_don_hang"],
                 "ngay_dat": header["ngay_dat"],
                 "tong_tien": header["tong_tien"],
                 "ten_nguoi_mua": header["ten_nguoi_mua"],
-                "chi_tiet": []
+                "ma_san_pham": "",
+                "ten_san_pham": "",
+                "so_luong": "",
+                "don_gia": ""
             }
-            
-            # Execute details query
+
             details_result = self._thucThiTruyVan(details_query, (ma_don_hang,))
             if details_result:
-                # Add all order details to the order_info
-                for detail in details_result:
-                    order_info["chi_tiet"].append({
-                        "ma_san_pham": detail["ma_san_pham"],
-                        "ten_san_pham": detail["ten_san_pham"],
-                        "so_luong": detail["so_luong"],
-                        "don_gia": detail["don_gia"]
-                    })
+                order_info["ma_san_pham"] = details_result[0]["ma_san_pham"]
+                order_info["ten_san_pham"] = details_result[0]["ten_san_pham"]
+                order_info["so_luong"] = details_result[0]["so_luong"]
+                order_info["don_gia"] = details_result[0]["don_gia"]
             
             return order_info
             
