@@ -35,12 +35,10 @@ def init_database():
                 conn.commit()
             print("Cấu trúc cơ sở dữ liệu đã được tạo thành công.")
 
-            # Check if database is empty
             cursor.execute("SELECT COUNT(*) FROM NGUOIDUNG")
             user_count = cursor.fetchone()[0]
 
             if user_count == 0:
-                # Load sample data only if database is empty
                 sample_data_path = os.path.join(current_dir, 'sample_data.sql')
                 with open(sample_data_path, 'r') as sample_file:
                     sample_script = sample_file.read()
