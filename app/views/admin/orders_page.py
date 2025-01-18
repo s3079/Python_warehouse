@@ -121,10 +121,10 @@ class OrdersPage(ctk.CTkFrame):
         
         # Define column configurations
         self.columns = [
-            {"name": "Mã đơn hàng", "key": "ma_don_hang", "width": 100},  # Updated from order_id
-            {"name": "Ngày đặt", "key": "ngay_dat", "width": 150},        # Updated from order_date
-            {"name": "Tổng tiền", "key": "tong_tien", "width": 100},      # Updated from total_amount
-            {"name": "Thao tác", "key": "actions", "width": 100}          # Updated from Actions
+            {"name": "Mã đơn hàng", "key": "ma_don_hang", "width": 100},
+            {"name": "Ngày đặt", "key": "ngay_dat", "width": 150},        
+            {"name": "Tổng tiền", "key": "tong_tien", "width": 100},      
+            {"name": "Thao tác", "key": "actions", "width": 100}          
         ]
         
         # Create table header
@@ -161,7 +161,16 @@ class OrdersPage(ctk.CTkFrame):
 
 
     def load_orders(self):
-        """Load orders into the table"""
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Xóa nội dung bảng hiện tại
+            - Tải và hiển thị danh sách đơn hàng mới
+            - Tạo các nút thao tác (sửa, xóa) cho mỗi đơn hàng
+            - Định dạng hiển thị tiền tệ
+            - Cập nhật điều khiển phân trang
+        """
         # Clear existing content
         for widget in self.content_frame.winfo_children():
             widget.destroy()
@@ -279,7 +288,18 @@ class OrdersPage(ctk.CTkFrame):
         self.create_pagination_controls(total_pages)
 
     def create_pagination_controls(self, total_pages):
-        """Create pagination controls"""
+        """
+        + Input:
+            - total_pages: Tổng số trang
+        + Output: Không có
+        + Side effects:
+            - Tạo hoặc cập nhật khung điều khiển phân trang
+            - Hiển thị thông tin số lượng bản ghi (ví dụ: "Hiển thị 1-10 trong 100 đơn hàng")
+            - Tạo nút Previous nếu không phải trang đầu
+            - Tạo các nút số trang (tối đa 5 nút)
+            - Tạo nút Next nếu không phải trang cuối
+            - Cập nhật trạng thái active/inactive của các nút
+        """
         # Create or clear pagination frame
         if hasattr(self, 'pagination_frame'):
             for widget in self.pagination_frame.winfo_children():
@@ -360,23 +380,50 @@ class OrdersPage(ctk.CTkFrame):
         next_button.pack(side="left", padx=(5, 0))
 
     def previous_page(self):
-        """Go to previous page"""
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Giảm số trang hiện tại nếu > 1
+            - Tải lại danh sách đơn hàng với trang mới
+        """
         if self.current_page > 1:
             self.current_page -= 1
             self.load_orders()
 
     def next_page(self):
-        """Go to next page"""
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Tăng số trang hiện tại
+            - Tải lại danh sách đơn hàng với trang mới
+        """
         self.current_page += 1
         self.load_orders()
 
     def go_to_page(self, page):
-        """Go to specific page"""
+        """
+        + Input:
+            - page: Số trang cần chuyển đến
+        + Output: Không có
+        + Side effects:
+            - Cập nhật số trang hiện tại
+            - Tải lại danh sách đơn hàng với trang mới
+        """
         self.current_page = page
         self.load_orders()
 
     def edit_order(self, order_data):
-        """Show dialog to edit an order"""
+        """
+        + Input:
+            - order_data: Từ điển chứa thông tin đơn hàng cần sửa
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Hiển thị thông báo nếu không có quyền
+            - Mở dialog sửa đơn hàng nếu có quyền
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -384,7 +431,17 @@ class OrdersPage(ctk.CTkFrame):
         dialog = EditOrderDialog(self, order_data, on_save=self.update_order)
 
     def update_order(self, data):
-        """Update an existing order"""
+        """
+        + Input:
+            - data: Từ điển chứa thông tin cập nhật đơn hàng
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Hiển thị thông báo nếu không có quyền
+            - Cập nhật đơn hàng trong database
+            - Tải lại danh sách đơn hàng nếu thành công
+            - Hiển thị thông báo thành công/thất bại
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -404,7 +461,18 @@ class OrdersPage(ctk.CTkFrame):
             messagebox.showerror("Error", str(e))
 
     def delete_order(self, order):
-        """Show confirmation dialog and delete order"""
+        """
+        + Input:
+            - order: Từ điển chứa thông tin đơn hàng cần xóa
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Hiển thị thông báo nếu không có quyền
+            - Mở dialog xác nhận xóa với:
+                + Icon cảnh báo
+                + Thông báo xác nhận
+                + Nút Hủy và Delete
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -467,7 +535,22 @@ class OrdersPage(ctk.CTkFrame):
         delete_button.pack(side="right")
 
     def save_order_changes(self, dialog, ma_don_hang, ngay_dat, tong_tien):
-        """Save order changes and close dialog"""
+        """
+        + Input:
+            - dialog: Dialog đang hiển thị
+            - ma_don_hang: Mã đơn hàng cần cập nhật
+            - ngay_dat: Ngày đặt hàng mới
+            - tong_tien: Tổng tiền mới
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Kiểm tra và xử lý dữ liệu đầu vào
+            - Cập nhật đơn hàng trong database
+            - Đóng dialog và tải lại danh sách nếu thành công
+            - Hiển thị thông báo lỗi nếu thất bại
+        + Raises:
+            - ValueError khi dữ liệu không hợp lệ
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -503,7 +586,17 @@ class OrdersPage(ctk.CTkFrame):
             messagebox.showerror("Lỗi", str(e))
 
     def confirm_delete(self, dialog, order):
-        """Execute delete operation and close dialog"""
+        """
+        + Input:
+            - dialog: Dialog xác nhận đang hiển thị
+            - order: Từ điển chứa thông tin đơn hàng cần xóa
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Xóa đơn hàng khỏi database
+            - Đóng dialog và tải lại danh sách nếu thành công
+            - Hiển thị thông báo lỗi nếu thất bại
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -520,7 +613,15 @@ class OrdersPage(ctk.CTkFrame):
             messagebox.showerror("Lỗi", str(e))
 
     def show_order_details(self, order):
-        """Show a dialog with order details"""
+        """
+        + Input:
+            - order: Từ điển chứa thông tin đơn hàng cần xem
+        + Output: Không có
+        + Side effects:
+            - Tải chi tiết đơn hàng từ database
+            - Hiển thị dialog chi tiết nếu tải thành công
+            - Hiển thị thông báo lỗi nếu thất bại
+        """
         order_details = self.controller.layChiTietDonHang(order['ma_don_hang'])
         if order_details:
             dialog = OrderDialog(self, order=order_details)
@@ -530,7 +631,14 @@ class OrdersPage(ctk.CTkFrame):
             messagebox.showerror("Lỗi", "Không thể tải chi tiết đơn hàng")
 
     def show_add_order_dialog(self):
-        """Show dialog to add a new order"""
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Hiển thị thông báo nếu không có quyền
+            - Mở dialog thêm đơn hàng mới nếu có quyền
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -538,7 +646,16 @@ class OrdersPage(ctk.CTkFrame):
         dialog = AddOrderDialog(self, ma_nguoi_dung=self.ma_nguoi_dung, on_save=self.add_order)
 
     def add_order(self, order_data):
-        """Add a new order and refresh the list"""
+        """
+        + Input:
+            - order_data: Từ điển chứa thông tin đơn hàng mới
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Thêm đơn hàng mới vào database
+            - Tải lại danh sách đơn hàng nếu thành công
+            - Hiển thị thông báo lỗi nếu thất bại
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")

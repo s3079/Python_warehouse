@@ -13,29 +13,26 @@ class UserDashboard(ctk.CTk):
         super().__init__()
         ctk.set_appearance_mode("light")
         self.user_data = user_data
-        self.has_edit_rights = False  # Users only have viewing rights
+        self.has_edit_rights = False
         self.title('User Dashboard')
         self.geometry('1200x700')
         self.configure(fg_color="white")
         
-        # Configure grid
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
         
-        # Main container
         main_container = ctk.CTkFrame(self, fg_color="white")
         main_container.grid(row=0, column=0, columnspan=2, sticky="nsew", padx=20, pady=20)
         main_container.grid_columnconfigure(1, weight=1)
         main_container.grid_rowconfigure(0, weight=1)
 
-        # Sidebar
         sidebar = ctk.CTkFrame(main_container, fg_color="#E8FAFF", corner_radius=20)
         sidebar.grid(row=0, column=0, sticky="nsew", padx=(0, 30))
         sidebar.grid_columnconfigure(0, weight=1)
         sidebar.grid_propagate(False)
         sidebar.configure(width=280)
 
-        # Icons
+
         self.buttons = []
         self.icons = {}
         self.active_icons = {}
@@ -49,11 +46,11 @@ class UserDashboard(ctk.CTk):
         }
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
         
-        # Sidebar content
+
         sidebar_content = ctk.CTkFrame(sidebar, fg_color="transparent")
         sidebar_content.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # Logo
+ 
         logo_frame = ctk.CTkFrame(sidebar_content, fg_color="transparent")
         logo_frame.pack(fill="x", pady=(0, 30))
         logo_path = str(Path(__file__).parent.parent.parent / 'assets' / 'logo.png')
@@ -64,7 +61,7 @@ class UserDashboard(ctk.CTk):
         project_name = ctk.CTkLabel(logo_frame, text="Warehouse", font=("", 20, "bold"), text_color="#16151C")
         project_name.pack(side="left")
         
-        # Menu
+
         menu_container = ctk.CTkFrame(sidebar_content, fg_color="transparent")
         menu_container.pack(fill="both", expand=True)
         sidebar_items = ['Sản Phẩm', 'Danh Mục', 'Kho', 'Nhà Cung Cấp', 'Đơn Hàng']
@@ -111,7 +108,7 @@ class UserDashboard(ctk.CTk):
             button.pack(fill='x', pady=5)
             self.buttons.append(button)
 
-        # Logout button
+   
         logout_frame = ctk.CTkFrame(sidebar_content, fg_color="transparent", height=50)
         logout_frame.pack(fill="x", side="bottom")
         logout_icon_path = str(assets_path / 'logout.png')
@@ -138,13 +135,13 @@ class UserDashboard(ctk.CTk):
         )
         logout_button.pack(fill="x")
 
-        # Right container
+   
         right_container = ctk.CTkFrame(main_container, fg_color="transparent")
         right_container.grid(row=0, column=1, sticky="nsew")
         right_container.grid_rowconfigure(1, weight=1)
         right_container.grid_columnconfigure(0, weight=1)
 
-        # Header
+
         header = ctk.CTkFrame(right_container, fg_color="transparent")
         header.grid(row=0, column=0, sticky="ew", padx=20, pady=(20, 0))
         header.grid_columnconfigure(1, weight=1)
@@ -174,16 +171,15 @@ class UserDashboard(ctk.CTk):
         chevron_label = ctk.CTkLabel(user_info_frame, text="", image=chevron_icon)
         chevron_label.pack(side="right", padx=10, pady=8)
 
-        # Content area
+  
         self.content_area = ctk.CTkFrame(right_container, fg_color="transparent")
         self.content_area.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
         self.content_area.grid_columnconfigure(0, weight=1)
         self.content_area.grid_rowconfigure(0, weight=1)
 
-        # Bind resize event
+ 
         self.bind("<Configure>", self.on_resize)
 
-        # Activate Dashboard by default
         self.show_page('Sản Phẩm')
 
     def logout(self):

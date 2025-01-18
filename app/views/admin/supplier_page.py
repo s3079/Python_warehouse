@@ -18,7 +18,6 @@ class SupplierPage(ctk.CTkFrame):
         self.name_sort_value = "none"
         self.contact_sort_value = "none"
         
-        # Load icons
         assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
         self.search_icon = ctk.CTkImage(
             light_image=Image.open(str(assets_path / 'search.png')),
@@ -286,7 +285,18 @@ class SupplierPage(ctk.CTkFrame):
             messagebox.showerror("Lỗi", f"Không thể tải dữ liệu: {str(e)}")
 
     def create_pagination_controls(self, total_pages):
-        """Create pagination controls"""
+        """
+        + Input:
+            - total_pages: Tổng số trang
+        + Output: Không có
+        + Side effects:
+            - Xóa điều khiển phân trang cũ nếu có
+            - Tạo khung điều khiển phân trang mới
+            - Hiển thị thông tin số lượng bản ghi (VD: "Hiển thị 1-10 của 50 nhà cung cấp")
+            - Tạo nút Previous (mờ đi nếu ở trang đầu)
+            - Tạo các nút số trang (tối đa 5 nút)
+            - Tạo nút Next (mờ đi nếu ở trang cuối)
+        """
         # Create or clear pagination frame
         if hasattr(self, 'pagination_frame'):
             for widget in self.pagination_frame.winfo_children():
@@ -367,22 +377,49 @@ class SupplierPage(ctk.CTkFrame):
         next_button.pack(side="left", padx=(5, 0))
 
     def previous_page(self):
-        """Go to previous page"""
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Giảm số trang hiện tại nếu > 1
+            - Tải lại danh sách nhà cung cấp với trang mới
+        """
         if self.current_page > 1:
             self.current_page -= 1
             self.load_suppliers()
 
     def next_page(self):
-        """Go to next page"""
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Tăng số trang hiện tại
+            - Tải lại danh sách nhà cung cấp với trang mới
+        """
         self.current_page += 1
         self.load_suppliers()
 
     def go_to_page(self, page):
-        """Go to specific page"""
+        """
+        + Input:
+            - page: Số trang cần chuyển đến
+        + Output: Không có
+        + Side effects:
+            - Cập nhật số trang hiện tại
+            - Tải lại danh sách nhà cung cấp với trang mới
+        """
         self.current_page = page
         self.load_suppliers()
 
     def show_add_dialog(self):
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Hiển thị thông báo nếu không có quyền
+            - Mở dialog thêm nhà cung cấp mới nếu có quyền
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -394,6 +431,16 @@ class SupplierPage(ctk.CTkFrame):
         )
 
     def show_edit_dialog(self, supplier):
+        """
+        + Input:
+            - supplier: Từ điển chứa thông tin nhà cung cấp cần sửa
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Hiển thị thông báo nếu không có quyền
+            - Mở dialog sửa nhà cung cấp nếu có quyền
+            - Điền sẵn thông tin nhà cung cấp vào form
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -469,7 +516,19 @@ class SupplierPage(ctk.CTkFrame):
         delete_button.pack(side="right")
 
     def confirm_delete(self, dialog, supplier):
-        """Execute delete operation and close dialog"""
+        """
+        + Input:
+            - dialog: Dialog xác nhận đang hiển thị
+            - supplier: Từ điển chứa thông tin nhà cung cấp cần xóa
+        + Output: Không có
+        + Side effects:
+            - Xóa nhà cung cấp khỏi database
+            - Đóng dialog xác nhận
+            - Tải lại danh sách nhà cung cấp
+            - Hiển thị thông báo lỗi nếu thất bại
+        + Raises:
+            - Exception khi xóa nhà cung cấp thất bại
+        """
         try:
             self.controller.xoaNhaCungCap(supplier["ma_ncc"])
             dialog.destroy()
@@ -479,7 +538,16 @@ class SupplierPage(ctk.CTkFrame):
             messagebox.showerror("Lỗi", f"Không thể xóa nhà cung cấp: {str(e)}")
 
     def show_filter_dialog(self):
-        """Show filter options dialog"""
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Mở dialog lọc với các tùy chọn:
+                + Sắp xếp theo tên (A-Z, Z-A)
+                + Sắp xếp theo số điện thoại (A-Z, Z-A)
+            - Tạo các nút radio cho mỗi tùy chọn
+            - Tạo nút Hủy và Áp dụng
+        """
         dialog = CenterDialog(self, "Lọc Nhà Cung Cấp", "400x300")
         
         # Store filter states
@@ -616,7 +684,16 @@ class SupplierPage(ctk.CTkFrame):
         apply_button.pack(side="left")
 
     def apply_filters(self, dialog):
-        """Apply the selected filters and refresh the table"""
+        """
+        + Input:
+            - dialog: Dialog lọc đang hiển thị
+        + Output: Không có
+        + Side effects:
+            - Đóng dialog lọc
+            - Reset về trang đầu tiên
+            - Cập nhật các giá trị lọc
+            - Tải lại danh sách nhà cung cấp theo điều kiện lọc mới
+        """
         dialog.destroy()
         self.current_page = 1  # Reset to first page
         self.name_sort_value = self.name_sort.get()
@@ -624,7 +701,24 @@ class SupplierPage(ctk.CTkFrame):
         self.load_suppliers()
 
     def save_supplier(self, supplier_data):
-        """Save or update a supplier"""
+        """
+        + Input:
+            - supplier_data: Từ điển chứa thông tin nhà cung cấp cần lưu:
+                + ma_ncc: Mã nhà cung cấp (nếu là cập nhật)
+                + ten: Tên nhà cung cấp
+                + email: Email liên hệ
+                + dien_thoai: Số điện thoại
+                + dia_chi: Địa chỉ
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra các trường bắt buộc
+            - Thêm mới hoặc cập nhật nhà cung cấp trong database
+            - Tải lại danh sách nhà cung cấp nếu thành công
+            - Hiển thị thông báo lỗi nếu thất bại
+        + Raises:
+            - ValueError khi thiếu trường bắt buộc
+            - Exception khi lưu nhà cung cấp thất bại
+        """
         try:
             # Validate that all required fields are present
             required_fields = ["ten", "email", "dien_thoai", "dia_chi"]

@@ -235,6 +235,15 @@ class ManagerDashboard(ctk.CTk):
         self.show_page('Sản Phẩm')
 
     def logout(self):
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Hiển thị hộp thoại xác nhận đăng xuất
+            - Nếu người dùng xác nhận:
+                + Đóng cửa sổ dashboard
+                + Mở lại màn hình đăng nhập
+        """
         from tkinter import messagebox
 
         if messagebox.askyesno("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?"):
@@ -245,14 +254,41 @@ class ManagerDashboard(ctk.CTk):
             root.mainloop()
 
     def on_resize(self, event):
+        """
+        + Input:
+            - event: Sự kiện thay đổi kích thước cửa sổ
+        + Output: Không có
+        + Side effects:
+            - Cập nhật lại giao diện khi cửa sổ thay đổi kích thước
+        """
         self.update_idletasks()
 
     def apply_opacity(self, hex_color, opacity):
+        """
+        + Input:
+            - hex_color: Mã màu hex (VD: "#FFFFFF")
+            - opacity: Độ trong suốt (0.0 - 1.0)
+        + Output: Mã màu hex với độ trong suốt được áp dụng
+        + Side effects: Không có
+        """
         hex_color = hex_color.lstrip('#')
         rgb = tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
         return f'#{int(rgb[0])}{int(rgb[1])}{int(rgb[2])}{int(opacity * 255):02x}'
 
     def show_page(self, page_name):
+        """
+        + Input:
+            - page_name: Tên trang cần hiển thị (VD: "Sản Phẩm", "Danh Mục",...)
+        + Output: Không có
+        + Side effects:
+            - Cập nhật trạng thái active của nút menu
+            - Thay đổi màu sắc và icon của nút được chọn
+            - Cập nhật tiêu đề trang
+            - Xóa nội dung trang cũ
+            - Tạo và hiển thị trang mới tương ứng với page_name
+            - Truyền quyền chỉnh sửa (can_edit=True) cho tất cả các trang
+            - Truyền thông tin người dùng cho trang Đơn hàng
+        """
         for button in self.buttons:
             button_text = button.cget("text")
             button.configure(

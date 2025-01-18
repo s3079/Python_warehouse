@@ -15,8 +15,6 @@ class AdminDashboard(ctk.CTk):
         self.user_data = user_data
 
         ctk.set_appearance_mode("light")
-
-        print("User data:", self.user_data)
         
         self.title('Admin Dashboard')
         self.geometry('1200x700')
@@ -285,7 +283,7 @@ class AdminDashboard(ctk.CTk):
         elif page_name == "Nhà Cung Cấp":
             page = SupplierPage(self.content_area, self, can_edit=True)
         elif page_name == "Tài Khoản":
-            page = UsersPage(self.content_area, self, can_edit=True)
+            page = UsersPage(self.content_area, self)
         elif page_name == "Đơn Hàng":
             page = OrdersPage(self.content_area, self, self.user_data, can_edit=True)
         else:

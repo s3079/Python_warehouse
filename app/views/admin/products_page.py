@@ -174,6 +174,17 @@ class ProductsPage(ctk.CTkFrame):
         self.load_products()
 
     def load_products(self):
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Xóa nội dung bảng hiện tại
+            - Tải và hiển thị danh sách sản phẩm mới
+            - Định dạng hiển thị giá tiền (VD: 100,000 ₫)
+            - Cắt ngắn nội dung dài và thêm tooltip
+            - Tạo đường phân cách giữa các dòng
+            - Cập nhật điều khiển phân trang
+        """
         for widget in self.content_frame.winfo_children():
             widget.destroy()
             
@@ -273,6 +284,18 @@ class ProductsPage(ctk.CTkFrame):
         self.create_pagination_controls(total_pages)
 
     def create_pagination_controls(self, total_pages):
+        """
+        + Input:
+            - total_pages: Tổng số trang
+        + Output: Không có
+        + Side effects:
+            - Xóa điều khiển phân trang cũ nếu có
+            - Tạo khung điều khiển phân trang mới
+            - Hiển thị thông tin số lượng bản ghi (VD: "Hiển thị 1-10 của 50 sản phẩm")
+            - Tạo nút Previous (mờ đi nếu ở trang đầu)
+            - Tạo các nút số trang (tối đa 5 nút)
+            - Tạo nút Next (mờ đi nếu ở trang cuối)
+        """
         if hasattr(self, 'pagination_frame'):
             for widget in self.pagination_frame.winfo_children():
                 widget.destroy()
@@ -346,19 +369,49 @@ class ProductsPage(ctk.CTkFrame):
         next_button.pack(side="left", padx=(5, 0))
 
     def previous_page(self):
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Giảm số trang hiện tại nếu > 1
+            - Tải lại danh sách sản phẩm với trang mới
+        """
         if self.current_page > 1:
             self.current_page -= 1
             self.load_products()
 
     def next_page(self):
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Tăng số trang hiện tại
+            - Tải lại danh sách sản phẩm với trang mới
+        """
         self.current_page += 1
         self.load_products()
 
     def go_to_page(self, page):
+        """
+        + Input:
+            - page: Số trang cần chuyển đến
+        + Output: Không có
+        + Side effects:
+            - Cập nhật số trang hiện tại
+            - Tải lại danh sách sản phẩm với trang mới
+        """
         self.current_page = page
         self.load_products()
 
     def show_add_dialog(self):
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Hiển thị thông báo nếu không có quyền
+            - Mở dialog thêm sản phẩm mới nếu có quyền
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -370,6 +423,16 @@ class ProductsPage(ctk.CTkFrame):
         )
 
     def show_edit_dialog(self, product):
+        """
+        + Input:
+            - product: Từ điển chứa thông tin sản phẩm cần sửa
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Hiển thị thông báo nếu không có quyền
+            - Mở dialog sửa sản phẩm nếu có quyền
+            - Điền sẵn thông tin sản phẩm vào form
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -393,6 +456,16 @@ class ProductsPage(ctk.CTkFrame):
         )
 
     def delete_product(self, product):
+        """
+        + Input:
+            - product: Từ điển chứa thông tin sản phẩm cần xóa
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra quyền chỉnh sửa
+            - Hiển thị thông báo nếu không có quyền
+            - Mở dialog xác nhận xóa nếu có quyền
+            - Xóa sản phẩm và tải lại danh sách nếu người dùng xác nhận
+        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -417,6 +490,16 @@ class ProductsPage(ctk.CTkFrame):
         )
 
     def show_filter_dialog(self):
+        """
+        + Input: Không có
+        + Output: Không có
+        + Side effects:
+            - Mở dialog lọc với các tùy chọn:
+                + Sắp xếp tên sản phẩm (A-Z, Z-A)
+                + Sắp xếp giá (Thấp đến cao, Cao đến thấp)
+            - Tạo các nút radio cho mỗi tùy chọn
+            - Tạo nút Hủy và Áp dụng
+        """
         dialog = CenterDialog(self, "Lọc Sản Phẩm", "400x300")
         
         self.name_sort = tk.StringVar(value="none")
@@ -544,6 +627,16 @@ class ProductsPage(ctk.CTkFrame):
         apply_button.pack(side="left")
 
     def apply_filters(self, dialog):
+        """
+        + Input:
+            - dialog: Dialog lọc đang hiển thị
+        + Output: Không có
+        + Side effects:
+            - Đóng dialog lọc
+            - Reset về trang đầu tiên
+            - Cập nhật các giá trị lọc
+            - Tải lại danh sách sản phẩm theo điều kiện lọc mới
+        """
         dialog.destroy()
         self.current_page = 1
         self.name_sort_value = self.name_sort.get()
@@ -551,6 +644,25 @@ class ProductsPage(ctk.CTkFrame):
         self.load_products()
 
     def save_product(self, data):
+        """
+        + Input:
+            - data: Từ điển chứa thông tin sản phẩm cần lưu:
+                + ma_san_pham: Mã sản phẩm (nếu là cập nhật)
+                + ten: Tên sản phẩm
+                + mo_ta: Mô tả sản phẩm
+                + don_gia: Giá sản phẩm
+                + ma_danh_muc: Mã danh mục
+                + ma_ncc: Mã nhà cung cấp
+        + Output: Không có
+        + Side effects:
+            - Kiểm tra và xử lý dữ liệu đầu vào
+            - Thêm mới hoặc cập nhật sản phẩm trong database
+            - Tải lại danh sách sản phẩm nếu thành công
+            - Hiển thị thông báo lỗi nếu thất bại
+        + Raises:
+            - ValueError khi giá không hợp lệ
+            - Exception khi lưu sản phẩm thất bại
+        """
         try:
             try:
                 price = float(data['don_gia'])

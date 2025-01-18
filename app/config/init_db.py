@@ -6,7 +6,6 @@ from app.config.config import Config
 
 def init_database():
     try:
-        # Connect without database name first
         conn = mysql.connector.connect(
             host=Config.DB_HOST,
             user=Config.DB_USER,
@@ -15,19 +14,15 @@ def init_database():
         
         if conn.is_connected():
             cursor = conn.cursor()
-            
-            # Create database if it doesn't exist
+
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {Config.DB_NAME}")
             print(f"Cơ sở dữ liệu '{Config.DB_NAME}' đã được tạo hoặc đã tồn tại.")
-            
-            # Switch to the database
+
             cursor.execute(f"USE {Config.DB_NAME}")
-            
-            # Get the absolute path to schema.sql
+
             # current_dir = os.path.dirname(os.path.abspath(__file__))
             # schema_path = os.path.join(current_dir, 'schema.sql')
-            
-            # # Read and execute schema.sql
+
             # with open(schema_path, 'r') as schema_file:
             #     schema_script = schema_file.read()
             #     # Split the script into individual statements
@@ -41,8 +36,7 @@ def init_database():
             #                 print(f"Error executing statement: {e}")
             #     conn.commit()
             # print("Cấu trúc cơ sở dữ liệu đã được tạo thành công.")
-            
-            # # Load sample data
+
             # sample_data_path = os.path.join(current_dir, 'sample_data.sql')
             # with open(sample_data_path, 'r') as sample_file:
             #     sample_script = sample_file.read()
@@ -56,22 +50,18 @@ def init_database():
             #                 print(f"Error executing statement: {e}")
             #     conn.commit()
             print("Dữ liệu mẫu đã được chèn thành công.")
-            
-            # Create admin user if it doesn't exist
+
             cursor.execute("SELECT ma_nguoi_dung FROM NGUOIDUNG WHERE ten_dang_nhap = 'admin'")
             admin_exists = cursor.fetchone()
             
             if not admin_exists:
-                # Get admin role id
                 cursor.execute("SELECT ma_quyen FROM PHANQUYEN WHERE ten_quyen = 'administrator'")
                 admin_role = cursor.fetchone()
                 
                 if admin_role:
-                    # Hash the password
                     password = "admin@123"
                     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-                    
-                    # Create admin user
+
                     cursor.execute("""
                         INSERT INTO NGUOIDUNG (ten_dang_nhap, mat_khau, ho_ten, ma_quyen)
                         VALUES (%s, %s, %s, %s)
