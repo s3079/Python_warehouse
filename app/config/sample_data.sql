@@ -5,10 +5,11 @@ INSERT INTO PHANQUYEN (ten_quyen, mo_ta) VALUES
 ('user', 'Chỉ xem'),
 ('manager', 'Quyền quản lý tất cả trừ người dùng');
 
--- Insert users
+-- Insert users with plain text passwords
 INSERT INTO NGUOIDUNG (ten_dang_nhap, mat_khau, ho_ten, ma_quyen) VALUES
-('quanly1', 'admin@123', 'Nguyễn Văn Quản Lý', 2),
-('nguoidung1', 'admin@123', 'Trần Thị Người Dùng', 3);
+('admin', 'admin@123', 'Quản trị viên', 1),
+('quanly1', 'quanly@123', 'Nguyễn Văn Quản Lý', 4),
+('nguoidung1', 'user@123', 'Trần Thị Người Dùng', 3);
 
 -- Insert categories
 INSERT INTO DANHMUC (ten, mo_ta) VALUES
@@ -30,15 +31,15 @@ INSERT INTO SANPHAM (ten, mo_ta, ma_danh_muc, ma_ncc, don_gia) VALUES
 
 -- Insert inventory
 INSERT INTO KHOHANG (ma_san_pham, so_luong, ngay_cap_nhat) VALUES
-(1, 50, '2023-10-01'),
-(2, 20, '2023-10-02'),
-(3, 100, '2023-10-03');
+(1, 50, '2024-01-01'),
+(2, 20, '2024-01-01'),
+(3, 100, '2024-01-01');
 
 -- Insert orders
 INSERT INTO DONHANG (ma_nguoi_dung, ngay_dat, tong_tien) VALUES
-(1, '2023-10-01', 3500000),
-(1, '2023-10-02', 4600000),
-(1, '2023-10-03', 7000000);
+(1, '2024-01-01', 16000000),
+(2, '2024-01-02', 7000000),
+(3, '2024-01-03', 2250000);
 
 -- Insert order details
 INSERT INTO CHITIETDONHANG (ma_don_hang, ma_san_pham, so_luong, don_gia) VALUES

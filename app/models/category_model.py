@@ -1,4 +1,3 @@
-from app.utils.database import Database
 from app.models.base_model import BaseModel
 
 class CategoryModel(BaseModel):

@@ -2,10 +2,6 @@ from app.models.base_model import BaseModel
 
 class UserModel(BaseModel):
     def __init__(self):
-        """
-        + Input: Không có
-        + Output: Khởi tạo đối tượng UserModel với tên bảng "NGUOIDUNG"
-        """
         super().__init__()
         self._table_name = "NGUOIDUNG"
         self._damBaoTruongDuyet()

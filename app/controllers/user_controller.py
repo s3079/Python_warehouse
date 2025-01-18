@@ -75,7 +75,7 @@ class UserController:
             if not nguoi_dung:
                 return False, "Tên đăng nhập hoặc mật khẩu không đúng"
     
-            if not bcrypt.checkpw(mat_khau.encode('utf-8'), nguoi_dung['mat_khau'].encode('utf-8')):
+            if nguoi_dung['mat_khau'] != mat_khau:
                 return False, "Tên đăng nhập hoặc mật khẩu không đúng"
     
             user_data = {k: v for k, v in nguoi_dung.items() if k != 'mat_khau'}
@@ -102,10 +102,8 @@ class UserController:
 
             if self.model.layTheoHoTen(ho_ten):
                 return False, "Họ tên đã tồn tại"
-
-            hashed = bcrypt.hashpw(mat_khau.encode('utf-8'), bcrypt.gensalt())
             
-            self.model.taoNguoiDung(ten_dang_nhap, hashed.decode('utf-8'), ho_ten, la_admin=False)
+            self.model.taoNguoiDung(ten_dang_nhap, mat_khau, ho_ten, la_admin=False)
             
             return True, "Đăng ký thành công! Vui lòng chờ quản trị viên duyệt."
 
@@ -143,12 +141,6 @@ class UserController:
             - Exception khi cập nhật thông tin người dùng thất bại
         """
         try:
-            if 'mat_khau' in data:
-                data['mat_khau'] = bcrypt.hashpw(
-                    data['mat_khau'].encode('utf-8'), 
-                    bcrypt.gensalt()
-                ).decode('utf-8')
-            
             success = self.model.capNhatNguoiDung(ma_nguoi_dung, data)
             if success:
                 return True, "Cập nhật người dùng thành công"

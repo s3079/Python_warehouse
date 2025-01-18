@@ -96,7 +96,7 @@ class CategoriesPage(ctk.CTkFrame):
             width=100,
             height=45,
             corner_radius=8,
-            command=self.hien_thi_bo_loc()
+            command=self.hien_thi_bo_loc
         )
         filter_button.pack(side="left", padx=(0, 10))
         
@@ -456,11 +456,10 @@ class CategoriesPage(ctk.CTkFrame):
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
             return
-        dialog = CenterDialog(self, "Filter Categories", "400x300")
-        
-    
-        self.name_sort = tk.StringVar(value="none")  # none, asc, desc
-        self.desc_sort = tk.StringVar(value="none")  # none, asc, desc
+        dialog = CenterDialog(self, "Lọc danh muc", "400x300")
+
+        self.name_sort = tk.StringVar(value="none")
+        self.desc_sort = tk.StringVar(value="none")
         
       
         content_frame = ctk.CTkFrame(dialog, fg_color="transparent")

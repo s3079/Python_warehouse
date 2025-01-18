@@ -1,6 +1,5 @@
 import mysql.connector
 from mysql.connector import Error
-import bcrypt
 import os
 from app.config.config import Config
 
@@ -20,35 +19,34 @@ def init_database():
 
             cursor.execute(f"USE {Config.DB_NAME}")
 
-            # current_dir = os.path.dirname(os.path.abspath(__file__))
-            # schema_path = os.path.join(current_dir, 'schema.sql')
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            schema_path = os.path.join(current_dir, 'schema.sql')
 
-            # with open(schema_path, 'r') as schema_file:
-            #     schema_script = schema_file.read()
-            #     # Split the script into individual statements
-            #     statements = schema_script.split(';')
+            with open(schema_path, 'r') as schema_file:
+                schema_script = schema_file.read()
+                statements = schema_script.split(';')
             
-            #     for statement in statements:
-            #         if statement.strip():
-            #             try:
-            #                 cursor.execute(statement)
-            #             except Error as e:
-            #                 print(f"Error executing statement: {e}")
-            #     conn.commit()
-            # print("Cấu trúc cơ sở dữ liệu đã được tạo thành công.")
+                for statement in statements:
+                    if statement.strip():
+                        try:
+                            cursor.execute(statement)
+                        except Error as e:
+                            print(f"Error executing statement: {e}")
+                conn.commit()
+            print("Cấu trúc cơ sở dữ liệu đã được tạo thành công.")
 
-            # sample_data_path = os.path.join(current_dir, 'sample_data.sql')
-            # with open(sample_data_path, 'r') as sample_file:
-            #     sample_script = sample_file.read()
-            #     statements = sample_script.split(';')
+            sample_data_path = os.path.join(current_dir, 'sample_data.sql')
+            with open(sample_data_path, 'r') as sample_file:
+                sample_script = sample_file.read()
+                statements = sample_script.split(';')
             
-            #     for statement in statements:
-            #         if statement.strip():
-            #             try:
-            #                 cursor.execute(statement)
-            #             except Error as e:
-            #                 print(f"Error executing statement: {e}")
-            #     conn.commit()
+                for statement in statements:
+                    if statement.strip():
+                        try:
+                            cursor.execute(statement)
+                        except Error as e:
+                            print(f"Error executing statement: {e}")
+                conn.commit()
             print("Dữ liệu mẫu đã được chèn thành công.")
 
             cursor.execute("SELECT ma_nguoi_dung FROM NGUOIDUNG WHERE ten_dang_nhap = 'admin'")
@@ -60,16 +58,12 @@ def init_database():
                 
                 if admin_role:
                     password = "admin@123"
-                    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
                     cursor.execute("""
                         INSERT INTO NGUOIDUNG (ten_dang_nhap, mat_khau, ho_ten, ma_quyen)
                         VALUES (%s, %s, %s, %s)
-                    """, ('admin', hashed_password, 'Quản trị viên', admin_role[0]))
+                    """, ('admin', password, 'Quản trị viên', admin_role[0]))
                     conn.commit()
                     print("Tài khoản quản trị viên đã được tạo thành công.")
-                else:
-                    print("Lỗi: Không tìm thấy vai trò quản trị viên.")
             else:
                 print("Tài khoản quản trị viên đã tồn tại.")
                 

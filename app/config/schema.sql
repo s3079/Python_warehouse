@@ -1,18 +1,15 @@
--- User roles table
 CREATE TABLE IF NOT EXISTS PHANQUYEN (
     ma_quyen INT PRIMARY KEY AUTO_INCREMENT,
     ten_quyen VARCHAR(50) NOT NULL UNIQUE,
     mo_ta TEXT
 );
 
--- Insert default roles
-INSERT INTO USERROLES (role_name, description) VALUES
-('administrator', 'Full access to all system features'),
-('registered_user', 'Wait for approval'),
-('user', 'View only'),
-('manager', 'Rights to manage all except users'); 
+INSERT INTO PHANQUYEN (ten_quyen, mo_ta) VALUES
+('administrator', 'Quyền truy cập đầy đủ vào tất cả tính năng'),
+('registered_user', 'Chờ phê duyệt'),
+('user', 'Chỉ xem'),
+('manager', 'Quyền quản lý tất cả trừ người dùng'); 
 
--- Users table
 CREATE TABLE IF NOT EXISTS NGUOIDUNG (
     ma_nguoi_dung INT PRIMARY KEY AUTO_INCREMENT,
     ten_dang_nhap VARCHAR(50) NOT NULL UNIQUE,
@@ -24,7 +21,6 @@ CREATE TABLE IF NOT EXISTS NGUOIDUNG (
     FOREIGN KEY (ma_quyen) REFERENCES PHANQUYEN(ma_quyen)
 );
 
--- Categories table
 CREATE TABLE IF NOT EXISTS DANHMUC (
     ma_danh_muc INT PRIMARY KEY AUTO_INCREMENT,
     ten VARCHAR(100) NOT NULL UNIQUE,
@@ -33,7 +29,6 @@ CREATE TABLE IF NOT EXISTS DANHMUC (
     ngay_cap_nhat TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Suppliers table
 CREATE TABLE IF NOT EXISTS NHACUNGCAP (
     ma_ncc INT PRIMARY KEY AUTO_INCREMENT,
     ten VARCHAR(100) NOT NULL,
@@ -44,9 +39,7 @@ CREATE TABLE IF NOT EXISTS NHACUNGCAP (
     ngay_cap_nhat TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-
--- Products table
-CREATE TABLE IF NOT EXISTS SANPHAM(
+CREATE TABLE IF NOT EXISTS SANPHAM (
     ma_san_pham INT PRIMARY KEY AUTO_INCREMENT,
     ten VARCHAR(100) NOT NULL,
     mo_ta TEXT,
@@ -59,7 +52,6 @@ CREATE TABLE IF NOT EXISTS SANPHAM(
     FOREIGN KEY (ma_ncc) REFERENCES NHACUNGCAP(ma_ncc)
 );
 
--- Inventory table
 CREATE TABLE IF NOT EXISTS KHOHANG (
     ma_kho INT PRIMARY KEY AUTO_INCREMENT,
     ma_san_pham INT NOT NULL,
@@ -70,7 +62,6 @@ CREATE TABLE IF NOT EXISTS KHOHANG (
     FOREIGN KEY (ma_san_pham) REFERENCES SANPHAM(ma_san_pham)
 );
 
--- Orders table
 CREATE TABLE IF NOT EXISTS DONHANG (
     ma_don_hang INT PRIMARY KEY AUTO_INCREMENT,
     ma_nguoi_dung INT NOT NULL,
@@ -81,7 +72,6 @@ CREATE TABLE IF NOT EXISTS DONHANG (
     FOREIGN KEY (ma_nguoi_dung) REFERENCES NGUOIDUNG(ma_nguoi_dung)
 );
 
--- Order details table
 CREATE TABLE IF NOT EXISTS CHITIETDONHANG (
     ma_chi_tiet INT PRIMARY KEY AUTO_INCREMENT,
     ma_don_hang INT NOT NULL,
