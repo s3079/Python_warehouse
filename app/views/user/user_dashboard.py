@@ -2,11 +2,11 @@ import tkinter as tk
 import customtkinter as ctk
 from pathlib import Path
 from PIL import Image
-from app.views.admin.products_page import ProductsPage
-from app.views.admin.categories_page import CategoriesPage
-from app.views.admin.inventory_page import InventoryPage
-from app.views.admin.supplier_page import SupplierPage
-from app.views.admin.orders_page import OrdersPage
+from app.views.products_page import ProductsPage
+from app.views.categories_page import CategoriesPage
+from app.views.inventory_page import InventoryPage
+from app.views.supplier_page import SupplierPage
+from app.views.orders_page import OrdersPage
 
 class UserDashboard(ctk.CTk):
     def __init__(self, user_data):

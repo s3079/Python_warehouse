@@ -2,7 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from tkcalendar import Calendar
 from datetime import datetime
-from app.views.admin.dialogs.center_dialog import CenterDialog
+from app.views.dialogs.center_dialog import CenterDialog
 
 class InventoryDialog(CenterDialog):
     def __init__(self, parent, ton_kho=None, on_save=None):

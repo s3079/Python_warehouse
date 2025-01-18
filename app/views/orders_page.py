@@ -2,10 +2,10 @@ import customtkinter as ctk
 from PIL import Image
 from pathlib import Path
 from app.controllers.order_controller import OrderController
-from app.views.admin.dialogs.order_dialog import OrderDialog
-from app.views.admin.dialogs.center_dialog import CenterDialog
-from app.views.admin.dialogs.add_order_dialog import AddOrderDialog
-from app.views.admin.dialogs.edit_order_dialog import EditOrderDialog
+from app.views.dialogs.order_dialog import OrderDialog
+from app.views.dialogs.center_dialog import CenterDialog
+from app.views.dialogs.add_order_dialog import AddOrderDialog
+from app.views.dialogs.edit_order_dialog import EditOrderDialog
 
 class OrdersPage(ctk.CTkFrame):
     def __init__(self, parent, controller, user_data, can_edit=True):

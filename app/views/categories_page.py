@@ -2,8 +2,8 @@ import customtkinter as ctk
 from PIL import Image
 from pathlib import Path
 from app.controllers.category_controller import CategoryController
-from app.views.admin.dialogs.category_dialog import CategoryDialog 
-from app.views.admin.dialogs.center_dialog import CenterDialog
+from app.views.dialogs.category_dialog import CategoryDialog
+from app.views.dialogs.center_dialog import CenterDialog
 import math
 import tkinter as tk
 

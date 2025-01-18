@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from app.views.admin.dialogs.center_dialog import CenterDialog
+from app.views.dialogs.center_dialog import CenterDialog
 from tkcalendar import Calendar
 import tkinter as tk
 from datetime import datetime

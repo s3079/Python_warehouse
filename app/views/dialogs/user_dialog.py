@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from app.views.admin.dialogs.center_dialog import CenterDialog
+from app.views.dialogs.center_dialog import CenterDialog
 from app.controllers.user_controller import UserController
 
 class UserDialog(CenterDialog):

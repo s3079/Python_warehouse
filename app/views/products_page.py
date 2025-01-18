@@ -3,10 +3,10 @@ from PIL import Image
 from pathlib import Path
 import tkinter as tk
 from app.controllers.product_controller import ProductController
-from app.views.admin.dialogs.product_dialog import ProductDialog
-from app.views.admin.dialogs.center_dialog import CenterDialog
-from app.views.admin.dialogs.delete_dialog import DeleteDialog
-from app.views.admin.dialogs.filter_dialog import FilterDialog
+from app.views.dialogs.product_dialog import ProductDialog
+from app.views.dialogs.center_dialog import CenterDialog
+from app.views.dialogs.delete_dialog import DeleteDialog
+
 
 class ProductsPage(ctk.CTkFrame):
     def __init__(self, parent, controller, can_edit=True):

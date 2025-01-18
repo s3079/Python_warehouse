@@ -2,7 +2,7 @@ import customtkinter as ctk
 from PIL import Image
 from pathlib import Path
 from app.controllers.inventory_controller import InventoryController
-from app.views.admin.dialogs.inventory_dialog import InventoryDialog
+from app.views.dialogs.inventory_dialog import InventoryDialog
 
 class InventoryPage(ctk.CTkFrame):
     def __init__(self, parent, controller, can_edit=True):
@@ -468,7 +468,7 @@ class InventoryPage(ctk.CTkFrame):
                 from tkinter import messagebox
                 messagebox.showerror("Lỗi", str(e))
         
-        from app.views.admin.dialogs.inventory_dialog import InventoryDialog
+        from app.views.dialogs.inventory_dialog import InventoryDialog
         InventoryDialog(self, inventory, on_save=handle_save)
 
     def delete_inventory(self, inventory):
@@ -486,7 +486,7 @@ class InventoryPage(ctk.CTkFrame):
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
             return
-        from app.views.admin.dialogs.delete_dialog import DeleteDialog
+        from app.views.dialogs.delete_dialog import DeleteDialog
         
         def handle_delete():
             try:

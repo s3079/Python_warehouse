@@ -3,8 +3,8 @@ from PIL import Image
 from pathlib import Path
 import tkinter as tk
 from app.controllers.supplier_controller import SupplierController
-from app.views.admin.dialogs.supplier_dialog import SupplierDialog
-from app.views.admin.dialogs.center_dialog import CenterDialog
+from app.views.dialogs.supplier_dialog import SupplierDialog
+from app.views.dialogs.center_dialog import CenterDialog
 
 class SupplierPage(ctk.CTkFrame):
     def __init__(self, parent, controller, can_edit=True):

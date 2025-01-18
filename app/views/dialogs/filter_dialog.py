@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
-from app.views.admin.dialogs.center_dialog import CenterDialog
+from app.views.dialogs.center_dialog import CenterDialog
 
 class FilterDialog(CenterDialog):
     def __init__(self, parent, on_apply=None):
