@@ -45,16 +45,13 @@ class InventoryPage(ctk.CTkFrame):
             size=(16, 16)
         )
 
-   
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
         
-       
         top_section = ctk.CTkFrame(self, fg_color="transparent")
         top_section.grid(row=0, column=0, sticky="ew", padx=20, pady=(0, 20))
         top_section.grid_columnconfigure(1, weight=1)
         
-       
         search_frame = ctk.CTkFrame(
             top_section,
             fg_color="#F8F9FA",
@@ -64,7 +61,6 @@ class InventoryPage(ctk.CTkFrame):
         )
         search_frame.grid(row=0, column=0, sticky="w")
         
-    
         search_icon_label = ctk.CTkLabel(
             search_frame,
             text="",
@@ -81,14 +77,11 @@ class InventoryPage(ctk.CTkFrame):
             height=35
         )
         self.search_entry.pack(side="left", padx=(0, 15), pady=10)
-        self.search_entry.bind("<Return>", self.on_search)
+        self.search_entry.bind("<Return>", self.timKiem)
         
-       
         buttons_frame = ctk.CTkFrame(top_section, fg_color="transparent")
         buttons_frame.grid(row=0, column=1, sticky="e")
         
-        
-    
         new_inventory_button = ctk.CTkButton(
             buttons_frame,
             text="Thêm",
@@ -100,11 +93,10 @@ class InventoryPage(ctk.CTkFrame):
             width=140,
             height=45,
             corner_radius=8,
-            command=self.show_add_dialog
+            command=self.hienThiFormThem
         )
         new_inventory_button.pack(side="left")
         
-     
         table_container = ctk.CTkFrame(
             self,
             fg_color="white",
@@ -116,14 +108,12 @@ class InventoryPage(ctk.CTkFrame):
         table_container.grid_columnconfigure(0, weight=1)
         table_container.grid_rowconfigure(0, weight=1)
 
-        
         self.table_frame = ctk.CTkScrollableFrame(
             table_container,
             fg_color="transparent"
         )
         self.table_frame.grid(row=0, column=0, sticky="nsew", padx=1, pady=1)
         
-       
         self.columns = [
             {"name": "Tên sản phẩm", "key": "ten_san_pham", "width": 200},
             {"name": "Số lượng", "key": "so_luong", "width": 100},
@@ -131,7 +121,6 @@ class InventoryPage(ctk.CTkFrame):
             {"name": "Thao tác", "key": "actions", "width": 120}
         ]
         
-       
         header_frame = ctk.CTkFrame(
             self.table_frame,
             fg_color="#F8F9FA",
@@ -140,7 +129,6 @@ class InventoryPage(ctk.CTkFrame):
         header_frame.pack(fill="x", expand=True)
         header_frame.pack_propagate(False)
         
-      
         for i, col in enumerate(self.columns):
             label = ctk.CTkLabel(
                 header_frame,
@@ -151,7 +139,6 @@ class InventoryPage(ctk.CTkFrame):
                 width=col["width"]
             )
             label.grid(row=0, column=i, padx=(20 if i == 0 else 10, 10), pady=15, sticky="w")
-            
 
         self.content_frame = ctk.CTkFrame(
             self.table_frame,
@@ -159,31 +146,14 @@ class InventoryPage(ctk.CTkFrame):
         )
         self.content_frame.pack(fill="both", expand=True)
         
-        self.load_inventory()
+        self.taiDuLieuKhoHang()
     
-    def on_search(self, event=None):
-        """
-        + Input:
-            - event: Sự kiện tìm kiếm (tùy chọn)
-        + Output: Không có
-        + Side effects:
-            - Cập nhật từ khóa tìm kiếm
-            - Reset về trang đầu tiên
-            - Tải lại danh sách kho hàng theo điều kiện tìm kiếm mới
-        """
+    def timKiem(self, event=None):
         self.search_query = self.search_entry.get().strip()
         self.current_page = 1
-        self.load_inventory()
+        self.taiDuLieuKhoHang()
 
-    def load_inventory(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Xóa nội dung bảng hiện tại
-            - Tải và hiển thị danh sách kho hàng mới
-            - Cập nhật điều khiển phân trang
-        """
+    def taiDuLieuKhoHang(self):
         for widget in self.content_frame.winfo_children():
             widget.destroy()
             
@@ -197,7 +167,6 @@ class InventoryPage(ctk.CTkFrame):
         
         self.total_items = total_count
         total_pages = -(-total_count // self.items_per_page) 
-        
 
         self.content_frame.grid_columnconfigure(tuple(range(len(self.columns))), weight=1)
         
@@ -210,7 +179,7 @@ class InventoryPage(ctk.CTkFrame):
             row_frame.pack(fill="x")
             
             for j, col in enumerate(self.columns):
-                self.create_row(row_frame, item, col, j)
+                self.taoHangDuLieu(row_frame, item, col, j)
             
             separator = ctk.CTkFrame(
                 self.content_frame,
@@ -219,18 +188,9 @@ class InventoryPage(ctk.CTkFrame):
             )
             separator.pack(fill="x")
     
-        self.create_pagination_controls(total_pages)
+        self.taoNutPhanTrang(total_pages)
 
-    def create_pagination_controls(self, total_pages):
-        """
-        + Input:
-            - total_pages: Tổng số trang
-        + Output: Không có
-        + Side effects:
-            - Tạo hoặc cập nhật điều khiển phân trang
-            - Hiển thị thông tin số lượng bản ghi
-            - Tạo các nút điều hướng trang
-        """
+    def taoNutPhanTrang(self, total_pages):
         if hasattr(self, 'pagination_frame'):
             for widget in self.pagination_frame.winfo_children():
                 widget.destroy()
@@ -267,7 +227,7 @@ class InventoryPage(ctk.CTkFrame):
             fg_color="#F8F9FA" if self.current_page > 1 else "#E9ECEF",
             text_color="#16151C",
             hover_color="#E8E9EA",
-            command=self.previous_page if self.current_page > 1 else None
+            command=self.trangTruoc if self.current_page > 1 else None
         )
         prev_button.pack(side="left", padx=(0, 5))
         
@@ -286,7 +246,7 @@ class InventoryPage(ctk.CTkFrame):
                 fg_color="#006EC4" if is_current else "#F8F9FA",
                 text_color="white" if is_current else "#16151C",
                 hover_color="#0059A1" if is_current else "#E8E9EA",
-                command=lambda p=page: self.go_to_page(p)
+                command=lambda p=page: self.denTrang(p)
             )
             page_button.pack(side="left", padx=2)
         
@@ -299,93 +259,41 @@ class InventoryPage(ctk.CTkFrame):
             fg_color="#F8F9FA" if self.current_page < total_pages else "#E9ECEF",
             text_color="#16151C",
             hover_color="#E8E9EA",
-            command=self.next_page if self.current_page < total_pages else None
+            command=self.trangTiepTheo if self.current_page < total_pages else None
         )
         next_button.pack(side="left", padx=(5, 0))
 
-    def previous_page(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Giảm số trang hiện tại
-            - Tải lại danh sách kho hàng với trang mới
-        """
+    def trangTruoc(self):
         if self.current_page > 1:
             self.current_page -= 1
-            self.load_inventory()
+            self.taiDuLieuKhoHang()
 
-    def next_page(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Tăng số trang hiện tại
-            - Tải lại danh sách kho hàng với trang mới
-        """
+    def trangTiepTheo(self):
         self.current_page += 1
-        self.load_inventory()
+        self.taiDuLieuKhoHang()
 
-    def go_to_page(self, page):
-        """
-        + Input:
-            - page: Số trang cần chuyển đến
-        + Output: Không có
-        + Side effects:
-            - Cập nhật số trang hiện tại
-            - Tải lại danh sách kho hàng với trang mới
-        """
+    def denTrang(self, page):
         self.current_page = page
-        self.load_inventory()
+        self.taiDuLieuKhoHang()
 
-    def show_add_dialog(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Hiển thị thông báo nếu không có quyền
-            - Mở dialog thêm kho hàng nếu có quyền
-        """
+    def hienThiFormThem(self):
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
             return
-        InventoryDialog(self, on_save=self.add_inventory_item)
+        InventoryDialog(self, on_save=self.themKhoHang)
 
-    def add_inventory_item(self, data):
-        """
-        + Input:
-            - data: Từ điển chứa thông tin kho hàng mới
-        + Output: Không có
-        + Side effects:
-            - Thêm kho hàng mới vào database
-            - Tải lại danh sách kho hàng nếu thành công
-            - In thông báo lỗi nếu thất bại
-        """
+    def themKhoHang(self, data):
         success, message = self.controller.themKhoHang(data)
         if success:
-            self.load_inventory()
+            self.taiDuLieuKhoHang()
         else:
             print(message)
 
-    def show_filter_dialog(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects: Hiển thị dialog tùy chọn lọc
-        """
+    def hienThiFormLoc(self):
+        pass
 
-    def create_row(self, row_frame, item, col, j):
-        """
-        + Input:
-            - row_frame: Frame chứa dòng dữ liệu
-            - item: Từ điển chứa thông tin kho hàng
-            - col: Từ điển chứa thông tin cột
-            - j: Chỉ số cột
-        + Output: Không có
-        + Side effects: Tạo và hiển thị các ô dữ liệu trong dòng
-        """
+    def taoHangDuLieu(self, row_frame, item, col, j):
         if col["key"] == "actions":
             actions_frame = ctk.CTkFrame(row_frame, fg_color="transparent")
             actions_frame.grid(row=0, column=j, padx=10, pady=10, sticky="w")
@@ -399,11 +307,10 @@ class InventoryPage(ctk.CTkFrame):
                 fg_color="#006EC4",
                 text_color="white",
                 hover_color="#0059A1",
-                command=lambda: self.edit_inventory(item)
+                command=lambda: self.suaKhoHang(item)
             )
             edit_button.pack(side="left", padx=(0, 5))
             
-    
             delete_button = ctk.CTkButton(
                 actions_frame,
                 text="",
@@ -413,7 +320,7 @@ class InventoryPage(ctk.CTkFrame):
                 fg_color="#e03137",
                 text_color="white",
                 hover_color="#b32429",
-                command=lambda: self.delete_inventory(item)
+                command=lambda: self.xoaKhoHang(item)
             )
             delete_button.pack(side="left")
         elif col["key"] == "ngay_nhap_cuoi":
@@ -441,26 +348,17 @@ class InventoryPage(ctk.CTkFrame):
             )
             label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
 
-    def edit_inventory(self, inventory):
-        """
-        + Input:
-            - inventory: Từ điển chứa thông tin kho hàng cần sửa
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Hiển thị thông báo nếu không có quyền
-            - Mở dialog sửa kho hàng nếu có quyền
-        """
+    def suaKhoHang(self, inventory):
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
             return
-        def handle_save(data):
+        def xuLyLuu(data):
             try:
                 print("data--", data)
                 success = self.controller.capNhatKhoHang(data)
                 if success:
-                    self.load_inventory() 
+                    self.taiDuLieuKhoHang() 
                 else:
                     from tkinter import messagebox
                     messagebox.showerror("Lỗi", "Cập nhật kho hàng thất bại")
@@ -469,30 +367,20 @@ class InventoryPage(ctk.CTkFrame):
                 messagebox.showerror("Lỗi", str(e))
         
         from app.views.dialogs.inventory_dialog import InventoryDialog
-        InventoryDialog(self, inventory, on_save=handle_save)
+        InventoryDialog(self, inventory, on_save=xuLyLuu)
 
-    def delete_inventory(self, inventory):
-        """
-        + Input:
-            - inventory: Từ điển chứa thông tin kho hàng cần xóa
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Hiển thị thông báo nếu không có quyền
-            - Mở dialog xác nhận xóa nếu có quyền
-            - Xóa kho hàng và tải lại danh sách nếu người dùng xác nhận
-        """
+    def xoaKhoHang(self, inventory):
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
             return
         from app.views.dialogs.delete_dialog import DeleteDialog
         
-        def handle_delete():
+        def xuLyXoa():
             try:
                 success = self.controller.xoaKhoHang(inventory["ma_kho"])
                 if success:
-                    self.load_inventory()
+                    self.taiDuLieuKhoHang()
                 else:
                     from tkinter import messagebox
                     messagebox.showerror("Lỗi", "Xóa kho hàng thất bại")
@@ -503,5 +391,5 @@ class InventoryPage(ctk.CTkFrame):
         DeleteDialog(
             self,
             f"kho hàng của sản phẩm '{inventory['ten_san_pham']}'",
-            on_confirm=handle_delete
+            on_confirm=xuLyXoa
         )

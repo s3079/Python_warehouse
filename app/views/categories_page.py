@@ -96,7 +96,7 @@ class CategoriesPage(ctk.CTkFrame):
             width=100,
             height=45,
             corner_radius=8,
-            command=self.show_filter_dialog
+            command=self.hien_thi_bo_loc()
         )
         filter_button.pack(side="left", padx=(0, 10))
         
@@ -167,15 +167,6 @@ class CategoriesPage(ctk.CTkFrame):
         self.tai_danh_muc()
     
     def khi_tim_kiem(self, event=None):
-        """
-        + Input:
-            - event: Sự kiện tìm kiếm (tùy chọn)
-        + Output: Không có
-        + Side effects:
-            - Cập nhật từ khóa tìm kiếm từ ô nhập liệu
-            - Reset về trang đầu tiên
-            - Tải lại danh sách danh mục theo từ khóa mới
-        """
         self.tu_khoa_tim = self.search_entry.get().strip()
         self.trang_hien_tai = 1
         self.tai_danh_muc()
@@ -264,18 +255,6 @@ class CategoriesPage(ctk.CTkFrame):
             print(f"Error loading categories: {e}")
 
     def tao_dieu_khien_phan_trang(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Xóa điều khiển phân trang cũ nếu có
-            - Tạo khung điều khiển phân trang mới
-            - Hiển thị thông tin số lượng bản ghi (ví dụ: "Hiển thị 1-10 trong 50 danh mục")
-            - Tạo nút Previous nếu không phải trang đầu
-            - Tạo các nút số trang (tối đa 5 nút)
-            - Tạo nút Next nếu không phải trang cuối
-            - Cập nhật trạng thái active/inactive của các nút
-        """
         if hasattr(self, 'pagination_frame'):
             for widget in self.pagination_frame.winfo_children():
                 widget.destroy()
@@ -350,49 +329,19 @@ class CategoriesPage(ctk.CTkFrame):
         next_button.pack(side="left", padx=(5, 0))
 
     def trang_truoc(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Giảm số trang hiện tại nếu > 1
-            - Tải lại danh sách danh mục với trang mới
-        """
         if self.trang_hien_tai > 1:
             self.trang_hien_tai -= 1
             self.tai_danh_muc()
 
     def trang_sau(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Tăng số trang hiện tại
-            - Tải lại danh sách danh mục với trang mới
-        """
         self.trang_hien_tai += 1
         self.tai_danh_muc()
 
     def den_trang(self, trang):
-        """
-        + Input:
-            - trang: Số trang cần chuyển đến
-        + Output: Không có
-        + Side effects:
-            - Cập nhật số trang hiện tại
-            - Tải lại danh sách danh mục với trang mới
-        """
         self.trang_hien_tai = trang
         self.tai_danh_muc()
 
     def hien_thi_them_moi(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Hiển thị thông báo nếu không có quyền
-            - Mở dialog thêm danh mục mới nếu có quyền
-        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -403,15 +352,6 @@ class CategoriesPage(ctk.CTkFrame):
         )
 
     def hien_thi_chinh_sua(self, danh_muc):
-        """
-        + Input:
-            - danh_muc: Từ điển chứa thông tin danh mục cần sửa
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Hiển thị thông báo nếu không có quyền
-            - Mở dialog sửa danh mục nếu có quyền
-        """
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -485,19 +425,6 @@ class CategoriesPage(ctk.CTkFrame):
         delete_button.pack(side="left")
 
     def xac_nhan_xoa(self, dialog, danh_muc):
-        """
-        + Input:
-            - dialog: Dialog xác nhận đang hiển thị
-            - danh_muc: Từ điển chứa thông tin danh mục cần xóa
-        + Output: Không có
-        + Side effects:
-            - Xóa danh mục khỏi database
-            - Đóng dialog xác nhận
-            - Tải lại danh sách danh mục
-            - Hiển thị thông báo lỗi nếu thất bại
-        + Raises:
-            - Exception khi xóa danh mục thất bại
-        """
         try:
             self.controller.xoa(danh_muc["ma_danh_muc"])
             dialog.destroy()
@@ -507,20 +434,6 @@ class CategoriesPage(ctk.CTkFrame):
             messagebox.showerror("Lỗi", f"Không thể xóa danh mục: {str(e)}")
 
     def luu_danh_muc(self, du_lieu_danh_muc):
-        """
-        + Input:
-            - du_lieu_danh_muc: Từ điển chứa thông tin danh mục cần lưu:
-                + ma_danh_muc: Mã danh mục (nếu là cập nhật)
-                + ten: Tên danh mục
-                + mo_ta: Mô tả danh mục
-        + Output: Không có
-        + Side effects:
-            - Thêm mới hoặc cập nhật danh mục trong database
-            - Tải lại danh sách danh mục
-            - Hiển thị thông báo lỗi nếu thất bại
-        + Raises:
-            - Exception khi lưu danh mục thất bại
-        """
         try:
             if "ma_danh_muc" in du_lieu_danh_muc:
                 self.controller.capNhat(
@@ -538,17 +451,7 @@ class CategoriesPage(ctk.CTkFrame):
             from tkinter import messagebox
             messagebox.showerror("Lỗi", f"Không thể lưu danh mục: {str(e)}")
 
-    def show_filter_dialog(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Hiển thị thông báo nếu không có quyền
-            - Mở dialog lọc với các tùy chọn:
-                + Sắp xếp theo tên (A-Z, Z-A)
-                + Sắp xếp theo mô tả
-        """
+    def hien_thi_bo_loc(self):
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
@@ -683,22 +586,11 @@ class CategoriesPage(ctk.CTkFrame):
             width=100,
             height=40,
             corner_radius=8,
-            command=lambda: self.apply_filters(dialog)
+            command=lambda: self.ap_dung_bo_loc(dialog)
         )
         apply_button.pack(side="left")
 
-    def apply_filters(self, dialog):
-        """
-        + Input:
-            - dialog: Dialog lọc đang hiển thị
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Đóng dialog lọc
-            - Reset về trang đầu tiên
-            - Cập nhật các giá trị lọc
-            - Tải lại danh sách danh mục theo điều kiện lọc mới
-        """
+    def ap_dung_bo_loc(self, dialog):
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")

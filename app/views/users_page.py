@@ -130,30 +130,12 @@ class UsersPage(ctk.CTkFrame):
         self.tai_danh_sach_nguoi_dung()
     
     def tim_kiem(self, event=None):
-        """
-        + Input:
-            - event: Sự kiện tìm kiếm (tùy chọn)
-        + Output: Không có
-        + Side effects:
-            - Cập nhật từ khóa tìm kiếm từ ô nhập liệu
-            - Reset về trang đầu tiên
-            - Tải lại danh sách người dùng theo từ khóa mới
-        """
         self.search_query = self.search_entry.get().strip()
         self.current_page = 1 
         self.tai_danh_sach_nguoi_dung()
 
     def tai_danh_sach_nguoi_dung(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Xóa nội dung bảng hiện tại
-            - Tải và hiển thị danh sách người dùng mới
-            - Tạo các nút thao tác (Duyệt/Từ chối) cho người dùng chưa duyệt
-            - Tạo đường phân cách giữa các dòng
-            - Cập nhật điều khiển phân trang
-        """
+
         for widget in self.content_frame.winfo_children():
             widget.destroy()
             
@@ -183,7 +165,6 @@ class UsersPage(ctk.CTkFrame):
                     if user['ten_quyen'].lower() == 'administrator':
                         continue
 
-                    # Create actions frame
                     actions_frame = ctk.CTkFrame(
                         row_frame,
                         fg_color="transparent"
@@ -259,18 +240,6 @@ class UsersPage(ctk.CTkFrame):
         self.tao_dieu_khien_phan_trang(total_pages)
 
     def tao_dieu_khien_phan_trang(self, total_pages):
-        """
-        + Input:
-            - total_pages: Tổng số trang
-        + Output: Không có
-        + Side effects:
-            - Xóa điều khiển phân trang cũ nếu có
-            - Tạo khung điều khiển phân trang mới
-            - Hiển thị thông tin số lượng bản ghi (VD: "Hiển thị 1-10 trong 50 người dùng")
-            - Tạo nút Previous (mờ đi nếu ở trang đầu)
-            - Tạo các nút số trang (tối đa 5 nút)
-            - Tạo nút Next (mờ đi nếu ở trang cuối)
-        """
         if hasattr(self, 'pagination_frame'):
             for widget in self.pagination_frame.winfo_children():
                 widget.destroy()
@@ -344,61 +313,23 @@ class UsersPage(ctk.CTkFrame):
         next_button.pack(side="left", padx=(5, 0))
 
     def trang_truoc(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Giảm số trang hiện tại nếu > 1
-            - Tải lại danh sách người dùng với trang mới
-        """
         if self.current_page > 1:
             self.current_page -= 1
             self.tai_danh_sach_nguoi_dung()
 
     def trang_sau(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Tăng số trang hiện tại
-            - Tải lại danh sách người dùng với trang mới
-        """
         self.current_page += 1
         self.tai_danh_sach_nguoi_dung()
 
     def den_trang(self, page):
-        """
-        + Input:
-            - page: Số trang cần chuyển đến
-        + Output: Không có
-        + Side effects:
-            - Cập nhật số trang hiện tại
-            - Tải lại danh sách người dùng với trang mới
-        """
         self.current_page = page
         self.tai_danh_sach_nguoi_dung()
 
     def duyet_nguoi_dung(self, user):
-        """
-        + Input:
-            - user: Từ điển chứa thông tin người dùng cần duyệt
-        + Output: Không có
-        + Side effects:
-            - Gọi API duyệt người dùng
-            - Tải lại danh sách người dùng nếu thành công
-        """
         if self.controller.duyetNguoiDung(user["ma_nguoi_dung"]):
             self.tai_danh_sach_nguoi_dung()
 
     def tu_choi_nguoi_dung(self, user):
-        """
-        + Input:
-            - user: Từ điển chứa thông tin người dùng cần từ chối
-        + Output: Không có
-        + Side effects:
-            - Gọi API từ chối người dùng
-            - Tải lại danh sách người dùng nếu thành công
-        """
         if self.controller.tuChoiNguoiDung(user["ma_nguoi_dung"]):
             self.tai_danh_sach_nguoi_dung()
 
@@ -406,16 +337,6 @@ class UsersPage(ctk.CTkFrame):
         print("Đã mở hộp thoại lọc")
 
     def dat_vai_tro(self, user):
-        """
-        + Input:
-            - user: Từ điển chứa thông tin người dùng cần đặt vai trò
-        + Output: Không có
-        + Side effects:
-            - Mở dialog đặt vai trò với:
-                + Hiển thị vai trò hiện tại
-                + Radio buttons cho các vai trò (Người dùng/Quản lý)
-                + Nút xác nhận thay đổi
-        """
         dialog = ctk.CTkToplevel(self)
         dialog.title("Đặt vai trò")
         dialog.geometry("300x200")
@@ -446,18 +367,6 @@ class UsersPage(ctk.CTkFrame):
         confirm_button.pack(pady=10)
 
     def xac_nhan_thay_doi_vai_tro(self, user, new_role, dialog):
-        """
-        + Input:
-            - user: Từ điển chứa thông tin người dùng
-            - new_role: Vai trò mới ("user" hoặc "manager")
-            - dialog: Dialog đang hiển thị
-        + Output: Không có
-        + Side effects:
-            - Gọi API đặt vai trò mới
-            - Đóng dialog nếu thành công
-            - Tải lại danh sách người dùng
-            - Hiển thị thông báo kết quả
-        """
         if self.controller.datVaiTroNguoiDung(user["ma_nguoi_dung"], new_role):
             self.tai_danh_sach_nguoi_dung()
             dialog.destroy()
@@ -466,24 +375,12 @@ class UsersPage(ctk.CTkFrame):
             tk.messagebox.showerror("Lỗi", "Không thể cập nhật vai trò người dùng.")
 
     def xoa_nguoi_dung(self, user):
-        """
-        + Input:
-            - user: Từ điển chứa thông tin người dùng cần xóa
-        + Output: Không có
-        + Side effects:
-            - Mở dialog xác nhận xóa với:
-                + Thông báo xác nhận có tên người dùng
-                + Cảnh báo không thể hoàn tác
-                + Nút Hủy và Xóa
-        """
-        # Create confirmation dialog
         dialog = ctk.CTkToplevel(self)
         dialog.title("Xác nhận xóa")
         dialog.geometry("400x200")
         dialog.transient(self)
         dialog.grab_set()
         
-        # Center the dialog on screen
         dialog.update_idletasks()
         width = dialog.winfo_width()
         height = dialog.winfo_height()
@@ -491,7 +388,6 @@ class UsersPage(ctk.CTkFrame):
         y = (dialog.winfo_screenheight() // 2) - (height // 2)
         dialog.geometry(f'{width}x{height}+{x}+{y}')
         
-        # Message
         message = ctk.CTkLabel(
             dialog,
             text=f"Bạn có chắc chắn muốn xóa người dùng '{user['ho_ten']}'?\nHành động này không thể hoàn tác.",
@@ -499,17 +395,15 @@ class UsersPage(ctk.CTkFrame):
         )
         message.pack(pady=(20, 0))
         
-        # Buttons frame
         buttons_frame = ctk.CTkFrame(dialog, fg_color="transparent", height=60)
         buttons_frame.pack(fill="x", padx=20, pady=(20, 20))
         buttons_frame.pack_propagate(False)
         
-        # Container for right-aligned buttons
         button_container = ctk.CTkFrame(buttons_frame, fg_color="transparent")
         button_container.pack(side="right")
         button_containerC = ctk.CTkFrame(buttons_frame, fg_color="transparent")
         button_containerC.pack(side="left")
-        # Cancel button
+        
         cancel_button = ctk.CTkButton(
             button_containerC,
             text="Hủy",
@@ -523,7 +417,6 @@ class UsersPage(ctk.CTkFrame):
         )
         cancel_button.pack(side="left", padx=(0, 10))
         
-        # Delete button
         delete_button = ctk.CTkButton(
             button_container,
             text="Xóa",
@@ -538,17 +431,6 @@ class UsersPage(ctk.CTkFrame):
         delete_button.pack(side="left")
 
     def xac_nhan_xoa_nguoi_dung(self, dialog, user):
-        """
-        + Input:
-            - dialog: Dialog xác nhận đang hiển thị
-            - user: Từ điển chứa thông tin người dùng cần xóa
-        + Output: Không có
-        + Side effects:
-            - Gọi API xóa người dùng
-            - Đóng dialog
-            - Tải lại danh sách người dùng nếu thành công
-            - Hiển thị thông báo kết quả
-        """
         # Confirm and execute user deletion
         success, message = self.controller.xoaNguoiDung(user["ma_nguoi_dung"])
         if success:

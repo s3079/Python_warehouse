@@ -80,7 +80,7 @@ class ProductsPage(ctk.CTkFrame):
             height=35
         )
         self.search_entry.pack(side="left", padx=(0, 15), pady=10)
-        self.search_entry.bind("<Return>", self.on_search)
+        self.search_entry.bind("<Return>", self.tim_kiem)
         
         buttons_frame = ctk.CTkFrame(top_section, fg_color="transparent")
         buttons_frame.grid(row=0, column=1, sticky="e")
@@ -96,7 +96,7 @@ class ProductsPage(ctk.CTkFrame):
             width=100,
             height=45,
             corner_radius=8,
-            command=self.show_filter_dialog
+            command=self.hien_thi_loc_san_pham
         )
         filter_button.pack(side="left", padx=(0, 10))
         
@@ -111,7 +111,7 @@ class ProductsPage(ctk.CTkFrame):
             width=140,
             height=45,
             corner_radius=8,
-            command=self.show_add_dialog
+            command=self.hien_thi_them_san_pham
         )
         new_product_button.pack(side="left")
         
@@ -166,25 +166,14 @@ class ProductsPage(ctk.CTkFrame):
         )
         self.content_frame.pack(fill="both", expand=True)
         
-        self.load_products()
+        self.tai_san_pham()
     
-    def on_search(self, event=None):
+    def tim_kiem(self, event=None):
         self.search_query = self.search_entry.get().strip()
         self.current_page = 1
-        self.load_products()
+        self.tai_san_pham()
 
-    def load_products(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Xóa nội dung bảng hiện tại
-            - Tải và hiển thị danh sách sản phẩm mới
-            - Định dạng hiển thị giá tiền (VD: 100,000 ₫)
-            - Cắt ngắn nội dung dài và thêm tooltip
-            - Tạo đường phân cách giữa các dòng
-            - Cập nhật điều khiển phân trang
-        """
+    def tai_san_pham(self):
         for widget in self.content_frame.winfo_children():
             widget.destroy()
             
@@ -228,7 +217,7 @@ class ProductsPage(ctk.CTkFrame):
                         fg_color="#006EC4",
                         text_color="white",
                         hover_color="#0059A1",
-                        command=lambda p=product: self.show_edit_dialog(p)
+                        command=lambda p=product: self.hien_thi_sua_san_pham(p)
                     )
                     edit_btn.pack(side="left", padx=(0, 5))
                     
@@ -241,7 +230,7 @@ class ProductsPage(ctk.CTkFrame):
                         fg_color="#e03137",
                         text_color="white",
                         hover_color="#b32429",
-                        command=lambda p=product: self.delete_product(p)
+                        command=lambda p=product: self.xoa_san_pham(p)
                     )
                     delete_btn.pack(side="left")
                     
@@ -272,7 +261,7 @@ class ProductsPage(ctk.CTkFrame):
                     label.grid(row=0, column=j, padx=(20 if j == 0 else 10, 10), pady=10, sticky="w")
                     
                     if len(value) != len(full_text):
-                        self.create_tooltip(label, full_text)
+                        self.tao_goi_y(label, full_text)
             
             separator = ctk.CTkFrame(
                 self.content_frame,
@@ -281,21 +270,9 @@ class ProductsPage(ctk.CTkFrame):
             )
             separator.pack(fill="x")
 
-        self.create_pagination_controls(total_pages)
+        self.tao_dieu_khien_phan_trang(total_pages)
 
-    def create_pagination_controls(self, total_pages):
-        """
-        + Input:
-            - total_pages: Tổng số trang
-        + Output: Không có
-        + Side effects:
-            - Xóa điều khiển phân trang cũ nếu có
-            - Tạo khung điều khiển phân trang mới
-            - Hiển thị thông tin số lượng bản ghi (VD: "Hiển thị 1-10 của 50 sản phẩm")
-            - Tạo nút Previous (mờ đi nếu ở trang đầu)
-            - Tạo các nút số trang (tối đa 5 nút)
-            - Tạo nút Next (mờ đi nếu ở trang cuối)
-        """
+    def tao_dieu_khien_phan_trang(self, total_pages):
         if hasattr(self, 'pagination_frame'):
             for widget in self.pagination_frame.winfo_children():
                 widget.destroy()
@@ -332,7 +309,7 @@ class ProductsPage(ctk.CTkFrame):
             fg_color="#F8F9FA" if self.current_page > 1 else "#E9ECEF",
             text_color="#16151C",
             hover_color="#E8E9EA",
-            command=self.previous_page if self.current_page > 1 else None
+            command=self.trang_truoc if self.current_page > 1 else None
         )
         prev_button.pack(side="left", padx=(0, 5))
         
@@ -351,7 +328,7 @@ class ProductsPage(ctk.CTkFrame):
                 fg_color="#006EC4" if is_current else "#F8F9FA",
                 text_color="white" if is_current else "#16151C",
                 hover_color="#0059A1" if is_current else "#E8E9EA",
-                command=lambda p=page: self.go_to_page(p)
+                command=lambda p=page: self.den_trang(p)
             )
             page_button.pack(side="left", padx=2)
         
@@ -364,82 +341,39 @@ class ProductsPage(ctk.CTkFrame):
             fg_color="#F8F9FA" if self.current_page < total_pages else "#E9ECEF",
             text_color="#16151C",
             hover_color="#E8E9EA",
-            command=self.next_page if self.current_page < total_pages else None
+            command=self.trang_sau if self.current_page < total_pages else None
         )
         next_button.pack(side="left", padx=(5, 0))
 
-    def previous_page(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Giảm số trang hiện tại nếu > 1
-            - Tải lại danh sách sản phẩm với trang mới
-        """
+    def trang_truoc(self):
         if self.current_page > 1:
             self.current_page -= 1
-            self.load_products()
+            self.tai_san_pham()
 
-    def next_page(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Tăng số trang hiện tại
-            - Tải lại danh sách sản phẩm với trang mới
-        """
+    def trang_sau(self):
         self.current_page += 1
-        self.load_products()
+        self.tai_san_pham()
 
-    def go_to_page(self, page):
-        """
-        + Input:
-            - page: Số trang cần chuyển đến
-        + Output: Không có
-        + Side effects:
-            - Cập nhật số trang hiện tại
-            - Tải lại danh sách sản phẩm với trang mới
-        """
+    def den_trang(self, page):
         self.current_page = page
-        self.load_products()
+        self.tai_san_pham()
 
-    def show_add_dialog(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Hiển thị thông báo nếu không có quyền
-            - Mở dialog thêm sản phẩm mới nếu có quyền
-        """
+    def hien_thi_them_san_pham(self):
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
             return
-        """Show dialog to add a new product"""
         dialog = ProductDialog(
             self,
-            on_save=self.save_product
+            on_save=self.luu_san_pham
         )
 
-    def show_edit_dialog(self, product):
-        """
-        + Input:
-            - product: Từ điển chứa thông tin sản phẩm cần sửa
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Hiển thị thông báo nếu không có quyền
-            - Mở dialog sửa sản phẩm nếu có quyền
-            - Điền sẵn thông tin sản phẩm vào form
-        """
+    def hien_thi_sua_san_pham(self, product):
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
             return
         print("product", product)
-        """Show dialog to edit a product"""
-        # Create product data dictionary with the required format
         product_data = {
             "ma_san_pham": product["ma_san_pham"],
             "ten": product["ten"],
@@ -452,30 +386,19 @@ class ProductsPage(ctk.CTkFrame):
         dialog = ProductDialog(
             self,
             product=product_data,
-            on_save=self.save_product,
+            on_save=self.luu_san_pham,
         )
 
-    def delete_product(self, product):
-        """
-        + Input:
-            - product: Từ điển chứa thông tin sản phẩm cần xóa
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra quyền chỉnh sửa
-            - Hiển thị thông báo nếu không có quyền
-            - Mở dialog xác nhận xóa nếu có quyền
-            - Xóa sản phẩm và tải lại danh sách nếu người dùng xác nhận
-        """
+    def xoa_san_pham(self, product):
         if not self.can_edit:
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
             return
-        """Show confirmation dialog and delete product"""
         def handle_delete():
             try:
                 success, message = self.controller.xoaSanPham(product["ma_san_pham"])
                 if success:
-                    self.load_products()
+                    self.tai_san_pham()
                 else:
                     from tkinter import messagebox
                     messagebox.showerror("Lỗi", message)
@@ -489,17 +412,7 @@ class ProductsPage(ctk.CTkFrame):
             on_confirm=handle_delete
         )
 
-    def show_filter_dialog(self):
-        """
-        + Input: Không có
-        + Output: Không có
-        + Side effects:
-            - Mở dialog lọc với các tùy chọn:
-                + Sắp xếp tên sản phẩm (A-Z, Z-A)
-                + Sắp xếp giá (Thấp đến cao, Cao đến thấp)
-            - Tạo các nút radio cho mỗi tùy chọn
-            - Tạo nút Hủy và Áp dụng
-        """
+    def hien_thi_loc_san_pham(self):
         dialog = CenterDialog(self, "Lọc Sản Phẩm", "400x300")
         
         self.name_sort = tk.StringVar(value="none")
@@ -622,47 +535,18 @@ class ProductsPage(ctk.CTkFrame):
             width=100,
             height=40,
             corner_radius=8,
-            command=lambda: self.apply_filters(dialog)
+            command=lambda: self.ap_dung_loc(dialog)
         )
         apply_button.pack(side="left")
 
-    def apply_filters(self, dialog):
-        """
-        + Input:
-            - dialog: Dialog lọc đang hiển thị
-        + Output: Không có
-        + Side effects:
-            - Đóng dialog lọc
-            - Reset về trang đầu tiên
-            - Cập nhật các giá trị lọc
-            - Tải lại danh sách sản phẩm theo điều kiện lọc mới
-        """
+    def ap_dung_loc(self, dialog):
         dialog.destroy()
         self.current_page = 1
         self.name_sort_value = self.name_sort.get()
         self.price_sort_value = self.price_sort.get()
-        self.load_products()
+        self.tai_san_pham()
 
-    def save_product(self, data):
-        """
-        + Input:
-            - data: Từ điển chứa thông tin sản phẩm cần lưu:
-                + ma_san_pham: Mã sản phẩm (nếu là cập nhật)
-                + ten: Tên sản phẩm
-                + mo_ta: Mô tả sản phẩm
-                + don_gia: Giá sản phẩm
-                + ma_danh_muc: Mã danh mục
-                + ma_ncc: Mã nhà cung cấp
-        + Output: Không có
-        + Side effects:
-            - Kiểm tra và xử lý dữ liệu đầu vào
-            - Thêm mới hoặc cập nhật sản phẩm trong database
-            - Tải lại danh sách sản phẩm nếu thành công
-            - Hiển thị thông báo lỗi nếu thất bại
-        + Raises:
-            - ValueError khi giá không hợp lệ
-            - Exception khi lưu sản phẩm thất bại
-        """
+    def luu_san_pham(self, data):
         try:
             try:
                 price = float(data['don_gia'])
@@ -688,7 +572,7 @@ class ProductsPage(ctk.CTkFrame):
                 success = self.controller.themSanPham(product_data)
             
             if success:
-                self.load_products()
+                self.tai_san_pham()
             else:
                 from tkinter import messagebox
                 messagebox.showerror("Error", "Failed to save product")
@@ -700,7 +584,7 @@ class ProductsPage(ctk.CTkFrame):
             from tkinter import messagebox
             messagebox.showerror("Error", f"Failed to save product: {str(e)}")
 
-    def create_tooltip(self, widget, text):
+    def tao_goi_y(self, widget, text):
         def show_tooltip(event):
             tooltip = tk.Toplevel()
             tooltip.wm_overrideredirect(True)

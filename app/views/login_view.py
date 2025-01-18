@@ -20,27 +20,19 @@ class LoginView(ctk.CTkFrame):
         self.parent = parent
         ctk.set_appearance_mode("light")
         ctk.set_default_color_theme("blue")
-        
-        # Configure the parent window to be resizable
         parent.resizable(True, True)
         parent.minsize(1000, 600)
-        
-        # Configure the grid
         self.grid(row=0, column=0, sticky="nsew")
         parent.grid_rowconfigure(0, weight=1)
         parent.grid_columnconfigure(0, weight=1)
-        
         self._setup_ui()
 
     def _setup_ui(self):
         self.configure(fg_color="white")
-        
-        # Configure grid columns with weights
-        self.grid_columnconfigure(0, weight=1)  # Left side - exactly half
-        self.grid_columnconfigure(1, weight=1)  # Right side - exactly half
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
         
-        # Create left and right frames
         left_frame = ctk.CTkFrame(self, fg_color="white", corner_radius=0)
         left_frame.grid(row=0, column=0, sticky="nsew")
         left_frame.grid_columnconfigure(0, weight=1)
@@ -49,18 +41,16 @@ class LoginView(ctk.CTkFrame):
         right_frame = ctk.CTkFrame(self, fg_color="white", corner_radius=0)
         right_frame.grid(row=0, column=1, sticky="nsew", padx=(20, 20))
         
-        # Configure right frame grid
         right_frame.grid_columnconfigure(0, weight=1)
-        for i in range(10):  # Approximate number of rows needed
+        for i in range(10):
             right_frame.grid_rowconfigure(i, weight=1)
 
-        # Left side - Warehouse Image
         try:
             screen_height = self.winfo_screenheight()
             screen_width = self.winfo_screenwidth()
             warehouse_img = ctk.CTkImage(
                 light_image=Image.open(relative_to_assets("warehouse.png")),
-                size=(screen_width // 2, screen_height)  # Half width, full height
+                size=(screen_width // 2, screen_height)
             )
             self.image_label = ctk.CTkLabel(
                 left_frame,
@@ -69,7 +59,6 @@ class LoginView(ctk.CTkFrame):
             )
             self.image_label.grid(row=0, column=0, sticky="nsew")
 
-            # Bind resize event to update image size
             def update_image_size(event=None):
                 new_width = self.winfo_width() // 2
                 new_height = self.winfo_height()
@@ -77,7 +66,6 @@ class LoginView(ctk.CTkFrame):
             
             self.bind('<Configure>', update_image_size)
         except:
-            # Fallback if image not found
             self.image_label = ctk.CTkLabel(
                 left_frame,
                 text="Warehouse\nManagement\nSystem",
@@ -86,10 +74,8 @@ class LoginView(ctk.CTkFrame):
             )
             self.image_label.grid(row=0, column=0, sticky="nsew")
 
-        # Right side - Login Form
         current_row = 0
         
-        # Logo
         try:
             logo_img = ctk.CTkImage(
                 light_image=Image.open(relative_to_assets("logo.png")),
@@ -106,14 +92,12 @@ class LoginView(ctk.CTkFrame):
         except:
             current_row = 0
 
-        # Create a frame for the login form
         login_form_frame = ctk.CTkFrame(right_frame, fg_color="transparent")
         login_form_frame.grid(row=current_row, column=0, sticky="w", padx=(50, 20))
         login_form_frame.grid_columnconfigure(0, weight=1)
 
         form_row = 0
 
-        # Welcome Text
         self.welcome_label = ctk.CTkLabel(
             login_form_frame,
             text="Welcome ",
@@ -124,7 +108,6 @@ class LoginView(ctk.CTkFrame):
         self.welcome_label.grid(row=form_row, column=0, sticky="w", pady=(0, 20))
         form_row += 1
 
-        # Login Form
         self.username_label = ctk.CTkLabel(
             login_form_frame,
             text="Tên đăng nhập",
@@ -168,7 +151,6 @@ class LoginView(ctk.CTkFrame):
         self.password_entry.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
-        # Login Button
         self.login_button = ctk.CTkButton(
             login_form_frame,
             text="Đăng nhập",
@@ -181,7 +163,6 @@ class LoginView(ctk.CTkFrame):
         self.login_button.grid(row=form_row, column=0, sticky="w", pady=(10, 0))
         form_row += 1
 
-        # Register Link
         self.register_button = ctk.CTkButton(
             login_form_frame,
             text="Đăng ký",
@@ -205,13 +186,10 @@ class LoginView(ctk.CTkFrame):
             if user_data['ten_quyen'] == "registered_user":
                 messagebox.showerror("Thông báo", "Tài khoản cần được phê duyệt để có thể vào ứng dụng!")
                 return
-            # First destroy the login view
             self.destroy()
-            # Then destroy the parent window if it exists
             if hasattr(self, 'parent') and self.parent:
                 self.parent.destroy()
             
-            # Create the appropriate dashboard or show notice
             if user_data['ten_quyen'] == "administrator":
                 app = AdminDashboard(user_data=user_data)
                 app.mainloop()
@@ -222,7 +200,7 @@ class LoginView(ctk.CTkFrame):
                 app = UserDashboard(user_data=user_data)
                 app.mainloop()
         else:
-            messagebox.showerror("Lỗi", user_data)  # Show error message
+            messagebox.showerror("Lỗi", user_data)
 
     def _on_register_click(self):
         from app.views.register_view import RegisterView

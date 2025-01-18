@@ -18,11 +18,10 @@ class RegisterView(ctk.CTkFrame):
         ctk.set_appearance_mode("light")
         ctk.set_default_color_theme("blue")
         
-        # Configure the parent window to be resizable
         parent.resizable(True, True)
         parent.minsize(1000, 600)
         
-        # Configure the grid
+
         self.grid(row=0, column=0, sticky="nsew")
         parent.grid_rowconfigure(0, weight=1)
         parent.grid_columnconfigure(0, weight=1)
@@ -31,31 +30,27 @@ class RegisterView(ctk.CTkFrame):
 
     def _setup_ui(self):
         self.configure(fg_color="white")
-        
-        # Configure grid columns with weights
-        self.grid_columnconfigure(0, weight=1)  # Left side
-        self.grid_columnconfigure(1, weight=1)  # Right side
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
         
-        # Create left and right frames
         left_frame = ctk.CTkFrame(self, fg_color="white", corner_radius=0)
         left_frame.grid(row=0, column=0, sticky="nsew")
         
         right_frame = ctk.CTkFrame(self, fg_color="white", corner_radius=0)
         right_frame.grid(row=0, column=1, sticky="nsew", padx=(20, 20))
-        
-        # Configure right frame grid
+
         right_frame.grid_columnconfigure(0, weight=1)
-        for i in range(10):  # Approximate number of rows needed
+        for i in range(10):
             right_frame.grid_rowconfigure(i, weight=1)
 
-        # Left side - Warehouse Image
         try:
             screen_height = self.winfo_screenheight()
             screen_width = self.winfo_screenwidth()
             warehouse_img = ctk.CTkImage(
                 light_image=Image.open(relative_to_assets("warehouse.png")),
-                size=(screen_width // 2, screen_height)  # Half width, full height
+                size=(screen_width // 2, screen_height)
             )
             self.image_label = ctk.CTkLabel(
                 left_frame,
@@ -64,7 +59,6 @@ class RegisterView(ctk.CTkFrame):
             )
             self.image_label.grid(row=0, column=0, sticky="nsew")
 
-            # Bind resize event to update image size
             def update_image_size(event=None):
                 new_width = self.winfo_width() // 2
                 new_height = self.winfo_height()
@@ -72,7 +66,6 @@ class RegisterView(ctk.CTkFrame):
             
             self.bind('<Configure>', update_image_size)
         except:
-            # Fallback if image not found
             self.image_label = ctk.CTkLabel(
                 left_frame,
                 text="Warehouse\nManagement\nSystem",
@@ -81,10 +74,8 @@ class RegisterView(ctk.CTkFrame):
             )
             self.image_label.grid(row=0, column=0, sticky="nsew")
 
-        # Right side - Registration Form
         current_row = 0
-        
-        # Logo
+
         try:
             logo_img = ctk.CTkImage(
                 light_image=Image.open(relative_to_assets("logo.png")),
@@ -101,14 +92,12 @@ class RegisterView(ctk.CTkFrame):
         except:
             current_row = 0
 
-        # Create a frame for the registration form
         register_form_frame = ctk.CTkFrame(right_frame, fg_color="transparent")
         register_form_frame.grid(row=current_row, column=0, sticky="w", padx=(50, 20))
         register_form_frame.grid_columnconfigure(0, weight=1)
 
         form_row = 0
 
-        # Welcome Text
         self.welcome_label = ctk.CTkLabel(
             register_form_frame,
             text="Đăng ký tài khoản",
@@ -119,7 +108,6 @@ class RegisterView(ctk.CTkFrame):
         self.welcome_label.grid(row=form_row, column=0, sticky="w", pady=(0, 20))
         form_row += 1
 
-        # Username field
         self.username_label = ctk.CTkLabel(
             register_form_frame,
             text="Tên đăng nhập",
@@ -141,7 +129,6 @@ class RegisterView(ctk.CTkFrame):
         self.username_entry.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
-        # Full Name field (formerly Email field)
         self.fullName_label = ctk.CTkLabel(
             register_form_frame,
             text="Họ và tên",
@@ -163,7 +150,6 @@ class RegisterView(ctk.CTkFrame):
         self.fullName_entry.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
-        # Password field
         self.password_label = ctk.CTkLabel(
             register_form_frame,
             text="Mật khẩu",
@@ -186,7 +172,6 @@ class RegisterView(ctk.CTkFrame):
         self.password_entry.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
-        # Confirm Password field
         self.confirm_password_label = ctk.CTkLabel(
             register_form_frame,
             text="Xác nhận mật khẩu",
@@ -209,7 +194,6 @@ class RegisterView(ctk.CTkFrame):
         self.confirm_password_entry.grid(row=form_row, column=0, sticky="w")
         form_row += 1
 
-        # Register Button
         self.register_button = ctk.CTkButton(
             register_form_frame,
             text="Đăng ký",
@@ -222,7 +206,6 @@ class RegisterView(ctk.CTkFrame):
         self.register_button.grid(row=form_row, column=0, sticky="w", pady=(20, 0))
         form_row += 1
 
-        # Login Link
         self.login_button = ctk.CTkButton(
             register_form_frame,
             text="Đã có tài khoản? Đăng nhập",
