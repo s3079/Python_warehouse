@@ -18,7 +18,7 @@ class CategoriesPage(ctk.CTkFrame):
         self.tu_khoa_tim = ""
         
 
-        assets_path = Path(__file__).parent.parent.parent / 'assets' / 'icons'
+        assets_path = Path(__file__).parent.parent.parent/ 'app' / 'assets' / 'icons'
         self.search_icon = ctk.CTkImage(
             light_image=Image.open(str(assets_path / 'search.png')),
             size=(20, 20)
