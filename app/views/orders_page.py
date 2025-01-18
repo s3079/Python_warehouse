@@ -333,10 +333,10 @@ class OrdersPage(ctk.CTkFrame):
             if success:
                 self.taiDonHang()
                 from tkinter import messagebox
-                messagebox.showinfo("Success", "Order updated successfully!")
+                messagebox.showinfo("Success", "Cập nhật đơn hàng thành công")
             else:
                 from tkinter import messagebox
-                messagebox.showerror("Error", "Failed to update order")
+                messagebox.showerror("Error", "Cập nhật đơn hàng thất bại")
         except Exception as e:
             from tkinter import messagebox
             messagebox.showerror("Error", str(e))
@@ -346,7 +346,7 @@ class OrdersPage(ctk.CTkFrame):
             from tkinter import messagebox
             messagebox.showinfo("Thông báo", "Tính năng dành cho người quản lý")
             return
-        dialog = CenterDialog(self, "Delete Order")
+        dialog = CenterDialog(self, "Xoá đơn hàng")
         
         content_frame = ctk.CTkFrame(dialog, fg_color="transparent")
         content_frame.pack(fill="both", expand=True, padx=20, pady=20)
