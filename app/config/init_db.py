@@ -35,19 +35,27 @@ def init_database():
                 conn.commit()
             print("Cấu trúc cơ sở dữ liệu đã được tạo thành công.")
 
-            sample_data_path = os.path.join(current_dir, 'sample_data.sql')
-            with open(sample_data_path, 'r') as sample_file:
-                sample_script = sample_file.read()
-                statements = sample_script.split(';')
-            
-                for statement in statements:
-                    if statement.strip():
-                        try:
-                            cursor.execute(statement)
-                        except Error as e:
-                            print(f"Error executing statement: {e}")
-                conn.commit()
-            print("Dữ liệu mẫu đã được chèn thành công.")
+            # Check if database is empty
+            cursor.execute("SELECT COUNT(*) FROM NGUOIDUNG")
+            user_count = cursor.fetchone()[0]
+
+            if user_count == 0:
+                # Load sample data only if database is empty
+                sample_data_path = os.path.join(current_dir, 'sample_data.sql')
+                with open(sample_data_path, 'r') as sample_file:
+                    sample_script = sample_file.read()
+                    statements = sample_script.split(';')
+                
+                    for statement in statements:
+                        if statement.strip():
+                            try:
+                                cursor.execute(statement)
+                            except Error as e:
+                                print(f"Error executing statement: {e}")
+                    conn.commit()
+                print("Dữ liệu mẫu đã được chèn thành công.")
+            else:
+                print("Đã có dữ liệu trong cơ sở dữ liệu, bỏ qua việc chèn dữ liệu mẫu.")
 
             cursor.execute("SELECT ma_nguoi_dung FROM NGUOIDUNG WHERE ten_dang_nhap = 'admin'")
             admin_exists = cursor.fetchone()
